@@ -28,7 +28,7 @@ import { TestWorkflowInstructions } from './test-workflow-instructions';
 import { SnippetLanguage } from './types';
 
 const tabsTriggerClassName = 'pt-1';
-const codePanelClassName = 'bg-background flex-1 w-full rounded-lg border border-neutral-200 p-3 overflow-y-auto';
+const codePanelClassName = '';
 
 const LANGUAGE_TO_SNIPPET_UTIL: Record<SnippetLanguage, (props: CodeSnippet) => string> = {
   shell: createCurlSnippet,
@@ -141,8 +141,8 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                 </TabsTrigger>
                 <Button
                   mode="ghost"
-                  variant="secondary"
-                  className="text-foreground-400 ml-auto"
+                  variant="primary"
+                  className="ml-auto"
                   size="xs"
                   onClick={() => setShowInstructions(true)}
                 >
@@ -151,19 +151,19 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                 </Button>
               </TabsList>
               <TabsContent value="shell" className={codePanelClassName} variant="regular">
-                <SnippetEditor language="shell" value={snippetValue} readOnly />
+                <SnippetEditor language="shell" value={snippetValue} />
               </TabsContent>
               <TabsContent value="typescript" className={codePanelClassName} variant="regular">
-                <SnippetEditor language="typescript" value={snippetValue} readOnly />
+                <SnippetEditor language="typescript" value={snippetValue} />
               </TabsContent>
               <TabsContent value="php" className={codePanelClassName} variant="regular">
-                <SnippetEditor language="php" value={snippetValue} readOnly />
+                <SnippetEditor language="php" value={snippetValue} />
               </TabsContent>
               <TabsContent value="go" className={codePanelClassName} variant="regular">
-                <SnippetEditor language="go" value={snippetValue} readOnly />
+                <SnippetEditor language="go" value={snippetValue} />
               </TabsContent>
               <TabsContent value="python" className={codePanelClassName} variant="regular">
-                <SnippetEditor language="python" value={snippetValue} readOnly />
+                <SnippetEditor language="python" value={snippetValue} />
               </TabsContent>
             </Tabs>
           </Panel>

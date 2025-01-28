@@ -1,21 +1,27 @@
-import { useState } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
+import { langs, loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { materialDark } from '@uiw/codemirror-theme-material';
+import CodeMirror from '@uiw/react-codemirror';
 import { Check, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 import { RiFileCopyLine } from 'react-icons/ri';
 import { cn } from '../../utils/ui';
-import { langs, loadLanguage } from '@uiw/codemirror-extensions-langs';
 
 loadLanguage('tsx');
 loadLanguage('json');
 loadLanguage('shell');
 loadLanguage('typescript');
+loadLanguage('php');
+loadLanguage('go');
+loadLanguage('python');
 
 const languageMap = {
   typescript: langs.typescript,
   tsx: langs.tsx,
   json: langs.json,
   shell: langs.shell,
+  php: langs.php,
+  go: langs.go,
+  python: langs.python,
 } as const;
 
 export type Language = keyof typeof languageMap;
