@@ -71,6 +71,22 @@ export class BaseRepository<T_DBModel, T_MappedEntity, T_Enforcement> {
     return this.mapEntity(data.toObject());
   }
 
+  async findOneAndUpdate(
+    query: FilterQuery<T_DBModel> & T_Enforcement,
+    update: UpdateQuery<T_DBModel>,
+    options: QueryOptions<T_DBModel> = {}
+  ): Promise<T_MappedEntity | null> {
+    const data = await this.MongooseModel.findOneAndUpdate(query, update, {
+      ...options,
+      upsert: options.upsert || false,
+      new: options.new || false,
+    });
+
+    if (!data) return null;
+
+    return this.mapEntity(data.toObject());
+  }
+
   async delete(query: FilterQuery<T_DBModel> & T_Enforcement): Promise<{
     /** Indicates whether this writes result was acknowledged. If not, then all other members of this result will be undefined. */
     acknowledged: boolean;

@@ -3,7 +3,6 @@ import { addBreadcrumb } from '@sentry/node';
 
 import {
   EnvironmentRepository,
-  IntegrationRepository,
   JobEntity,
   JobRepository,
   NotificationTemplateEntity,
@@ -12,14 +11,11 @@ import {
 } from '@novu/dal';
 import {
   AddressingTypeEnum,
-  ChannelTypeEnum,
   ISubscribersDefine,
   ITenantDefine,
-  ProvidersIdEnum,
   TriggerRecipientSubscriber,
   TriggerTenantContext,
 } from '@novu/shared';
-
 import { Instrument, InstrumentUsecase } from '../../instrumentation';
 import { PinoLogger } from '../../logging';
 import { AnalyticsService } from '../../services/analytics.service';
@@ -47,7 +43,6 @@ const LOG_CONTEXT = 'TriggerEventUseCase';
 export class TriggerEvent {
   constructor(
     private processSubscriber: ProcessSubscriber,
-    private integrationRepository: IntegrationRepository,
     private environmentRepository: EnvironmentRepository,
     private jobRepository: JobRepository,
     private notificationTemplateRepository: NotificationTemplateRepository,
@@ -67,10 +62,24 @@ export class TriggerEvent {
         actor: this.mapActor(command.actor),
       };
 
-      Logger.debug(mappedCommand.actor);
-
       const { environmentId, identifier, organizationId, userId } =
         mappedCommand;
+
+      const environment = await this.environmentRepository.findOne({
+        _id: environmentId,
+      });
+
+      if (!environment) {
+        throw new ApiException('Environment not found');
+      }
+
+      this.logger.assign({
+        transactionId: mappedCommand.transactionId,
+        environmentId: mappedCommand.environmentId,
+        organizationId: mappedCommand.organizationId,
+      });
+
+      Logger.debug(mappedCommand.actor);
 
       await this.validateTransactionIdProperty(
         mappedCommand.transactionId,
@@ -82,12 +91,6 @@ export class TriggerEvent {
         data: {
           triggerIdentifier: identifier,
         },
-      });
-
-      this.logger.assign({
-        transactionId: mappedCommand.transactionId,
-        environmentId: mappedCommand.environmentId,
-        organizationId: mappedCommand.organizationId,
       });
 
       let storedWorkflow: NotificationTemplateEntity | null = null;
@@ -138,14 +141,6 @@ export class TriggerEvent {
             subscriber: mappedCommand.actor,
           }),
         );
-      }
-
-      const environment = await this.environmentRepository.findOne({
-        _id: environmentId,
-      });
-
-      if (!environment) {
-        throw new ApiException('Environment not found');
       }
 
       switch (mappedCommand.addressingType) {
@@ -277,47 +272,6 @@ export class TriggerEvent {
         'transactionId property is not unique, please make sure all triggers have a unique transactionId',
       );
     }
-  }
-
-  @Instrument()
-  private async validateSubscriberIdProperty(
-    to: ISubscribersDefine[],
-  ): Promise<boolean> {
-    for (const subscriber of to) {
-      const subscriberIdExists =
-        typeof subscriber === 'string' ? subscriber : subscriber.subscriberId;
-
-      if (Array.isArray(subscriberIdExists)) {
-        throw new ApiException(
-          'subscriberId under property to is type array, which is not allowed please make sure all subscribers ids are strings',
-        );
-      }
-
-      if (!subscriberIdExists) {
-        throw new ApiException(
-          'subscriberId under property to is not configured, please make sure all subscribers contains subscriberId property',
-        );
-      }
-    }
-
-    return true;
-  }
-
-  @Instrument()
-  private async getProviderId(
-    environmentId: string,
-    channelType: ChannelTypeEnum,
-  ): Promise<ProvidersIdEnum> {
-    const integration = await this.integrationRepository.findOne(
-      {
-        _environmentId: environmentId,
-        active: true,
-        channel: channelType,
-      },
-      'providerId',
-    );
-
-    return integration?.providerId as ProvidersIdEnum;
   }
 
   private mapTenant(tenant: TriggerTenantContext): ITenantDefine | null {
