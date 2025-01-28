@@ -1,28 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SubscriberEntity, SubscriberRepository } from '@novu/dal';
 import { CustomDataType, IGetSubscriberResponseDto } from '@novu/shared';
-import { GetSubscriberCommand } from '../get-subscriber/get-subscriber.command';
-import { GetSubscriber } from '../get-subscriber/get-subscriber.usecase';
 import { PatchSubscriberCommand } from './patch-subscriber.command';
 
 @Injectable()
 export class PatchSubscriber {
-  constructor(
-    private subscriberRepository: SubscriberRepository,
-    private getSubscriberUsecase: GetSubscriber
-  ) {}
+  constructor(private subscriberRepository: SubscriberRepository) {}
 
   async execute(command: PatchSubscriberCommand): Promise<IGetSubscriberResponseDto> {
-    const subscriber = await this.fetchSubscriber({
-      subscriberId: command.subscriberId,
-      _environmentId: command.environmentId,
-      _organizationId: command.organizationId,
-    });
-
-    if (!subscriber) {
-      throw new NotFoundException(`Subscriber: ${command.subscriberId} was not found`);
-    }
-
     const payload: Partial<SubscriberEntity> = {};
 
     if (command.firstName !== undefined && command.firstName !== null) {
@@ -57,17 +42,19 @@ export class PatchSubscriber {
       payload.data = command.data as CustomDataType;
     }
 
-    if (Object.keys(payload).length === 0) {
-      return subscriber;
-    }
-
     const updatedSubscriber = await this.subscriberRepository.findOneAndUpdate(
-      { _id: subscriber._id, _environmentId: command.environmentId, _organizationId: command.organizationId },
+      {
+        subscriberId: command.subscriberId,
+        _environmentId: command.environmentId,
+        _organizationId: command.organizationId,
+      },
       { ...payload },
       {
         new: true,
         projection: {
+          _environmentId: 1,
           _id: 1,
+          _organizationId: 1,
           avatar: 1,
           data: 1,
           email: 1,
@@ -77,8 +64,6 @@ export class PatchSubscriber {
           phone: 1,
           subscriberId: 1,
           timezone: 1,
-          _organizationId: 1,
-          _environmentId: 1,
         },
       }
     );
@@ -88,23 +73,5 @@ export class PatchSubscriber {
     }
 
     return updatedSubscriber;
-  }
-
-  private async fetchSubscriber({
-    subscriberId,
-    _environmentId,
-    _organizationId,
-  }: {
-    subscriberId: string;
-    _environmentId: string;
-    _organizationId: string;
-  }): Promise<IGetSubscriberResponseDto> {
-    return await this.getSubscriberUsecase.execute(
-      GetSubscriberCommand.create({
-        subscriberId,
-        environmentId: _environmentId,
-        organizationId: _organizationId,
-      })
-    );
   }
 }
