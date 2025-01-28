@@ -3,7 +3,10 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
+  Max,
+  Min,
 } from 'class-validator';
 
 import { DirectionEnum, UserSessionData } from '@novu/shared';
@@ -95,4 +98,19 @@ export abstract class EnvironmentCommand extends BaseCommand {
 
   @IsNotEmpty()
   readonly organizationId: string;
+}
+export abstract class CursorBasedPaginatedCommand extends EnvironmentWithUserObjectCommand {
+  @IsDefined()
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  limit: number;
+
+  @IsString()
+  @IsOptional()
+  after?: string;
+
+  @IsString()
+  @IsOptional()
+  before?: string;
 }

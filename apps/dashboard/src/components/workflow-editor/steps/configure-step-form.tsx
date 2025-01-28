@@ -346,10 +346,12 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                   >
                     <RiGuideFill className="h-4 w-4 text-neutral-600" />
                     Skip Conditions
-                    <span className="ml-auto flex items-center gap-0.5">
-                      <span>{conditionsCount}</span>
-                      <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-                    </span>
+                    {conditionsCount > 0 && (
+                      <span className="ml-auto flex items-center gap-0.5">
+                        <span>{conditionsCount}</span>
+                        <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+                      </span>
+                    )}
                   </Button>
                 </Link>
               </SidebarContent>
