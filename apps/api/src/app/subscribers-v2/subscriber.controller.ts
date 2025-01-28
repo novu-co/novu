@@ -28,7 +28,7 @@ export class SubscriberController {
         after: query.after,
         before: query.before,
         orderDirection: query.orderDirection || DirectionEnum.DESC,
-        orderBy: query.orderBy || 'createdAt',
+        orderBy: query.orderBy || '_id',
         email: query.email,
         phone: query.phone,
         subscriberId: query.subscriberId,

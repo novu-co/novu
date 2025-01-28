@@ -7,9 +7,9 @@ export class ListSubscribersCommand extends CursorBasedPaginatedCommand {
   @IsOptional()
   orderDirection: DirectionEnum = DirectionEnum.DESC;
 
-  @IsEnum(['updatedAt', 'createdAt'])
+  @IsEnum(['updatedAt', '_id'])
   @IsOptional()
-  orderBy: 'updatedAt' | 'createdAt' = 'createdAt';
+  orderBy: 'updatedAt' | '_id' = '_id';
 
   @IsString()
   @IsOptional()
