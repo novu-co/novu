@@ -48,4 +48,5 @@ export enum TelemetryEvent {
   ENVIRONMENTS_PAGE_VIEWED = 'Environments Page Viewed',
   CREATE_ENVIRONMENT_CLICK = 'Create Environment Click',
   UPGRADE_TO_BUSINESS_TIER_CLICK = 'Upgrade to Business Tier Click',
+  SUBSCRIBERS_PAGE_VISIT = 'Subscribers page visit',
 }
