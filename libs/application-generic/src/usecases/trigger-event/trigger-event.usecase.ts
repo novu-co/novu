@@ -22,7 +22,7 @@ import {
 
 import { Instrument, InstrumentUsecase } from '../../instrumentation';
 import { PinoLogger } from '../../logging';
-import { AnalyticsService } from '../../services';
+import { AnalyticsService } from '../../services/analytics.service';
 import {
   buildNotificationTemplateIdentifierKey,
   CachedEntity,
@@ -233,7 +233,7 @@ export class TriggerEvent {
     if (workflow) {
       // We only consider trigger when it's coming from the backend SDK
       if (!command.payload?.__source) {
-        await this.notificationTemplateRepository.update(
+        await this.notificationTemplateRepository.updateOne(
           {
             _id: workflow._id,
             _environmentId: command.environmentId,
