@@ -247,7 +247,7 @@ export class TriggerEvent {
         /**
          * Update the entry to cache it with the new lastTriggeredAt
          */
-        workflow.lastTriggeredAt = lastTriggeredAt;
+        workflow.lastTriggeredAt = lastTriggeredAt.toISOString();
       }
     }
 
