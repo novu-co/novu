@@ -92,37 +92,13 @@ export class TriggerEvent {
 
       let storedWorkflow: NotificationTemplateEntity | null = null;
       if (!command.bridgeWorkflow) {
-        storedWorkflow = await this.getNotificationTemplateByTriggerIdentifier({
+        storedWorkflow = await this.getAndUpdateWorkflowById({
           environmentId: mappedCommand.environmentId,
           triggerIdentifier: mappedCommand.identifier,
+          payload: mappedCommand.payload,
+          organizationId: mappedCommand.organizationId,
+          userId: mappedCommand.userId,
         });
-
-        if (!command.payload?.__source) {
-          await this.notificationTemplateRepository.update(
-            {
-              _id: storedWorkflow._id,
-              _environmentId: command.environmentId,
-            },
-            {
-              $set: {
-                lastTriggeredAt: new Date(),
-              },
-            },
-          );
-
-          if (!storedWorkflow.lastTriggeredAt) {
-            this.analyticsService.track(
-              'Workflow Connected to Backend SDK - [API]',
-              command.userId,
-              {
-                name: storedWorkflow.name,
-                origin: storedWorkflow.origin,
-                _organization: command.organizationId,
-                _environment: command.environmentId,
-              },
-            );
-          }
-        }
       }
 
       if (!storedWorkflow && !command.bridgeWorkflow) {
@@ -237,15 +213,54 @@ export class TriggerEvent {
         _environmentId: command.environmentId,
         templateIdentifier: command.triggerIdentifier,
       }),
+    options: {
+      ttl: 120, // seconds
+    },
   })
-  private async getNotificationTemplateByTriggerIdentifier(command: {
+  private async getAndUpdateWorkflowById(command: {
     triggerIdentifier: string;
     environmentId: string;
+    payload: Record<string, any>;
+    organizationId: string;
+    userId: string;
   }) {
-    return await this.notificationTemplateRepository.findByTriggerIdentifier(
-      command.environmentId,
-      command.triggerIdentifier,
-    );
+    const workflow =
+      await this.notificationTemplateRepository.findByTriggerIdentifier(
+        command.environmentId,
+        command.triggerIdentifier,
+      );
+
+    if (workflow) {
+      // We only consider trigger when it's coming from the backend SDK
+      if (!command.payload?.__source) {
+        await this.notificationTemplateRepository.update(
+          {
+            _id: workflow._id,
+            _environmentId: command.environmentId,
+          },
+          {
+            $set: {
+              lastTriggeredAt: new Date(),
+            },
+          },
+        );
+
+        if (!workflow.lastTriggeredAt) {
+          this.analyticsService.track(
+            'Workflow Connected to Backend SDK - [API]',
+            command.userId,
+            {
+              name: workflow.name,
+              origin: workflow.origin,
+              _organization: command.organizationId,
+              _environment: command.environmentId,
+            },
+          );
+        }
+      }
+    }
+
+    return workflow;
   }
 
   @Instrument()
