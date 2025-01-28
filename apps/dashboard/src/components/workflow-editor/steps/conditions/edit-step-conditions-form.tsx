@@ -102,7 +102,7 @@ export const EditStepConditionsForm = () => {
     const updateStepData: Partial<StepUpdateDto> = {
       controlValues: { ...step.controls.values, skip },
     };
-    if (typeof skip === 'boolean') {
+    if (!skip) {
       updateStepData.controlValues!.skip = null;
     }
 
