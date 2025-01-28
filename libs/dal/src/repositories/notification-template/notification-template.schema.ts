@@ -204,9 +204,9 @@ const notificationTemplateSchema = new Schema<NotificationTemplateDBModel>(
     status: {
       type: Schema.Types.String,
     },
-    connected: {
-      type: Schema.Types.Boolean,
-      default: false,
+    lastTriggeredAt: {
+      type: Schema.Types.Date,
+      default: null,
     },
     _environmentId: {
       type: Schema.Types.ObjectId,

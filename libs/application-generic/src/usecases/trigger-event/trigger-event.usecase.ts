@@ -2,13 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { addBreadcrumb } from '@sentry/node';
 
 import {
+  EnvironmentRepository,
   IntegrationRepository,
   JobEntity,
   JobRepository,
+  NotificationTemplateEntity,
   NotificationTemplateRepository,
   SubscriberEntity,
-  NotificationTemplateEntity,
-  EnvironmentRepository,
 } from '@novu/dal';
 import {
   AddressingTypeEnum,
@@ -20,26 +20,26 @@ import {
   TriggerTenantContext,
 } from '@novu/shared';
 
-import { GetActionEnum, PostActionEnum } from '@novu/framework/internal';
-import { TriggerEventCommand } from './trigger-event.command';
-import {
-  ProcessSubscriber,
-  ProcessSubscriberCommand,
-} from '../process-subscriber';
-import { PinoLogger } from '../../logging';
 import { Instrument, InstrumentUsecase } from '../../instrumentation';
+import { PinoLogger } from '../../logging';
+import { AnalyticsService } from '../../services';
 import {
   buildNotificationTemplateIdentifierKey,
   CachedEntity,
 } from '../../services/cache';
 import { ApiException } from '../../utils/exceptions';
+import {
+  ProcessSubscriber,
+  ProcessSubscriberCommand,
+} from '../process-subscriber';
 import { ProcessTenant, ProcessTenantCommand } from '../process-tenant';
-import { TriggerBroadcast } from '../trigger-broadcast/trigger-broadcast.usecase';
 import { TriggerBroadcastCommand } from '../trigger-broadcast/trigger-broadcast.command';
+import { TriggerBroadcast } from '../trigger-broadcast/trigger-broadcast.usecase';
 import {
   TriggerMulticast,
   TriggerMulticastCommand,
 } from '../trigger-multicast';
+import { TriggerEventCommand } from './trigger-event.command';
 
 const LOG_CONTEXT = 'TriggerEventUseCase';
 
@@ -55,6 +55,7 @@ export class TriggerEvent {
     private logger: PinoLogger,
     private triggerBroadcast: TriggerBroadcast,
     private triggerMulticast: TriggerMulticast,
+    private analyticsService: AnalyticsService,
   ) {}
 
   @InstrumentUsecase()
@@ -95,6 +96,33 @@ export class TriggerEvent {
           environmentId: mappedCommand.environmentId,
           triggerIdentifier: mappedCommand.identifier,
         });
+
+        if (!command.payload?.__source) {
+          await this.notificationTemplateRepository.update(
+            {
+              _id: storedWorkflow._id,
+              _environmentId: command.environmentId,
+            },
+            {
+              $set: {
+                lastTriggeredAt: new Date(),
+              },
+            },
+          );
+
+          if (!storedWorkflow.lastTriggeredAt) {
+            this.analyticsService.track(
+              'Workflow Connected to Backend SDK - [API]',
+              command.userId,
+              {
+                name: storedWorkflow.name,
+                origin: storedWorkflow.origin,
+                _organization: command.organizationId,
+                _environment: command.environmentId,
+              },
+            );
+          }
+        }
       }
 
       if (!storedWorkflow && !command.bridgeWorkflow) {

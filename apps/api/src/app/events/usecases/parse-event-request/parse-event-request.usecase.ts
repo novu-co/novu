@@ -175,34 +175,6 @@ export class ParseEventRequest {
 
     const result = await this.dispatchEvent(command, transactionId);
 
-    if (!template.connected && !command.payload?.__source) {
-      await this.notificationTemplateRepository.updateOne(
-        {
-          _environmentId: command.environmentId,
-          _id: template._id,
-        },
-        {
-          $set: {
-            connected: true,
-          },
-        }
-      );
-
-      await this.invalidateCacheService.invalidateByKey({
-        key: buildNotificationTemplateIdentifierKey({
-          _environmentId: command.environmentId,
-          templateIdentifier: command.identifier,
-        }),
-      });
-
-      this.analyticsService.track('Workflow Connected to Backend SDK - [API]', command.userId, {
-        name: template.name,
-        origin: template.origin,
-        _organization: command.organizationId,
-        _environment: command.environmentId,
-      });
-    }
-
     return result;
   }
 

@@ -40,7 +40,7 @@ export function toResponseWorkflowDto(
     createdAt: workflow.createdAt || 'Missing Create At',
     status: workflow.status || WorkflowStatusEnum.ACTIVE,
     issues: workflow.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssueDto>,
-    connected: workflow.connected,
+    lastTriggeredAt: workflow.lastTriggeredAt?.toISOString(),
   };
 }
 

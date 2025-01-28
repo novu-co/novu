@@ -55,7 +55,7 @@ export type WorkflowResponseDto = WorkflowCommonsFields & {
   preferences: PreferencesResponseDto;
   status: WorkflowStatusEnum;
   issues?: Record<WorkflowCreateAndUpdateKeys, RuntimeIssueDto>;
-  connected?: boolean;
+  lastTriggeredAt?: string;
 };
 export type WorkflowCreateAndUpdateKeys = keyof CreateWorkflowDto | keyof UpdateWorkflowDto;
 export class RuntimeIssueDto {

@@ -194,16 +194,22 @@ function useChecklistItems(steps: Step[]) {
           ]
         : []),
       {
-        title: 'Trigger from your application',
-        isCompleted: () => workflow?.connected ?? false,
+        key: 'trigger',
+        title: 'Trigger workflow',
+        description: 'Trigger the workflow to test it in production',
+        isCompleted: () => workflow?.lastTriggeredAt !== undefined,
         onClick: () => {
-          telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_STEP_CLICKED, { stepTitle: 'Trigger from your application' });
+          telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_STEP_CLICKED, { stepTitle: 'Trigger workflow' });
           navigate(
             buildRoute(ROUTES.TEST_WORKFLOW, {
               environmentSlug: currentEnvironment?.slug ?? '',
               workflowSlug: workflow?.slug ?? '',
             })
           );
+        },
+        link: {
+          text: 'Learn how to trigger',
+          url: 'https://docs.novu.co/platform/triggers',
         },
       },
     ],
