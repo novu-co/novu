@@ -1,5 +1,4 @@
 import { ChatProviderIdEnum, ISubscriberChannel, PushProviderIdEnum } from '../../types';
-import { CursorPaginationDto } from '../pagination';
 
 interface IChannelCredentials {
   webhookUrl?: string;
