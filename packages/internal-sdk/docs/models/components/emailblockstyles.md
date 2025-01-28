@@ -6,7 +6,7 @@
 import { EmailBlockStyles } from "@novu/api/models/components";
 
 let value: EmailBlockStyles = {
-  textAlign: "center",
+  textAlign: "left",
 };
 ```
 

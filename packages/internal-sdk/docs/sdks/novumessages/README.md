@@ -102,7 +102,7 @@ import {
 
 ### Response
 
-**Promise\<[operations.SubscribersControllerMarkMessagesAsResponse](../../models/operations/subscriberscontrollermarkmessagesasresponse.md)\>**
+**Promise\<[operations.SubscribersV1ControllerMarkMessagesAsResponse](../../models/operations/subscribersv1controllermarkmessagesasresponse.md)\>**
 
 ### Errors
 
@@ -205,7 +205,7 @@ import {
 
 ### Response
 
-**Promise\<[operations.SubscribersControllerMarkAllUnreadAsReadResponse](../../models/operations/subscriberscontrollermarkallunreadasreadresponse.md)\>**
+**Promise\<[operations.SubscribersV1ControllerMarkAllUnreadAsReadResponse](../../models/operations/subscribersv1controllermarkallunreadasreadresponse.md)\>**
 
 ### Errors
 
@@ -309,14 +309,14 @@ import {
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.SubscribersControllerMarkActionAsSeenRequest](../../models/operations/subscriberscontrollermarkactionasseenrequest.md)                                             | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `request`                                                                                                                                                                      | [operations.SubscribersV1ControllerMarkActionAsSeenRequest](../../models/operations/subscribersv1controllermarkactionasseenrequest.md)                                         | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
 
 ### Response
 
-**Promise\<[operations.SubscribersControllerMarkActionAsSeenResponse](../../models/operations/subscriberscontrollermarkactionasseenresponse.md)\>**
+**Promise\<[operations.SubscribersV1ControllerMarkActionAsSeenResponse](../../models/operations/subscribersv1controllermarkactionasseenresponse.md)\>**
 
 ### Errors
 

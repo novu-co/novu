@@ -5,7 +5,7 @@
 ```typescript
 import { MarkAs } from "@novu/api/models/components";
 
-let value: MarkAs = "read";
+let value: MarkAs = "unread";
 ```
 
 ## Values

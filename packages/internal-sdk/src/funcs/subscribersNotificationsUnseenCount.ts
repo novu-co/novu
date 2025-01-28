@@ -28,11 +28,11 @@ import { Result } from "../types/fp.js";
  */
 export async function subscribersNotificationsUnseenCount(
   client: NovuCore,
-  request: operations.SubscribersControllerGetUnseenCountRequest,
+  request: operations.SubscribersV1ControllerGetUnseenCountRequest,
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerGetUnseenCountResponse,
+    operations.SubscribersV1ControllerGetUnseenCountResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -49,7 +49,7 @@ export async function subscribersNotificationsUnseenCount(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.SubscribersControllerGetUnseenCountRequest$outboundSchema
+      operations.SubscribersV1ControllerGetUnseenCountRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -88,7 +88,7 @@ export async function subscribersNotificationsUnseenCount(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_getUnseenCount",
+    operationID: "SubscribersV1Controller_getUnseenCount",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -157,7 +157,7 @@ export async function subscribersNotificationsUnseenCount(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerGetUnseenCountResponse,
+    operations.SubscribersV1ControllerGetUnseenCountResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -172,7 +172,7 @@ export async function subscribersNotificationsUnseenCount(
   >(
     M.json(
       200,
-      operations.SubscribersControllerGetUnseenCountResponse$inboundSchema,
+      operations.SubscribersV1ControllerGetUnseenCountResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

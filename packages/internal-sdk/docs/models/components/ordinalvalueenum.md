@@ -7,7 +7,7 @@ Value of the ordinal
 ```typescript
 import { OrdinalValueEnum } from "@novu/api/models/components";
 
-let value: OrdinalValueEnum = "sunday";
+let value: OrdinalValueEnum = "tuesday";
 ```
 
 ## Values

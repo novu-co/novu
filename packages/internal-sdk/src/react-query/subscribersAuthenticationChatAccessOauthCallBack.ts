@@ -31,13 +31,13 @@ import {
 export { ChatAccessOauthCallBackAcceptEnum } from "../funcs/subscribersAuthenticationChatAccessOauthCallBack.js";
 
 export type SubscribersAuthenticationChatAccessOauthCallBackQueryData =
-  operations.SubscribersControllerChatOauthCallbackResponse;
+  operations.SubscribersV1ControllerChatOauthCallbackResponse;
 
 /**
  * Handle providers oauth redirect
  */
 export function useSubscribersAuthenticationChatAccessOauthCallBack(
-  request: operations.SubscribersControllerChatOauthCallbackRequest,
+  request: operations.SubscribersV1ControllerChatOauthCallbackRequest,
   options?: QueryHookOptions<
     SubscribersAuthenticationChatAccessOauthCallBackQueryData
   >,
@@ -60,7 +60,7 @@ export function useSubscribersAuthenticationChatAccessOauthCallBack(
  * Handle providers oauth redirect
  */
 export function useSubscribersAuthenticationChatAccessOauthCallBackSuspense(
-  request: operations.SubscribersControllerChatOauthCallbackRequest,
+  request: operations.SubscribersV1ControllerChatOauthCallbackRequest,
   options?: SuspenseQueryHookOptions<
     SubscribersAuthenticationChatAccessOauthCallBackQueryData
   >,
@@ -82,7 +82,7 @@ export function useSubscribersAuthenticationChatAccessOauthCallBackSuspense(
 export function prefetchSubscribersAuthenticationChatAccessOauthCallBack(
   queryClient: QueryClient,
   client$: NovuCore,
-  request: operations.SubscribersControllerChatOauthCallbackRequest,
+  request: operations.SubscribersV1ControllerChatOauthCallbackRequest,
 ): Promise<void> {
   return queryClient.prefetchQuery({
     ...buildSubscribersAuthenticationChatAccessOauthCallBackQuery(
@@ -156,7 +156,7 @@ export function invalidateAllSubscribersAuthenticationChatAccessOauthCallBack(
 
 export function buildSubscribersAuthenticationChatAccessOauthCallBackQuery(
   client$: NovuCore,
-  request: operations.SubscribersControllerChatOauthCallbackRequest,
+  request: operations.SubscribersV1ControllerChatOauthCallbackRequest,
   options?: RequestOptions & {
     acceptHeaderOverride?: ChatAccessOauthCallBackAcceptEnum;
   },

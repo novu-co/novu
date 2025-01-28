@@ -7,7 +7,7 @@ Status of the execution detail
 ```typescript
 import { ExecutionDetailsStatusEnum } from "@novu/api/models/components";
 
-let value: ExecutionDetailsStatusEnum = "ReadConfirmation";
+let value: ExecutionDetailsStatusEnum = "Warning";
 ```
 
 ## Values

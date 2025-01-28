@@ -22,7 +22,7 @@ export class Properties extends ClientSDK {
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
   ): Promise<
-    operations.SubscribersControllerUpdateSubscriberOnlineFlagResponse
+    operations.SubscribersV1ControllerUpdateSubscriberOnlineFlagResponse
   > {
     return unwrapAsync(subscribersPropertiesUpdateOnlineFlag(
       this,

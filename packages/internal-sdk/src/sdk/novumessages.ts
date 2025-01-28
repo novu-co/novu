@@ -19,7 +19,7 @@ export class NovuMessages extends ClientSDK {
     subscriberId: string,
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerMarkMessagesAsResponse> {
+  ): Promise<operations.SubscribersV1ControllerMarkMessagesAsResponse> {
     return unwrapAsync(subscribersMessagesMarkAllAs(
       this,
       messageMarkAsRequestDto,
@@ -37,7 +37,7 @@ export class NovuMessages extends ClientSDK {
     subscriberId: string,
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerMarkAllUnreadAsReadResponse> {
+  ): Promise<operations.SubscribersV1ControllerMarkAllUnreadAsReadResponse> {
     return unwrapAsync(subscribersMessagesMarkAll(
       this,
       markAllMessageAsRequestDto,
@@ -51,9 +51,9 @@ export class NovuMessages extends ClientSDK {
    * Mark message action as seen
    */
   async updateAsSeen(
-    request: operations.SubscribersControllerMarkActionAsSeenRequest,
+    request: operations.SubscribersV1ControllerMarkActionAsSeenRequest,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerMarkActionAsSeenResponse> {
+  ): Promise<operations.SubscribersV1ControllerMarkActionAsSeenResponse> {
     return unwrapAsync(subscribersMessagesUpdateAsSeen(
       this,
       request,

@@ -35,7 +35,7 @@ export async function subscribersMessagesMarkAll(
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerMarkAllUnreadAsReadResponse,
+    operations.SubscribersV1ControllerMarkAllUnreadAsReadResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -49,7 +49,7 @@ export async function subscribersMessagesMarkAll(
     | ConnectionError
   >
 > {
-  const input: operations.SubscribersControllerMarkAllUnreadAsReadRequest = {
+  const input: operations.SubscribersV1ControllerMarkAllUnreadAsReadRequest = {
     markAllMessageAsRequestDto: markAllMessageAsRequestDto,
     subscriberId: subscriberId,
     idempotencyKey: idempotencyKey,
@@ -58,8 +58,10 @@ export async function subscribersMessagesMarkAll(
   const parsed = safeParse(
     input,
     (value) =>
-      operations.SubscribersControllerMarkAllUnreadAsReadRequest$outboundSchema
-        .parse(value),
+      operations
+        .SubscribersV1ControllerMarkAllUnreadAsReadRequest$outboundSchema.parse(
+          value,
+        ),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -95,7 +97,7 @@ export async function subscribersMessagesMarkAll(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_markAllUnreadAsRead",
+    operationID: "SubscribersV1Controller_markAllUnreadAsRead",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -163,7 +165,7 @@ export async function subscribersMessagesMarkAll(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerMarkAllUnreadAsReadResponse,
+    operations.SubscribersV1ControllerMarkAllUnreadAsReadResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -178,7 +180,8 @@ export async function subscribersMessagesMarkAll(
   >(
     M.json(
       201,
-      operations.SubscribersControllerMarkAllUnreadAsReadResponse$inboundSchema,
+      operations
+        .SubscribersV1ControllerMarkAllUnreadAsReadResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

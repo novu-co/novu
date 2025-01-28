@@ -28,11 +28,11 @@ import { Result } from "../types/fp.js";
  */
 export async function subscribersPreferencesUpdate(
   client: NovuCore,
-  request: operations.SubscribersControllerUpdateSubscriberPreferenceRequest,
+  request: operations.SubscribersV1ControllerUpdateSubscriberPreferenceRequest,
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerUpdateSubscriberPreferenceResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberPreferenceResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -50,7 +50,7 @@ export async function subscribersPreferencesUpdate(
     request,
     (value) =>
       operations
-        .SubscribersControllerUpdateSubscriberPreferenceRequest$outboundSchema
+        .SubscribersV1ControllerUpdateSubscriberPreferenceRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -93,7 +93,7 @@ export async function subscribersPreferencesUpdate(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_updateSubscriberPreference",
+    operationID: "SubscribersV1Controller_updateSubscriberPreference",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -161,7 +161,7 @@ export async function subscribersPreferencesUpdate(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerUpdateSubscriberPreferenceResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberPreferenceResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -177,7 +177,7 @@ export async function subscribersPreferencesUpdate(
     M.json(
       200,
       operations
-        .SubscribersControllerUpdateSubscriberPreferenceResponse$inboundSchema,
+        .SubscribersV1ControllerUpdateSubscriberPreferenceResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

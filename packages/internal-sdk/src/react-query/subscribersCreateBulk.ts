@@ -24,7 +24,7 @@ export type SubscribersCreateBulkMutationVariables = {
 };
 
 export type SubscribersCreateBulkMutationData =
-  operations.SubscribersControllerBulkCreateSubscribersResponse;
+  operations.SubscribersV1ControllerBulkCreateSubscribersResponse;
 
 /**
  * Bulk create subscribers

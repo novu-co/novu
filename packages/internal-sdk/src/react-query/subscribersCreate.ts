@@ -24,7 +24,7 @@ export type SubscribersCreateMutationVariables = {
 };
 
 export type SubscribersCreateMutationData =
-  operations.SubscribersControllerCreateSubscriberResponse;
+  operations.SubscribersV1ControllerCreateSubscriberResponse;
 
 /**
  * Create subscriber

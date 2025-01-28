@@ -29,11 +29,11 @@ import { Result } from "../types/fp.js";
 export async function subscribersPreferencesRetrieveByLevel(
   client: NovuCore,
   request:
-    operations.SubscribersControllerGetSubscriberPreferenceByLevelRequest,
+    operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelRequest,
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerGetSubscriberPreferenceByLevelResponse,
+    operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -51,7 +51,7 @@ export async function subscribersPreferencesRetrieveByLevel(
     request,
     (value) =>
       operations
-        .SubscribersControllerGetSubscriberPreferenceByLevelRequest$outboundSchema
+        .SubscribersV1ControllerGetSubscriberPreferenceByLevelRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -93,7 +93,7 @@ export async function subscribersPreferencesRetrieveByLevel(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_getSubscriberPreferenceByLevel",
+    operationID: "SubscribersV1Controller_getSubscriberPreferenceByLevel",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -162,7 +162,7 @@ export async function subscribersPreferencesRetrieveByLevel(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerGetSubscriberPreferenceByLevelResponse,
+    operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -178,7 +178,7 @@ export async function subscribersPreferencesRetrieveByLevel(
     M.json(
       200,
       operations
-        .SubscribersControllerGetSubscriberPreferenceByLevelResponse$inboundSchema,
+        .SubscribersV1ControllerGetSubscriberPreferenceByLevelResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

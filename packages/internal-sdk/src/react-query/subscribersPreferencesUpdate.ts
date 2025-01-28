@@ -17,12 +17,12 @@ import { useNovuContext } from "./_context.js";
 import { MutationHookOptions } from "./_types.js";
 
 export type SubscribersPreferencesUpdateMutationVariables = {
-  request: operations.SubscribersControllerUpdateSubscriberPreferenceRequest;
+  request: operations.SubscribersV1ControllerUpdateSubscriberPreferenceRequest;
   options?: RequestOptions;
 };
 
 export type SubscribersPreferencesUpdateMutationData =
-  operations.SubscribersControllerUpdateSubscriberPreferenceResponse;
+  operations.SubscribersV1ControllerUpdateSubscriberPreferenceResponse;
 
 /**
  * Update subscriber preference

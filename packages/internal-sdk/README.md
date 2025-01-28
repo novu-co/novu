@@ -406,6 +406,7 @@ run();
 * [update](docs/sdks/subscribers/README.md#update) - Update subscriber
 * [delete](docs/sdks/subscribers/README.md#delete) - Delete subscriber
 * [createBulk](docs/sdks/subscribers/README.md#createbulk) - Bulk create subscribers
+* [search](docs/sdks/subscribers/README.md#search) - Search for subscribers
 
 #### [subscribers.authentication](docs/sdks/authentication/README.md)
 
@@ -521,6 +522,7 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 - [`subscribersPreferencesUpdateGlobal`](docs/sdks/preferences/README.md#updateglobal) - Update subscriber global preferences
 - [`subscribersPropertiesUpdateOnlineFlag`](docs/sdks/properties/README.md#updateonlineflag) - Update subscriber online status
 - [`subscribersRetrieve`](docs/sdks/subscribers/README.md#retrieve) - Get subscriber
+- [`subscribersSearch`](docs/sdks/subscribers/README.md#search) - Search for subscribers
 - [`subscribersUpdate`](docs/sdks/subscribers/README.md#update) - Update subscriber
 - [`topicsCreate`](docs/sdks/topics/README.md#create) - Topic creation
 - [`topicsDelete`](docs/sdks/topics/README.md#delete) - Delete topic
@@ -605,6 +607,7 @@ To learn about this feature and how to get started, check
 - [`useSubscribersPreferencesUpdateMutation`](docs/sdks/preferences/README.md#update) - Update subscriber preference
 - [`useSubscribersPropertiesUpdateOnlineFlagMutation`](docs/sdks/properties/README.md#updateonlineflag) - Update subscriber online status
 - [`useSubscribersRetrieve`](docs/sdks/subscribers/README.md#retrieve) - Get subscriber
+- [`useSubscribersSearch`](docs/sdks/subscribers/README.md#search) - Search for subscribers
 - [`useSubscribersUpdateMutation`](docs/sdks/subscribers/README.md#update) - Update subscriber
 - [`useTopicsCreateMutation`](docs/sdks/topics/README.md#create) - Topic creation
 - [`useTopicsDeleteMutation`](docs/sdks/topics/README.md#delete) - Delete topic

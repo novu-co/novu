@@ -37,7 +37,7 @@ export async function subscribersCredentialsDelete(
   options?: RequestOptions,
 ): Promise<
   Result<
-    | operations.SubscribersControllerDeleteSubscriberCredentialsResponse
+    | operations.SubscribersV1ControllerDeleteSubscriberCredentialsResponse
     | undefined,
     | errors.ErrorDto
     | errors.ErrorDto
@@ -53,7 +53,7 @@ export async function subscribersCredentialsDelete(
   >
 > {
   const input:
-    operations.SubscribersControllerDeleteSubscriberCredentialsRequest = {
+    operations.SubscribersV1ControllerDeleteSubscriberCredentialsRequest = {
       subscriberId: subscriberId,
       providerId: providerId,
       idempotencyKey: idempotencyKey,
@@ -63,7 +63,7 @@ export async function subscribersCredentialsDelete(
     input,
     (value) =>
       operations
-        .SubscribersControllerDeleteSubscriberCredentialsRequest$outboundSchema
+        .SubscribersV1ControllerDeleteSubscriberCredentialsRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -101,7 +101,7 @@ export async function subscribersCredentialsDelete(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_deleteSubscriberCredentials",
+    operationID: "SubscribersV1Controller_deleteSubscriberCredentials",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -169,7 +169,7 @@ export async function subscribersCredentialsDelete(
   };
 
   const [result] = await M.match<
-    | operations.SubscribersControllerDeleteSubscriberCredentialsResponse
+    | operations.SubscribersV1ControllerDeleteSubscriberCredentialsResponse
     | undefined,
     | errors.ErrorDto
     | errors.ErrorDto
@@ -186,7 +186,7 @@ export async function subscribersCredentialsDelete(
     M.nil(
       204,
       operations
-        .SubscribersControllerDeleteSubscriberCredentialsResponse$inboundSchema
+        .SubscribersV1ControllerDeleteSubscriberCredentialsResponse$inboundSchema
         .optional(),
       { hdrs: true },
     ),

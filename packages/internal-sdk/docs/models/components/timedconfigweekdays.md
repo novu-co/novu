@@ -5,7 +5,7 @@
 ```typescript
 import { TimedConfigWeekDays } from "@novu/api/models/components";
 
-let value: TimedConfigWeekDays = "thursday";
+let value: TimedConfigWeekDays = "saturday";
 ```
 
 ## Values

@@ -13,9 +13,9 @@ export class NovuNotifications extends ClientSDK {
    * Get in-app notification feed for a particular subscriber
    */
   async feed(
-    request: operations.SubscribersControllerGetNotificationsFeedRequest,
+    request: operations.SubscribersV1ControllerGetNotificationsFeedRequest,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerGetNotificationsFeedResponse> {
+  ): Promise<operations.SubscribersV1ControllerGetNotificationsFeedResponse> {
     return unwrapAsync(subscribersNotificationsFeed(
       this,
       request,
@@ -27,9 +27,9 @@ export class NovuNotifications extends ClientSDK {
    * Get the unseen in-app notifications count for subscribers feed
    */
   async unseenCount(
-    request: operations.SubscribersControllerGetUnseenCountRequest,
+    request: operations.SubscribersV1ControllerGetUnseenCountRequest,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerGetUnseenCountResponse> {
+  ): Promise<operations.SubscribersV1ControllerGetUnseenCountResponse> {
     return unwrapAsync(subscribersNotificationsUnseenCount(
       this,
       request,

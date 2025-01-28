@@ -37,7 +37,7 @@ export async function subscribersRetrieve(
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerGetSubscriberResponse,
+    operations.SubscribersV1ControllerGetSubscriberResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -51,7 +51,7 @@ export async function subscribersRetrieve(
     | ConnectionError
   >
 > {
-  const input: operations.SubscribersControllerGetSubscriberRequest = {
+  const input: operations.SubscribersV1ControllerGetSubscriberRequest = {
     subscriberId: subscriberId,
     includeTopics: includeTopics,
     idempotencyKey: idempotencyKey,
@@ -60,9 +60,8 @@ export async function subscribersRetrieve(
   const parsed = safeParse(
     input,
     (value) =>
-      operations.SubscribersControllerGetSubscriberRequest$outboundSchema.parse(
-        value,
-      ),
+      operations.SubscribersV1ControllerGetSubscriberRequest$outboundSchema
+        .parse(value),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -97,7 +96,7 @@ export async function subscribersRetrieve(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_getSubscriber",
+    operationID: "SubscribersV1Controller_getSubscriber",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -166,7 +165,7 @@ export async function subscribersRetrieve(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerGetSubscriberResponse,
+    operations.SubscribersV1ControllerGetSubscriberResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -181,7 +180,7 @@ export async function subscribersRetrieve(
   >(
     M.json(
       200,
-      operations.SubscribersControllerGetSubscriberResponse$inboundSchema,
+      operations.SubscribersV1ControllerGetSubscriberResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

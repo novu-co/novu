@@ -45,7 +45,7 @@ export async function subscribersList(
 ): Promise<
   PageIterator<
     Result<
-      operations.SubscribersControllerListSubscribersResponse,
+      operations.SubscribersV1ControllerListSubscribersResponse,
       | errors.ErrorDto
       | errors.ErrorDto
       | errors.ValidationErrorDto
@@ -61,7 +61,7 @@ export async function subscribersList(
     { page: number }
   >
 > {
-  const input: operations.SubscribersControllerListSubscribersRequest = {
+  const input: operations.SubscribersV1ControllerListSubscribersRequest = {
     page: page,
     limit: limit,
     idempotencyKey: idempotencyKey,
@@ -70,7 +70,7 @@ export async function subscribersList(
   const parsed = safeParse(
     input,
     (value) =>
-      operations.SubscribersControllerListSubscribersRequest$outboundSchema
+      operations.SubscribersV1ControllerListSubscribersRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -100,7 +100,7 @@ export async function subscribersList(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_listSubscribers",
+    operationID: "SubscribersV1Controller_listSubscribers",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -169,7 +169,7 @@ export async function subscribersList(
   };
 
   const [result, raw] = await M.match<
-    operations.SubscribersControllerListSubscribersResponse,
+    operations.SubscribersV1ControllerListSubscribersResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -184,7 +184,7 @@ export async function subscribersList(
   >(
     M.json(
       200,
-      operations.SubscribersControllerListSubscribersResponse$inboundSchema,
+      operations.SubscribersV1ControllerListSubscribersResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(
@@ -209,7 +209,7 @@ export async function subscribersList(
   ): {
     next: Paginator<
       Result<
-        operations.SubscribersControllerListSubscribersResponse,
+        operations.SubscribersV1ControllerListSubscribersResponse,
         | errors.ErrorDto
         | errors.ErrorDto
         | errors.ValidationErrorDto

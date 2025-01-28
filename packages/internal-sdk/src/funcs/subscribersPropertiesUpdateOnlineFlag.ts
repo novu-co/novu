@@ -39,7 +39,7 @@ export async function subscribersPropertiesUpdateOnlineFlag(
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerUpdateSubscriberOnlineFlagResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberOnlineFlagResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -54,7 +54,7 @@ export async function subscribersPropertiesUpdateOnlineFlag(
   >
 > {
   const input:
-    operations.SubscribersControllerUpdateSubscriberOnlineFlagRequest = {
+    operations.SubscribersV1ControllerUpdateSubscriberOnlineFlagRequest = {
       updateSubscriberOnlineFlagRequestDto:
         updateSubscriberOnlineFlagRequestDto,
       subscriberId: subscriberId,
@@ -65,7 +65,7 @@ export async function subscribersPropertiesUpdateOnlineFlag(
     input,
     (value) =>
       operations
-        .SubscribersControllerUpdateSubscriberOnlineFlagRequest$outboundSchema
+        .SubscribersV1ControllerUpdateSubscriberOnlineFlagRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -104,7 +104,7 @@ export async function subscribersPropertiesUpdateOnlineFlag(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_updateSubscriberOnlineFlag",
+    operationID: "SubscribersV1Controller_updateSubscriberOnlineFlag",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -172,7 +172,7 @@ export async function subscribersPropertiesUpdateOnlineFlag(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerUpdateSubscriberOnlineFlagResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberOnlineFlagResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -188,7 +188,7 @@ export async function subscribersPropertiesUpdateOnlineFlag(
     M.json(
       200,
       operations
-        .SubscribersControllerUpdateSubscriberOnlineFlagResponse$inboundSchema,
+        .SubscribersV1ControllerUpdateSubscriberOnlineFlagResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

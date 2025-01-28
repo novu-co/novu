@@ -7,7 +7,7 @@ The type of the variable
 ```typescript
 import { NotificationTriggerVariableResponseType } from "@novu/api/models/components";
 
-let value: NotificationTriggerVariableResponseType = "String";
+let value: NotificationTriggerVariableResponseType = "Boolean";
 ```
 
 ## Values

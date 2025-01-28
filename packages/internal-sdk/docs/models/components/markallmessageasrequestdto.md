@@ -6,7 +6,7 @@
 import { MarkAllMessageAsRequestDto } from "@novu/api/models/components";
 
 let value: MarkAllMessageAsRequestDto = {
-  markAs: "unseen",
+  markAs: "read",
 };
 ```
 

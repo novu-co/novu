@@ -34,7 +34,7 @@ export async function subscribersPreferencesList(
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerListSubscriberPreferencesResponse,
+    operations.SubscribersV1ControllerListSubscriberPreferencesResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -49,7 +49,7 @@ export async function subscribersPreferencesList(
   >
 > {
   const input:
-    operations.SubscribersControllerListSubscriberPreferencesRequest = {
+    operations.SubscribersV1ControllerListSubscriberPreferencesRequest = {
       subscriberId: subscriberId,
       includeInactiveChannels: includeInactiveChannels,
       idempotencyKey: idempotencyKey,
@@ -59,7 +59,7 @@ export async function subscribersPreferencesList(
     input,
     (value) =>
       operations
-        .SubscribersControllerListSubscriberPreferencesRequest$outboundSchema
+        .SubscribersV1ControllerListSubscriberPreferencesRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -97,7 +97,7 @@ export async function subscribersPreferencesList(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_listSubscriberPreferences",
+    operationID: "SubscribersV1Controller_listSubscriberPreferences",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -166,7 +166,7 @@ export async function subscribersPreferencesList(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerListSubscriberPreferencesResponse,
+    operations.SubscribersV1ControllerListSubscriberPreferencesResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -182,7 +182,7 @@ export async function subscribersPreferencesList(
     M.json(
       200,
       operations
-        .SubscribersControllerListSubscriberPreferencesResponse$inboundSchema,
+        .SubscribersV1ControllerListSubscriberPreferencesResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

@@ -7,7 +7,7 @@ Channel type through which the message is sent
 ```typescript
 import { ChannelTypeEnum } from "@novu/api/models/components";
 
-let value: ChannelTypeEnum = "in_app";
+let value: ChannelTypeEnum = "sms";
 ```
 
 ## Values

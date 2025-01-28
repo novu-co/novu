@@ -1,5 +1,6 @@
-import type { DirectionEnum, IEnvironment, IListSubscribersResponseDto } from '@novu/shared';
+import type { DirectionEnum, IEnvironment } from '@novu/shared';
 import { getV2 } from './api.client';
+import { ListSubscribersResponseDto } from '@novu/api/models/components';
 
 export const getSubscribers = async ({
   environment,
@@ -23,7 +24,7 @@ export const getSubscribers = async ({
   name?: string;
   orderDirection?: DirectionEnum;
   orderBy?: string;
-}): Promise<IListSubscribersResponseDto> => {
+}): Promise<ListSubscribersResponseDto> => {
   const params = new URLSearchParams({
     limit: limit.toString(),
     ...(after && { after }),
@@ -36,8 +37,7 @@ export const getSubscribers = async ({
     ...(orderBy && { orderBy }),
     ...(orderDirection && { orderDirection }),
   });
-
-  const { data } = await getV2<{ data: IListSubscribersResponseDto }>(`/subscribers?${params}`, {
+  const { data } = await getV2<{ data: ListSubscribersResponseDto }>(`/subscribers?${params}`, {
     environment,
   });
   return data;

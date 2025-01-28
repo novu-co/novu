@@ -39,7 +39,7 @@ export async function subscribersCreateBulk(
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerBulkCreateSubscribersResponse,
+    operations.SubscribersV1ControllerBulkCreateSubscribersResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -53,18 +53,18 @@ export async function subscribersCreateBulk(
     | ConnectionError
   >
 > {
-  const input: operations.SubscribersControllerBulkCreateSubscribersRequest = {
-    bulkSubscriberCreateDto: bulkSubscriberCreateDto,
-    idempotencyKey: idempotencyKey,
-  };
+  const input: operations.SubscribersV1ControllerBulkCreateSubscribersRequest =
+    {
+      bulkSubscriberCreateDto: bulkSubscriberCreateDto,
+      idempotencyKey: idempotencyKey,
+    };
 
   const parsed = safeParse(
     input,
     (value) =>
       operations
-        .SubscribersControllerBulkCreateSubscribersRequest$outboundSchema.parse(
-          value,
-        ),
+        .SubscribersV1ControllerBulkCreateSubscribersRequest$outboundSchema
+        .parse(value),
     "Input validation failed",
   );
   if (!parsed.ok) {
@@ -91,7 +91,7 @@ export async function subscribersCreateBulk(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_bulkCreateSubscribers",
+    operationID: "SubscribersV1Controller_bulkCreateSubscribers",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -159,7 +159,7 @@ export async function subscribersCreateBulk(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerBulkCreateSubscribersResponse,
+    operations.SubscribersV1ControllerBulkCreateSubscribersResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -175,7 +175,7 @@ export async function subscribersCreateBulk(
     M.json(
       201,
       operations
-        .SubscribersControllerBulkCreateSubscribersResponse$inboundSchema,
+        .SubscribersV1ControllerBulkCreateSubscribersResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

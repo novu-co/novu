@@ -10,7 +10,8 @@ The recipients list of people who will receive the notification.
 ```typescript
 const value: components.One[] = [
   {
-    subscriberId: "<id>",
+    topicKey: "<value>",
+    type: "Subscriber",
   },
 ];
 ```
@@ -34,7 +35,7 @@ const value: components.SubscriberPayloadDto = {
 ```typescript
 const value: components.TopicPayloadDto = {
   topicKey: "<value>",
-  type: "Subscriber",
+  type: "Topic",
 };
 ```
 

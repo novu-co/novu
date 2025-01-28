@@ -28,11 +28,11 @@ import { Result } from "../types/fp.js";
  */
 export async function subscribersMessagesUpdateAsSeen(
   client: NovuCore,
-  request: operations.SubscribersControllerMarkActionAsSeenRequest,
+  request: operations.SubscribersV1ControllerMarkActionAsSeenRequest,
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerMarkActionAsSeenResponse,
+    operations.SubscribersV1ControllerMarkActionAsSeenResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -49,7 +49,7 @@ export async function subscribersMessagesUpdateAsSeen(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.SubscribersControllerMarkActionAsSeenRequest$outboundSchema
+      operations.SubscribersV1ControllerMarkActionAsSeenRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -94,7 +94,7 @@ export async function subscribersMessagesUpdateAsSeen(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_markActionAsSeen",
+    operationID: "SubscribersV1Controller_markActionAsSeen",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -162,7 +162,7 @@ export async function subscribersMessagesUpdateAsSeen(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerMarkActionAsSeenResponse,
+    operations.SubscribersV1ControllerMarkActionAsSeenResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -177,7 +177,7 @@ export async function subscribersMessagesUpdateAsSeen(
   >(
     M.json(
       201,
-      operations.SubscribersControllerMarkActionAsSeenResponse$inboundSchema,
+      operations.SubscribersV1ControllerMarkActionAsSeenResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

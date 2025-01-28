@@ -9,7 +9,7 @@ Metadata associated with the workflow step. Can vary based on the type of step.
 
 ```typescript
 const value: components.DigestRegularMetadata = {
-  type: "regular",
+  type: "backoff",
 };
 ```
 

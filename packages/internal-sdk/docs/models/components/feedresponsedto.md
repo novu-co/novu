@@ -23,7 +23,7 @@ let value: FeedResponseDto = {
       updatedAt: new Date("2024-12-10T10:10:59.639Z"),
       actor: {
         data: null,
-        type: "none",
+        type: "system_custom",
       },
       transactionId: "transaction_123456",
       templateIdentifier: "template_abcdef",

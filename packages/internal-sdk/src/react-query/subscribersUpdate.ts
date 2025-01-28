@@ -25,7 +25,7 @@ export type SubscribersUpdateMutationVariables = {
 };
 
 export type SubscribersUpdateMutationData =
-  operations.SubscribersControllerUpdateSubscriberResponse;
+  operations.SubscribersV1ControllerUpdateSubscriberResponse;
 
 /**
  * Update subscriber

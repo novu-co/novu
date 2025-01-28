@@ -1,7 +1,7 @@
 lockVersion: 2.0.0
 id: e6c6e9ec-c286-4d64-973e-d7137c0f02cd
 management:
-  docChecksum: f8551dedc63daa86aa91b88b55051b18
+  docChecksum: 6ab623c1b934f140dabbc5277d3b689c
   docVersion: "1.0"
   speakeasyVersion: 1.476.2
   generationVersion: 2.495.1
@@ -121,6 +121,7 @@ generatedFiles:
   - docs/models/components/gettopicresponsedto.md
   - docs/models/components/integrationresponsedto.md
   - docs/models/components/issues.md
+  - docs/models/components/listsubscribersresponsedto.md
   - docs/models/components/markallmessageasrequestdto.md
   - docs/models/components/markallmessageasrequestdtomarkas.md
   - docs/models/components/markas.md
@@ -266,51 +267,54 @@ generatedFiles:
   - docs/models/operations/notificationscontrollergetnotificationresponse.md
   - docs/models/operations/notificationscontrollerlistnotificationsrequest.md
   - docs/models/operations/notificationscontrollerlistnotificationsresponse.md
+  - docs/models/operations/orderdirection.md
   - docs/models/operations/parameter.md
-  - docs/models/operations/subscriberscontrollerbulkcreatesubscribersrequest.md
-  - docs/models/operations/subscriberscontrollerbulkcreatesubscribersresponse.md
-  - docs/models/operations/subscriberscontrollerchataccessoauthrequest.md
-  - docs/models/operations/subscriberscontrollerchataccessoauthresponse.md
-  - docs/models/operations/subscriberscontrollerchatoauthcallbackrequest.md
-  - docs/models/operations/subscriberscontrollerchatoauthcallbackresponse.md
-  - docs/models/operations/subscriberscontrollerchatoauthcallbackresponseresult.md
-  - docs/models/operations/subscriberscontrollercreatesubscriberrequest.md
-  - docs/models/operations/subscriberscontrollercreatesubscriberresponse.md
-  - docs/models/operations/subscriberscontrollerdeletesubscribercredentialsrequest.md
-  - docs/models/operations/subscriberscontrollerdeletesubscribercredentialsresponse.md
-  - docs/models/operations/subscriberscontrollergetnotificationsfeedrequest.md
-  - docs/models/operations/subscriberscontrollergetnotificationsfeedresponse.md
-  - docs/models/operations/subscriberscontrollergetsubscriberpreferencebylevelrequest.md
-  - docs/models/operations/subscriberscontrollergetsubscriberpreferencebylevelresponse.md
-  - docs/models/operations/subscriberscontrollergetsubscriberrequest.md
-  - docs/models/operations/subscriberscontrollergetsubscriberresponse.md
-  - docs/models/operations/subscriberscontrollergetunseencountrequest.md
-  - docs/models/operations/subscriberscontrollergetunseencountresponse.md
-  - docs/models/operations/subscriberscontrollerlistsubscriberpreferencesrequest.md
-  - docs/models/operations/subscriberscontrollerlistsubscriberpreferencesresponse.md
-  - docs/models/operations/subscriberscontrollerlistsubscribersrequest.md
-  - docs/models/operations/subscriberscontrollerlistsubscribersresponse.md
-  - docs/models/operations/subscriberscontrollerlistsubscribersresponsebody.md
-  - docs/models/operations/subscriberscontrollermarkactionasseenrequest.md
-  - docs/models/operations/subscriberscontrollermarkactionasseenresponse.md
-  - docs/models/operations/subscriberscontrollermarkallunreadasreadrequest.md
-  - docs/models/operations/subscriberscontrollermarkallunreadasreadresponse.md
-  - docs/models/operations/subscriberscontrollermarkmessagesasrequest.md
-  - docs/models/operations/subscriberscontrollermarkmessagesasresponse.md
-  - docs/models/operations/subscriberscontrollermodifysubscriberchannelrequest.md
-  - docs/models/operations/subscriberscontrollermodifysubscriberchannelresponse.md
-  - docs/models/operations/subscriberscontrollerremovesubscriberrequest.md
-  - docs/models/operations/subscriberscontrollerremovesubscriberresponse.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberchannelrequest.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberchannelresponse.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberglobalpreferencesrequest.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberglobalpreferencesresponse.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberonlineflagrequest.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberonlineflagresponse.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberpreferencerequest.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberpreferenceresponse.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberrequest.md
-  - docs/models/operations/subscriberscontrollerupdatesubscriberresponse.md
+  - docs/models/operations/subscriberscontrollersearchsubscribersrequest.md
+  - docs/models/operations/subscriberscontrollersearchsubscribersresponse.md
+  - docs/models/operations/subscribersv1controllerbulkcreatesubscribersrequest.md
+  - docs/models/operations/subscribersv1controllerbulkcreatesubscribersresponse.md
+  - docs/models/operations/subscribersv1controllerchataccessoauthrequest.md
+  - docs/models/operations/subscribersv1controllerchataccessoauthresponse.md
+  - docs/models/operations/subscribersv1controllerchatoauthcallbackrequest.md
+  - docs/models/operations/subscribersv1controllerchatoauthcallbackresponse.md
+  - docs/models/operations/subscribersv1controllerchatoauthcallbackresponseresult.md
+  - docs/models/operations/subscribersv1controllercreatesubscriberrequest.md
+  - docs/models/operations/subscribersv1controllercreatesubscriberresponse.md
+  - docs/models/operations/subscribersv1controllerdeletesubscribercredentialsrequest.md
+  - docs/models/operations/subscribersv1controllerdeletesubscribercredentialsresponse.md
+  - docs/models/operations/subscribersv1controllergetnotificationsfeedrequest.md
+  - docs/models/operations/subscribersv1controllergetnotificationsfeedresponse.md
+  - docs/models/operations/subscribersv1controllergetsubscriberpreferencebylevelrequest.md
+  - docs/models/operations/subscribersv1controllergetsubscriberpreferencebylevelresponse.md
+  - docs/models/operations/subscribersv1controllergetsubscriberrequest.md
+  - docs/models/operations/subscribersv1controllergetsubscriberresponse.md
+  - docs/models/operations/subscribersv1controllergetunseencountrequest.md
+  - docs/models/operations/subscribersv1controllergetunseencountresponse.md
+  - docs/models/operations/subscribersv1controllerlistsubscriberpreferencesrequest.md
+  - docs/models/operations/subscribersv1controllerlistsubscriberpreferencesresponse.md
+  - docs/models/operations/subscribersv1controllerlistsubscribersrequest.md
+  - docs/models/operations/subscribersv1controllerlistsubscribersresponse.md
+  - docs/models/operations/subscribersv1controllerlistsubscribersresponsebody.md
+  - docs/models/operations/subscribersv1controllermarkactionasseenrequest.md
+  - docs/models/operations/subscribersv1controllermarkactionasseenresponse.md
+  - docs/models/operations/subscribersv1controllermarkallunreadasreadrequest.md
+  - docs/models/operations/subscribersv1controllermarkallunreadasreadresponse.md
+  - docs/models/operations/subscribersv1controllermarkmessagesasrequest.md
+  - docs/models/operations/subscribersv1controllermarkmessagesasresponse.md
+  - docs/models/operations/subscribersv1controllermodifysubscriberchannelrequest.md
+  - docs/models/operations/subscribersv1controllermodifysubscriberchannelresponse.md
+  - docs/models/operations/subscribersv1controllerremovesubscriberrequest.md
+  - docs/models/operations/subscribersv1controllerremovesubscriberresponse.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberchannelrequest.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberchannelresponse.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberglobalpreferencesrequest.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberglobalpreferencesresponse.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberonlineflagrequest.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberonlineflagresponse.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberpreferencerequest.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberpreferenceresponse.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberrequest.md
+  - docs/models/operations/subscribersv1controllerupdatesubscriberresponse.md
   - docs/models/operations/topicscontrollerassignrequest.md
   - docs/models/operations/topicscontrollerassignresponse.md
   - docs/models/operations/topicscontrollercreatetopicrequest.md
@@ -412,6 +416,7 @@ generatedFiles:
   - src/funcs/subscribersPreferencesUpdateGlobal.ts
   - src/funcs/subscribersPropertiesUpdateOnlineFlag.ts
   - src/funcs/subscribersRetrieve.ts
+  - src/funcs/subscribersSearch.ts
   - src/funcs/subscribersUpdate.ts
   - src/funcs/topicsCreate.ts
   - src/funcs/topicsDelete.ts
@@ -510,6 +515,7 @@ generatedFiles:
   - src/models/components/gettopicresponsedto.ts
   - src/models/components/index.ts
   - src/models/components/integrationresponsedto.ts
+  - src/models/components/listsubscribersresponsedto.ts
   - src/models/components/markallmessageasrequestdto.ts
   - src/models/components/markmessageactionasseendto.ts
   - src/models/components/messageaction.ts
@@ -599,27 +605,28 @@ generatedFiles:
   - src/models/operations/notificationscontrollergetactivitystats.ts
   - src/models/operations/notificationscontrollergetnotification.ts
   - src/models/operations/notificationscontrollerlistnotifications.ts
-  - src/models/operations/subscriberscontrollerbulkcreatesubscribers.ts
-  - src/models/operations/subscriberscontrollerchataccessoauth.ts
-  - src/models/operations/subscriberscontrollerchatoauthcallback.ts
-  - src/models/operations/subscriberscontrollercreatesubscriber.ts
-  - src/models/operations/subscriberscontrollerdeletesubscribercredentials.ts
-  - src/models/operations/subscriberscontrollergetnotificationsfeed.ts
-  - src/models/operations/subscriberscontrollergetsubscriber.ts
-  - src/models/operations/subscriberscontrollergetsubscriberpreferencebylevel.ts
-  - src/models/operations/subscriberscontrollergetunseencount.ts
-  - src/models/operations/subscriberscontrollerlistsubscriberpreferences.ts
-  - src/models/operations/subscriberscontrollerlistsubscribers.ts
-  - src/models/operations/subscriberscontrollermarkactionasseen.ts
-  - src/models/operations/subscriberscontrollermarkallunreadasread.ts
-  - src/models/operations/subscriberscontrollermarkmessagesas.ts
-  - src/models/operations/subscriberscontrollermodifysubscriberchannel.ts
-  - src/models/operations/subscriberscontrollerremovesubscriber.ts
-  - src/models/operations/subscriberscontrollerupdatesubscriber.ts
-  - src/models/operations/subscriberscontrollerupdatesubscriberchannel.ts
-  - src/models/operations/subscriberscontrollerupdatesubscriberglobalpreferences.ts
-  - src/models/operations/subscriberscontrollerupdatesubscriberonlineflag.ts
-  - src/models/operations/subscriberscontrollerupdatesubscriberpreference.ts
+  - src/models/operations/subscriberscontrollersearchsubscribers.ts
+  - src/models/operations/subscribersv1controllerbulkcreatesubscribers.ts
+  - src/models/operations/subscribersv1controllerchataccessoauth.ts
+  - src/models/operations/subscribersv1controllerchatoauthcallback.ts
+  - src/models/operations/subscribersv1controllercreatesubscriber.ts
+  - src/models/operations/subscribersv1controllerdeletesubscribercredentials.ts
+  - src/models/operations/subscribersv1controllergetnotificationsfeed.ts
+  - src/models/operations/subscribersv1controllergetsubscriber.ts
+  - src/models/operations/subscribersv1controllergetsubscriberpreferencebylevel.ts
+  - src/models/operations/subscribersv1controllergetunseencount.ts
+  - src/models/operations/subscribersv1controllerlistsubscriberpreferences.ts
+  - src/models/operations/subscribersv1controllerlistsubscribers.ts
+  - src/models/operations/subscribersv1controllermarkactionasseen.ts
+  - src/models/operations/subscribersv1controllermarkallunreadasread.ts
+  - src/models/operations/subscribersv1controllermarkmessagesas.ts
+  - src/models/operations/subscribersv1controllermodifysubscriberchannel.ts
+  - src/models/operations/subscribersv1controllerremovesubscriber.ts
+  - src/models/operations/subscribersv1controllerupdatesubscriber.ts
+  - src/models/operations/subscribersv1controllerupdatesubscriberchannel.ts
+  - src/models/operations/subscribersv1controllerupdatesubscriberglobalpreferences.ts
+  - src/models/operations/subscribersv1controllerupdatesubscriberonlineflag.ts
+  - src/models/operations/subscribersv1controllerupdatesubscriberpreference.ts
   - src/models/operations/topicscontrollerassign.ts
   - src/models/operations/topicscontrollercreatetopic.ts
   - src/models/operations/topicscontrollerdeletetopic.ts
@@ -677,6 +684,7 @@ generatedFiles:
   - src/react-query/subscribersPreferencesUpdateGlobal.ts
   - src/react-query/subscribersPropertiesUpdateOnlineFlag.ts
   - src/react-query/subscribersRetrieve.ts
+  - src/react-query/subscribersSearch.ts
   - src/react-query/subscribersUpdate.ts
   - src/react-query/topicsCreate.ts
   - src/react-query/topicsDelete.ts
@@ -2126,6 +2134,19 @@ examples:
           environmentId: "<id>"
         header: {}
       responses:
+        "400":
+          application/json: {"statusCode": 404, "timestamp": "2024-12-12T13:00:00Z", "path": "/api/v1/resource", "message": "Resource not found.", "ctx": {"workflowId": "some_wf_id", "stepId": "some_wf_id"}, "errorId": "abc123"}
+        "414":
+          application/json: {"statusCode": 404, "timestamp": "2024-12-12T13:00:00Z", "path": "/api/v1/resource", "message": "Resource not found.", "ctx": {"workflowId": "some_wf_id", "stepId": "some_wf_id"}, "errorId": "abc123"}
+        "422":
+          application/json: {"statusCode": 404, "timestamp": "2024-12-12T13:00:00Z", "path": "/api/v1/resource", "message": "Resource not found.", "ctx": {"workflowId": "some_wf_id", "stepId": "some_wf_id"}, "errorId": "abc123", "errors": {"fieldName1": {"messages": ["Field is required", "Invalid format"], "value": "xx xx xx "}, "fieldName2": {"messages": ["Field is required", "Invalid format"], "value": "xx xx xx "}, "fieldName3": {"messages": ["Field is required", "Invalid format"], "value": "xx xx xx "}, "fieldName4": {"messages": ["Field is required", "Invalid format"], "value": "xx xx xx "}}}
+        "500":
+          application/json: {"statusCode": 404, "timestamp": "2024-12-12T13:00:00Z", "path": "/api/v1/resource", "message": "Resource not found.", "ctx": {"workflowId": "some_wf_id", "stepId": "some_wf_id"}, "errorId": "abc123"}
+  SubscriberController_getSubscribers:
+    speakeasy-default-subscriber-controller-get-subscribers:
+      responses:
+        "200":
+          application/json: {}
         "400":
           application/json: {"statusCode": 404, "timestamp": "2024-12-12T13:00:00Z", "path": "/api/v1/resource", "message": "Resource not found.", "ctx": {"workflowId": "some_wf_id", "stepId": "some_wf_id"}, "errorId": "abc123"}
         "414":

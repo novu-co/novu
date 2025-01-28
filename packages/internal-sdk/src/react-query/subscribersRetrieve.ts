@@ -26,7 +26,7 @@ import {
 } from "./_types.js";
 
 export type SubscribersRetrieveQueryData =
-  operations.SubscribersControllerGetSubscriberResponse;
+  operations.SubscribersV1ControllerGetSubscriberResponse;
 
 /**
  * Get subscriber

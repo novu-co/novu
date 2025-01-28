@@ -39,7 +39,7 @@ export async function subscribersCredentialsUpdate(
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerUpdateSubscriberChannelResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberChannelResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -53,8 +53,8 @@ export async function subscribersCredentialsUpdate(
     | ConnectionError
   >
 > {
-  const input: operations.SubscribersControllerUpdateSubscriberChannelRequest =
-    {
+  const input:
+    operations.SubscribersV1ControllerUpdateSubscriberChannelRequest = {
       updateSubscriberChannelRequestDto: updateSubscriberChannelRequestDto,
       subscriberId: subscriberId,
       idempotencyKey: idempotencyKey,
@@ -64,7 +64,7 @@ export async function subscribersCredentialsUpdate(
     input,
     (value) =>
       operations
-        .SubscribersControllerUpdateSubscriberChannelRequest$outboundSchema
+        .SubscribersV1ControllerUpdateSubscriberChannelRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -101,7 +101,7 @@ export async function subscribersCredentialsUpdate(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_updateSubscriberChannel",
+    operationID: "SubscribersV1Controller_updateSubscriberChannel",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -169,7 +169,7 @@ export async function subscribersCredentialsUpdate(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerUpdateSubscriberChannelResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberChannelResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -185,7 +185,7 @@ export async function subscribersCredentialsUpdate(
     M.json(
       200,
       operations
-        .SubscribersControllerUpdateSubscriberChannelResponse$inboundSchema,
+        .SubscribersV1ControllerUpdateSubscriberChannelResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

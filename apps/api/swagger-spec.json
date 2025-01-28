@@ -7393,7 +7393,7 @@
     },
     "/v1/subscribers": {
       "get": {
-        "operationId": "SubscribersController_listSubscribers",
+        "operationId": "SubscribersV1Controller_listSubscribers",
         "x-speakeasy-pagination": {
           "type": "offsetLimit",
           "inputs": [
@@ -7917,7 +7917,7 @@
         ]
       },
       "post": {
-        "operationId": "SubscribersController_createSubscriber",
+        "operationId": "SubscribersV1Controller_createSubscriber",
         "summary": "Create subscriber",
         "description": "Creates a subscriber entity, in the Novu platform. The subscriber will be later used to receive notifications, and access notification feeds. Communication credentials such as email, phone number, and 3 rd party credentials i.e slack tokens could be later associated to this entity.",
         "parameters": [
@@ -8403,7 +8403,7 @@
     },
     "/v1/subscribers/{subscriberId}": {
       "get": {
-        "operationId": "SubscribersController_getSubscriber",
+        "operationId": "SubscribersV1Controller_getSubscriber",
         "summary": "Get subscriber",
         "description": "Get subscriber by your internal id used to identify the subscriber",
         "parameters": [
@@ -8894,7 +8894,7 @@
         ]
       },
       "put": {
-        "operationId": "SubscribersController_updateSubscriber",
+        "operationId": "SubscribersV1Controller_updateSubscriber",
         "summary": "Update subscriber",
         "description": "Used to update the subscriber entity with new information",
         "parameters": [
@@ -9386,7 +9386,7 @@
         ]
       },
       "delete": {
-        "operationId": "SubscribersController_removeSubscriber",
+        "operationId": "SubscribersV1Controller_removeSubscriber",
         "summary": "Delete subscriber",
         "description": "Deletes a subscriber entity from the Novu platform",
         "parameters": [
@@ -9870,7 +9870,7 @@
     },
     "/v1/subscribers/bulk": {
       "post": {
-        "operationId": "SubscribersController_bulkCreateSubscribers",
+        "operationId": "SubscribersV1Controller_bulkCreateSubscribers",
         "x-speakeasy-name-override": "createBulk",
         "summary": "Bulk create subscribers",
         "description": "\n      Using this endpoint you can create multiple subscribers at once, to avoid multiple calls to the API.\n      The bulk API is limited to 500 subscribers per request.\n    ",
@@ -10357,7 +10357,7 @@
     },
     "/v1/subscribers/{subscriberId}/credentials": {
       "put": {
-        "operationId": "SubscribersController_updateSubscriberChannel",
+        "operationId": "SubscribersV1Controller_updateSubscriberChannel",
         "x-speakeasy-group": "Subscribers.Credentials",
         "summary": "Update subscriber credentials",
         "description": "Subscriber credentials associated to the delivery methods such as slack and push tokens.",
@@ -10850,7 +10850,7 @@
         ]
       },
       "patch": {
-        "operationId": "SubscribersController_modifySubscriberChannel",
+        "operationId": "SubscribersV1Controller_modifySubscriberChannel",
         "x-speakeasy-name-override": "append",
         "x-speakeasy-group": "Subscribers.Credentials",
         "summary": "Modify subscriber credentials",
@@ -11346,7 +11346,7 @@
     },
     "/v1/subscribers/{subscriberId}/credentials/{providerId}": {
       "delete": {
-        "operationId": "SubscribersController_deleteSubscriberCredentials",
+        "operationId": "SubscribersV1Controller_deleteSubscriberCredentials",
         "x-speakeasy-group": "Subscribers.Credentials",
         "summary": "Delete subscriber credentials by providerId",
         "description": "Delete subscriber credentials such as slack and expo tokens.",
@@ -11832,7 +11832,7 @@
     },
     "/v1/subscribers/{subscriberId}/online-status": {
       "patch": {
-        "operationId": "SubscribersController_updateSubscriberOnlineFlag",
+        "operationId": "SubscribersV1Controller_updateSubscriberOnlineFlag",
         "x-speakeasy-name-override": "updateOnlineFlag",
         "x-speakeasy-group": "Subscribers.properties",
         "summary": "Update subscriber online status",
@@ -12328,7 +12328,7 @@
     },
     "/v1/subscribers/{subscriberId}/preferences": {
       "get": {
-        "operationId": "SubscribersController_listSubscriberPreferences",
+        "operationId": "SubscribersV1Controller_listSubscriberPreferences",
         "x-speakeasy-name-override": "list",
         "x-speakeasy-group": "Subscribers.Preferences",
         "summary": "Get subscriber preferences",
@@ -12823,7 +12823,7 @@
         ]
       },
       "patch": {
-        "operationId": "SubscribersController_updateSubscriberGlobalPreferences",
+        "operationId": "SubscribersV1Controller_updateSubscriberGlobalPreferences",
         "x-speakeasy-name-override": "updateGlobal",
         "x-speakeasy-group": "Subscribers.Preferences",
         "summary": "Update subscriber global preferences",
@@ -13318,7 +13318,7 @@
     },
     "/v1/subscribers/{subscriberId}/preferences/{parameter}": {
       "get": {
-        "operationId": "SubscribersController_getSubscriberPreferenceByLevel",
+        "operationId": "SubscribersV1Controller_getSubscriberPreferenceByLevel",
         "x-speakeasy-name-override": "retrieveByLevel",
         "x-speakeasy-group": "Subscribers.Preferences",
         "summary": "Get subscriber preferences by level",
@@ -13824,7 +13824,7 @@
         ]
       },
       "patch": {
-        "operationId": "SubscribersController_updateSubscriberPreference",
+        "operationId": "SubscribersV1Controller_updateSubscriberPreference",
         "x-speakeasy-group": "Subscribers.Preferences",
         "summary": "Update subscriber preference",
         "parameters": [
@@ -14327,7 +14327,7 @@
     },
     "/v1/subscribers/{subscriberId}/notifications/feed": {
       "get": {
-        "operationId": "SubscribersController_getNotificationsFeed",
+        "operationId": "SubscribersV1Controller_getNotificationsFeed",
         "x-speakeasy-name-override": "feed",
         "x-speakeasy-group": "Subscribers.Notifications",
         "summary": "Get in-app notification feed for a particular subscriber",
@@ -14856,7 +14856,7 @@
     },
     "/v1/subscribers/{subscriberId}/notifications/unseen": {
       "get": {
-        "operationId": "SubscribersController_getUnseenCount",
+        "operationId": "SubscribersV1Controller_getUnseenCount",
         "x-speakeasy-name-override": "unseenCount",
         "x-speakeasy-group": "Subscribers.Notifications",
         "summary": "Get the unseen in-app notifications count for subscribers feed",
@@ -15361,7 +15361,7 @@
     },
     "/v1/subscribers/{subscriberId}/messages/mark-as": {
       "post": {
-        "operationId": "SubscribersController_markMessagesAs",
+        "operationId": "SubscribersV1Controller_markMessagesAs",
         "x-speakeasy-name-override": "markAllAs",
         "x-speakeasy-group": "Subscribers.Messages",
         "summary": "Mark a subscriber messages as seen, read, unseen or unread",
@@ -15859,7 +15859,7 @@
     },
     "/v1/subscribers/{subscriberId}/messages/mark-all": {
       "post": {
-        "operationId": "SubscribersController_markAllUnreadAsRead",
+        "operationId": "SubscribersV1Controller_markAllUnreadAsRead",
         "x-speakeasy-name-override": "markAll",
         "x-speakeasy-group": "Subscribers.Messages",
         "summary": "Marks all the subscriber messages as read, unread, seen or unseen. Optionally you can pass feed id (or array) to mark messages of a particular feed.",
@@ -16354,7 +16354,7 @@
     },
     "/v1/subscribers/{subscriberId}/messages/{messageId}/actions/{type}": {
       "post": {
-        "operationId": "SubscribersController_markActionAsSeen",
+        "operationId": "SubscribersV1Controller_markActionAsSeen",
         "x-speakeasy-name-override": "updateAsSeen",
         "x-speakeasy-group": "Subscribers.Messages",
         "summary": "Mark message action as seen",
@@ -16865,7 +16865,7 @@
     },
     "/v1/subscribers/{subscriberId}/credentials/{providerId}/oauth/callback": {
       "get": {
-        "operationId": "SubscribersController_chatOauthCallback",
+        "operationId": "SubscribersV1Controller_chatOauthCallback",
         "x-speakeasy-name-override": "chatAccessOauthCallBack",
         "x-speakeasy-group": "Subscribers.Authentication",
         "summary": "Handle providers oauth redirect",
@@ -17431,7 +17431,7 @@
     },
     "/v1/subscribers/{subscriberId}/credentials/{providerId}/oauth": {
       "get": {
-        "operationId": "SubscribersController_chatAccessOauth",
+        "operationId": "SubscribersV1Controller_chatAccessOauth",
         "x-speakeasy-name-override": "chatAccessOauth",
         "x-speakeasy-group": "Subscribers.Authentication",
         "summary": "Handle chat oauth",
@@ -17912,6 +17912,536 @@
         "security": [
           {
             "api-key": []
+          }
+        ]
+      }
+    },
+    "/v2/subscribers": {
+      "get": {
+        "operationId": "SubscribersController_searchSubscribers",
+        "x-speakeasy-name-override": "search",
+        "summary": "Search for subscribers",
+        "parameters": [
+          {
+            "name": "after",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination indicating the starting point after which to fetch results.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "before",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination indicating the ending point before which to fetch results.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "required": false,
+            "in": "query",
+            "description": "Email address of the subscriber to filter results.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "description": "Name of the subscriber to filter results.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phone",
+            "required": false,
+            "in": "query",
+            "description": "Phone number of the subscriber to filter results.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subscriberId",
+            "required": false,
+            "in": "query",
+            "description": "Unique identifier of the subscriber to filter results.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": ["ASC", "DESC"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "description": "A header for idempotency purposes",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of subscribers retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListSubscribersResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "414": {
+            "description": "URI Too Long",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The client has sent too many requests in a given amount of time. ",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              },
+              "Retry-After": {
+                "$ref": "#/components/headers/Retry-After"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "API rate limit exceeded"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The server is currently unable to handle the request due to a temporary overload or scheduled maintenance, which will likely be alleviated after some delay.",
+            "headers": {
+              "Content-Type": {
+                "$ref": "#/components/headers/Content-Type"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimit-Limit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimit-Remaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimit-Reset"
+              },
+              "RateLimit-Policy": {
+                "$ref": "#/components/headers/RateLimit-Policy"
+              },
+              "Idempotency-Key": {
+                "$ref": "#/components/headers/Idempotency-Key"
+              },
+              "Idempotency-Replay": {
+                "$ref": "#/components/headers/Idempotency-Replay"
+              },
+              "Retry-After": {
+                "$ref": "#/components/headers/Retry-After"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Please wait some time, then try again."
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Subscribers"],
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "bearerAuth": []
           }
         ]
       }
@@ -31839,6 +32369,29 @@
       "String": {
         "type": "object",
         "properties": {}
+      },
+      "ListSubscribersResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "List of returned Subscribers",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriberResponseDto"
+            }
+          },
+          "next": {
+            "type": "string",
+            "description": "The cursor for the next page of results, or null if there are no more pages.",
+            "nullable": true
+          },
+          "previous": {
+            "type": "string",
+            "description": "The cursor for the previous page of results, or null if this is the first page.",
+            "nullable": true
+          }
+        },
+        "required": ["data", "next", "previous"]
       },
       "DeleteMessageResponseDto": {
         "type": "object",

@@ -18,11 +18,11 @@ export class Authentication extends ClientSDK {
    * Handle providers oauth redirect
    */
   async chatAccessOauthCallBack(
-    request: operations.SubscribersControllerChatOauthCallbackRequest,
+    request: operations.SubscribersV1ControllerChatOauthCallbackRequest,
     options?: RequestOptions & {
       acceptHeaderOverride?: ChatAccessOauthCallBackAcceptEnum;
     },
-  ): Promise<operations.SubscribersControllerChatOauthCallbackResponse> {
+  ): Promise<operations.SubscribersV1ControllerChatOauthCallbackResponse> {
     return unwrapAsync(subscribersAuthenticationChatAccessOauthCallBack(
       this,
       request,
@@ -34,10 +34,10 @@ export class Authentication extends ClientSDK {
    * Handle chat oauth
    */
   async chatAccessOauth(
-    request: operations.SubscribersControllerChatAccessOauthRequest,
+    request: operations.SubscribersV1ControllerChatAccessOauthRequest,
     options?: RequestOptions,
   ): Promise<
-    operations.SubscribersControllerChatAccessOauthResponse | undefined
+    operations.SubscribersV1ControllerChatAccessOauthResponse | undefined
   > {
     return unwrapAsync(subscribersAuthenticationChatAccessOauth(
       this,

@@ -21,7 +21,7 @@ export class Preferences extends ClientSDK {
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
   ): Promise<
-    operations.SubscribersControllerListSubscriberPreferencesResponse
+    operations.SubscribersV1ControllerListSubscriberPreferencesResponse
   > {
     return unwrapAsync(subscribersPreferencesList(
       this,
@@ -42,7 +42,7 @@ export class Preferences extends ClientSDK {
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
   ): Promise<
-    operations.SubscribersControllerUpdateSubscriberGlobalPreferencesResponse
+    operations.SubscribersV1ControllerUpdateSubscriberGlobalPreferencesResponse
   > {
     return unwrapAsync(subscribersPreferencesUpdateGlobal(
       this,
@@ -58,10 +58,10 @@ export class Preferences extends ClientSDK {
    */
   async retrieveByLevel(
     request:
-      operations.SubscribersControllerGetSubscriberPreferenceByLevelRequest,
+      operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelRequest,
     options?: RequestOptions,
   ): Promise<
-    operations.SubscribersControllerGetSubscriberPreferenceByLevelResponse
+    operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelResponse
   > {
     return unwrapAsync(subscribersPreferencesRetrieveByLevel(
       this,
@@ -74,10 +74,11 @@ export class Preferences extends ClientSDK {
    * Update subscriber preference
    */
   async update(
-    request: operations.SubscribersControllerUpdateSubscriberPreferenceRequest,
+    request:
+      operations.SubscribersV1ControllerUpdateSubscriberPreferenceRequest,
     options?: RequestOptions,
   ): Promise<
-    operations.SubscribersControllerUpdateSubscriberPreferenceResponse
+    operations.SubscribersV1ControllerUpdateSubscriberPreferenceResponse
   > {
     return unwrapAsync(subscribersPreferencesUpdate(
       this,

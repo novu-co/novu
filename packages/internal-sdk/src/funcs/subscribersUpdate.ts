@@ -38,7 +38,7 @@ export async function subscribersUpdate(
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerUpdateSubscriberResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -52,7 +52,7 @@ export async function subscribersUpdate(
     | ConnectionError
   >
 > {
-  const input: operations.SubscribersControllerUpdateSubscriberRequest = {
+  const input: operations.SubscribersV1ControllerUpdateSubscriberRequest = {
     updateSubscriberRequestDto: updateSubscriberRequestDto,
     subscriberId: subscriberId,
     idempotencyKey: idempotencyKey,
@@ -61,7 +61,7 @@ export async function subscribersUpdate(
   const parsed = safeParse(
     input,
     (value) =>
-      operations.SubscribersControllerUpdateSubscriberRequest$outboundSchema
+      operations.SubscribersV1ControllerUpdateSubscriberRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -96,7 +96,7 @@ export async function subscribersUpdate(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_updateSubscriber",
+    operationID: "SubscribersV1Controller_updateSubscriber",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -164,7 +164,7 @@ export async function subscribersUpdate(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerUpdateSubscriberResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -179,7 +179,7 @@ export async function subscribersUpdate(
   >(
     M.json(
       200,
-      operations.SubscribersControllerUpdateSubscriberResponse$inboundSchema,
+      operations.SubscribersV1ControllerUpdateSubscriberResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

@@ -28,11 +28,11 @@ import { Result } from "../types/fp.js";
  */
 export async function subscribersAuthenticationChatAccessOauth(
   client: NovuCore,
-  request: operations.SubscribersControllerChatAccessOauthRequest,
+  request: operations.SubscribersV1ControllerChatAccessOauthRequest,
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerChatAccessOauthResponse | undefined,
+    operations.SubscribersV1ControllerChatAccessOauthResponse | undefined,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -49,7 +49,7 @@ export async function subscribersAuthenticationChatAccessOauth(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.SubscribersControllerChatAccessOauthRequest$outboundSchema
+      operations.SubscribersV1ControllerChatAccessOauthRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -93,7 +93,7 @@ export async function subscribersAuthenticationChatAccessOauth(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_chatAccessOauth",
+    operationID: "SubscribersV1Controller_chatAccessOauth",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -162,7 +162,7 @@ export async function subscribersAuthenticationChatAccessOauth(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerChatAccessOauthResponse | undefined,
+    operations.SubscribersV1ControllerChatAccessOauthResponse | undefined,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -177,7 +177,7 @@ export async function subscribersAuthenticationChatAccessOauth(
   >(
     M.nil(
       200,
-      operations.SubscribersControllerChatAccessOauthResponse$inboundSchema
+      operations.SubscribersV1ControllerChatAccessOauthResponse$inboundSchema
         .optional(),
     ),
     M.jsonErr(

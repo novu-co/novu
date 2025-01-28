@@ -8,7 +8,7 @@ import { FieldFilterPartDto } from "@novu/api/models/components";
 let value: FieldFilterPartDto = {
   field: "<value>",
   value: "<value>",
-  operator: "NOT_EQUAL",
+  operator: "IN",
   on: "payload",
 };
 ```

@@ -34,15 +34,15 @@ import {
 } from "./_types.js";
 
 export type SubscribersListQueryData =
-  operations.SubscribersControllerListSubscribersResponse;
+  operations.SubscribersV1ControllerListSubscribersResponse;
 
 export type SubscribersListInfiniteQueryData = PageIterator<
-  operations.SubscribersControllerListSubscribersResponse,
+  operations.SubscribersV1ControllerListSubscribersResponse,
   { page: number }
 >;
 
 export type SubscribersListPageParams = PageIterator<
-  operations.SubscribersControllerListSubscribersResponse,
+  operations.SubscribersV1ControllerListSubscribersResponse,
   { page: number }
 >["~next"];
 

@@ -7,6 +7,7 @@ import { subscribersCreateBulk } from "../funcs/subscribersCreateBulk.js";
 import { subscribersDelete } from "../funcs/subscribersDelete.js";
 import { subscribersList } from "../funcs/subscribersList.js";
 import { subscribersRetrieve } from "../funcs/subscribersRetrieve.js";
+import { subscribersSearch } from "../funcs/subscribersSearch.js";
 import { subscribersUpdate } from "../funcs/subscribersUpdate.js";
 import { ClientSDK, RequestOptions } from "../lib/sdks.js";
 import * as components from "../models/components/index.js";
@@ -64,7 +65,7 @@ export class Subscribers extends ClientSDK {
     options?: RequestOptions,
   ): Promise<
     PageIterator<
-      operations.SubscribersControllerListSubscribersResponse,
+      operations.SubscribersV1ControllerListSubscribersResponse,
       { page: number }
     >
   > {
@@ -87,7 +88,7 @@ export class Subscribers extends ClientSDK {
     createSubscriberRequestDto: components.CreateSubscriberRequestDto,
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerCreateSubscriberResponse> {
+  ): Promise<operations.SubscribersV1ControllerCreateSubscriberResponse> {
     return unwrapAsync(subscribersCreate(
       this,
       createSubscriberRequestDto,
@@ -107,7 +108,7 @@ export class Subscribers extends ClientSDK {
     includeTopics?: boolean | undefined,
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerGetSubscriberResponse> {
+  ): Promise<operations.SubscribersV1ControllerGetSubscriberResponse> {
     return unwrapAsync(subscribersRetrieve(
       this,
       subscriberId,
@@ -128,7 +129,7 @@ export class Subscribers extends ClientSDK {
     subscriberId: string,
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerUpdateSubscriberResponse> {
+  ): Promise<operations.SubscribersV1ControllerUpdateSubscriberResponse> {
     return unwrapAsync(subscribersUpdate(
       this,
       updateSubscriberRequestDto,
@@ -148,7 +149,7 @@ export class Subscribers extends ClientSDK {
     subscriberId: string,
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerRemoveSubscriberResponse> {
+  ): Promise<operations.SubscribersV1ControllerRemoveSubscriberResponse> {
     return unwrapAsync(subscribersDelete(
       this,
       subscriberId,
@@ -169,11 +170,25 @@ export class Subscribers extends ClientSDK {
     bulkSubscriberCreateDto: components.BulkSubscriberCreateDto,
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerBulkCreateSubscribersResponse> {
+  ): Promise<operations.SubscribersV1ControllerBulkCreateSubscribersResponse> {
     return unwrapAsync(subscribersCreateBulk(
       this,
       bulkSubscriberCreateDto,
       idempotencyKey,
+      options,
+    ));
+  }
+
+  /**
+   * Search for subscribers
+   */
+  async search(
+    request: operations.SubscribersControllerSearchSubscribersRequest,
+    options?: RequestOptions,
+  ): Promise<operations.SubscribersControllerSearchSubscribersResponse> {
+    return unwrapAsync(subscribersSearch(
+      this,
+      request,
       options,
     ));
   }

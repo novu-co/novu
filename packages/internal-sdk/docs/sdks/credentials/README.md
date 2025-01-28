@@ -27,6 +27,7 @@ const novu = new Novu({
 async function run() {
   const result = await novu.subscribers.credentials.update({
     providerId: "pushpad",
+    integrationIdentifier: "<value>",
     credentials: {
       webhookUrl: "https://example.com/webhook",
       channel: "general",
@@ -69,6 +70,7 @@ const novu = new NovuCore({
 async function run() {
   const res = await subscribersCredentialsUpdate(novu, {
     providerId: "pushpad",
+    integrationIdentifier: "<value>",
     credentials: {
       webhookUrl: "https://example.com/webhook",
       channel: "general",
@@ -128,7 +130,7 @@ import {
 
 ### Response
 
-**Promise\<[operations.SubscribersControllerUpdateSubscriberChannelResponse](../../models/operations/subscriberscontrollerupdatesubscriberchannelresponse.md)\>**
+**Promise\<[operations.SubscribersV1ControllerUpdateSubscriberChannelResponse](../../models/operations/subscribersv1controllerupdatesubscriberchannelresponse.md)\>**
 
 ### Errors
 
@@ -159,6 +161,7 @@ const novu = new Novu({
 async function run() {
   const result = await novu.subscribers.credentials.append({
     providerId: "zulip",
+    integrationIdentifier: "<value>",
     credentials: {
       webhookUrl: "https://example.com/webhook",
       channel: "general",
@@ -201,6 +204,7 @@ const novu = new NovuCore({
 async function run() {
   const res = await subscribersCredentialsAppend(novu, {
     providerId: "zulip",
+    integrationIdentifier: "<value>",
     credentials: {
       webhookUrl: "https://example.com/webhook",
       channel: "general",
@@ -260,7 +264,7 @@ import {
 
 ### Response
 
-**Promise\<[operations.SubscribersControllerModifySubscriberChannelResponse](../../models/operations/subscriberscontrollermodifysubscriberchannelresponse.md)\>**
+**Promise\<[operations.SubscribersV1ControllerModifySubscriberChannelResponse](../../models/operations/subscribersv1controllermodifysubscriberchannelresponse.md)\>**
 
 ### Errors
 
@@ -359,7 +363,7 @@ import {
 
 ### Response
 
-**Promise\<[operations.SubscribersControllerDeleteSubscriberCredentialsResponse](../../models/operations/subscriberscontrollerdeletesubscribercredentialsresponse.md)\>**
+**Promise\<[operations.SubscribersV1ControllerDeleteSubscriberCredentialsResponse](../../models/operations/subscribersv1controllerdeletesubscribercredentialsresponse.md)\>**
 
 ### Errors
 

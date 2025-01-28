@@ -26,7 +26,7 @@ import {
 } from "./_types.js";
 
 export type SubscribersPreferencesListQueryData =
-  operations.SubscribersControllerListSubscriberPreferencesResponse;
+  operations.SubscribersV1ControllerListSubscriberPreferencesResponse;
 
 /**
  * Get subscriber preferences

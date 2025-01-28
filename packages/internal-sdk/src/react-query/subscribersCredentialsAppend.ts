@@ -26,7 +26,7 @@ export type SubscribersCredentialsAppendMutationVariables = {
 };
 
 export type SubscribersCredentialsAppendMutationData =
-  operations.SubscribersControllerModifySubscriberChannelResponse;
+  operations.SubscribersV1ControllerModifySubscriberChannelResponse;
 
 /**
  * Modify subscriber credentials

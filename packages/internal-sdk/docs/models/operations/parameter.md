@@ -7,7 +7,7 @@ the preferences level to be retrieved (template / global)
 ```typescript
 import { Parameter } from "@novu/api/models/operations";
 
-let value: Parameter = "global";
+let value: Parameter = "template";
 ```
 
 ## Values

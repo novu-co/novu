@@ -40,6 +40,7 @@ export * from "./subscribersPreferencesUpdate.js";
 export * from "./subscribersPreferencesUpdateGlobal.js";
 export * from "./subscribersPropertiesUpdateOnlineFlag.js";
 export * from "./subscribersRetrieve.js";
+export * from "./subscribersSearch.js";
 export * from "./subscribersUpdate.js";
 export * from "./topicsCreate.js";
 export * from "./topicsDelete.js";

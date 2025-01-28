@@ -7,7 +7,8 @@ import { WorkflowResponse } from "@novu/api/models/components";
 
 let value: WorkflowResponse = {
   name: "<value>",
-  description: "obedience finally less over how prejudge cutover for",
+  description:
+    "meh instead technician inasmuch sympathetically disappointment nor until",
   active: false,
   draft: false,
   preferenceSettings: {},

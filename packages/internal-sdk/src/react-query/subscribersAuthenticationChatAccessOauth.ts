@@ -26,14 +26,14 @@ import {
 } from "./_types.js";
 
 export type SubscribersAuthenticationChatAccessOauthQueryData =
-  | operations.SubscribersControllerChatAccessOauthResponse
+  | operations.SubscribersV1ControllerChatAccessOauthResponse
   | undefined;
 
 /**
  * Handle chat oauth
  */
 export function useSubscribersAuthenticationChatAccessOauth(
-  request: operations.SubscribersControllerChatAccessOauthRequest,
+  request: operations.SubscribersV1ControllerChatAccessOauthRequest,
   options?: QueryHookOptions<SubscribersAuthenticationChatAccessOauthQueryData>,
 ): UseQueryResult<SubscribersAuthenticationChatAccessOauthQueryData, Error> {
   const client = useNovuContext();
@@ -51,7 +51,7 @@ export function useSubscribersAuthenticationChatAccessOauth(
  * Handle chat oauth
  */
 export function useSubscribersAuthenticationChatAccessOauthSuspense(
-  request: operations.SubscribersControllerChatAccessOauthRequest,
+  request: operations.SubscribersV1ControllerChatAccessOauthRequest,
   options?: SuspenseQueryHookOptions<
     SubscribersAuthenticationChatAccessOauthQueryData
   >,
@@ -73,7 +73,7 @@ export function useSubscribersAuthenticationChatAccessOauthSuspense(
 export function prefetchSubscribersAuthenticationChatAccessOauth(
   queryClient: QueryClient,
   client$: NovuCore,
-  request: operations.SubscribersControllerChatAccessOauthRequest,
+  request: operations.SubscribersV1ControllerChatAccessOauthRequest,
 ): Promise<void> {
   return queryClient.prefetchQuery({
     ...buildSubscribersAuthenticationChatAccessOauthQuery(
@@ -144,7 +144,7 @@ export function invalidateAllSubscribersAuthenticationChatAccessOauth(
 
 export function buildSubscribersAuthenticationChatAccessOauthQuery(
   client$: NovuCore,
-  request: operations.SubscribersControllerChatAccessOauthRequest,
+  request: operations.SubscribersV1ControllerChatAccessOauthRequest,
   options?: RequestOptions,
 ): {
   queryKey: QueryKey;

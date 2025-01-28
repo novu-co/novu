@@ -23,7 +23,9 @@ export class Credentials extends ClientSDK {
     subscriberId: string,
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerUpdateSubscriberChannelResponse> {
+  ): Promise<
+    operations.SubscribersV1ControllerUpdateSubscriberChannelResponse
+  > {
     return unwrapAsync(subscribersCredentialsUpdate(
       this,
       updateSubscriberChannelRequestDto,
@@ -46,7 +48,9 @@ export class Credentials extends ClientSDK {
     subscriberId: string,
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
-  ): Promise<operations.SubscribersControllerModifySubscriberChannelResponse> {
+  ): Promise<
+    operations.SubscribersV1ControllerModifySubscriberChannelResponse
+  > {
     return unwrapAsync(subscribersCredentialsAppend(
       this,
       updateSubscriberChannelRequestDto,
@@ -68,7 +72,7 @@ export class Credentials extends ClientSDK {
     idempotencyKey?: string | undefined,
     options?: RequestOptions,
   ): Promise<
-    | operations.SubscribersControllerDeleteSubscriberCredentialsResponse
+    | operations.SubscribersV1ControllerDeleteSubscriberCredentialsResponse
     | undefined
   > {
     return unwrapAsync(subscribersCredentialsDelete(

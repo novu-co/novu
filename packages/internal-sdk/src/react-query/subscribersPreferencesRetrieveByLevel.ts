@@ -26,14 +26,14 @@ import {
 } from "./_types.js";
 
 export type SubscribersPreferencesRetrieveByLevelQueryData =
-  operations.SubscribersControllerGetSubscriberPreferenceByLevelResponse;
+  operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelResponse;
 
 /**
  * Get subscriber preferences by level
  */
 export function useSubscribersPreferencesRetrieveByLevel(
   request:
-    operations.SubscribersControllerGetSubscriberPreferenceByLevelRequest,
+    operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelRequest,
   options?: QueryHookOptions<SubscribersPreferencesRetrieveByLevelQueryData>,
 ): UseQueryResult<SubscribersPreferencesRetrieveByLevelQueryData, Error> {
   const client = useNovuContext();
@@ -52,7 +52,7 @@ export function useSubscribersPreferencesRetrieveByLevel(
  */
 export function useSubscribersPreferencesRetrieveByLevelSuspense(
   request:
-    operations.SubscribersControllerGetSubscriberPreferenceByLevelRequest,
+    operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelRequest,
   options?: SuspenseQueryHookOptions<
     SubscribersPreferencesRetrieveByLevelQueryData
   >,
@@ -75,7 +75,7 @@ export function prefetchSubscribersPreferencesRetrieveByLevel(
   queryClient: QueryClient,
   client$: NovuCore,
   request:
-    operations.SubscribersControllerGetSubscriberPreferenceByLevelRequest,
+    operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelRequest,
 ): Promise<void> {
   return queryClient.prefetchQuery({
     ...buildSubscribersPreferencesRetrieveByLevelQuery(
@@ -138,7 +138,7 @@ export function invalidateAllSubscribersPreferencesRetrieveByLevel(
 export function buildSubscribersPreferencesRetrieveByLevelQuery(
   client$: NovuCore,
   request:
-    operations.SubscribersControllerGetSubscriberPreferenceByLevelRequest,
+    operations.SubscribersV1ControllerGetSubscriberPreferenceByLevelRequest,
   options?: RequestOptions,
 ): {
   queryKey: QueryKey;

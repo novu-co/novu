@@ -17,12 +17,12 @@ import { useNovuContext } from "./_context.js";
 import { MutationHookOptions } from "./_types.js";
 
 export type SubscribersMessagesUpdateAsSeenMutationVariables = {
-  request: operations.SubscribersControllerMarkActionAsSeenRequest;
+  request: operations.SubscribersV1ControllerMarkActionAsSeenRequest;
   options?: RequestOptions;
 };
 
 export type SubscribersMessagesUpdateAsSeenMutationData =
-  operations.SubscribersControllerMarkActionAsSeenResponse;
+  operations.SubscribersV1ControllerMarkActionAsSeenResponse;
 
 /**
  * Mark message action as seen

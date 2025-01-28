@@ -26,7 +26,7 @@ export type SubscribersPreferencesUpdateGlobalMutationVariables = {
 };
 
 export type SubscribersPreferencesUpdateGlobalMutationData =
-  operations.SubscribersControllerUpdateSubscriberGlobalPreferencesResponse;
+  operations.SubscribersV1ControllerUpdateSubscriberGlobalPreferencesResponse;
 
 /**
  * Update subscriber global preferences

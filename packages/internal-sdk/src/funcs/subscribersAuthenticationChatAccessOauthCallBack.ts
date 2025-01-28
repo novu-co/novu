@@ -33,13 +33,13 @@ export enum ChatAccessOauthCallBackAcceptEnum {
  */
 export async function subscribersAuthenticationChatAccessOauthCallBack(
   client: NovuCore,
-  request: operations.SubscribersControllerChatOauthCallbackRequest,
+  request: operations.SubscribersV1ControllerChatOauthCallbackRequest,
   options?: RequestOptions & {
     acceptHeaderOverride?: ChatAccessOauthCallBackAcceptEnum;
   },
 ): Promise<
   Result<
-    operations.SubscribersControllerChatOauthCallbackResponse,
+    operations.SubscribersV1ControllerChatOauthCallbackResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -56,7 +56,7 @@ export async function subscribersAuthenticationChatAccessOauthCallBack(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.SubscribersControllerChatOauthCallbackRequest$outboundSchema
+      operations.SubscribersV1ControllerChatOauthCallbackRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -102,7 +102,7 @@ export async function subscribersAuthenticationChatAccessOauthCallBack(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_chatOauthCallback",
+    operationID: "SubscribersV1Controller_chatOauthCallback",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -171,7 +171,7 @@ export async function subscribersAuthenticationChatAccessOauthCallBack(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerChatOauthCallbackResponse,
+    operations.SubscribersV1ControllerChatOauthCallbackResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -186,12 +186,12 @@ export async function subscribersAuthenticationChatAccessOauthCallBack(
   >(
     M.text(
       200,
-      operations.SubscribersControllerChatOauthCallbackResponse$inboundSchema,
+      operations.SubscribersV1ControllerChatOauthCallbackResponse$inboundSchema,
       { ctype: "text/html", hdrs: true, key: "Result" },
     ),
     M.json(
       302,
-      operations.SubscribersControllerChatOauthCallbackResponse$inboundSchema,
+      operations.SubscribersV1ControllerChatOauthCallbackResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

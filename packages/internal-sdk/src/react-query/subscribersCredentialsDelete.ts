@@ -24,7 +24,7 @@ export type SubscribersCredentialsDeleteMutationVariables = {
 };
 
 export type SubscribersCredentialsDeleteMutationData =
-  | operations.SubscribersControllerDeleteSubscriberCredentialsResponse
+  | operations.SubscribersV1ControllerDeleteSubscriberCredentialsResponse
   | undefined;
 
 /**

@@ -98,7 +98,7 @@ import {
 
 ### Response
 
-**Promise\<[operations.SubscribersControllerUpdateSubscriberOnlineFlagResponse](../../models/operations/subscriberscontrollerupdatesubscriberonlineflagresponse.md)\>**
+**Promise\<[operations.SubscribersV1ControllerUpdateSubscriberOnlineFlagResponse](../../models/operations/subscribersv1controllerupdatesubscriberonlineflagresponse.md)\>**
 
 ### Errors
 

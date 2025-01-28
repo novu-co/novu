@@ -23,7 +23,7 @@ export type SubscribersDeleteMutationVariables = {
 };
 
 export type SubscribersDeleteMutationData =
-  operations.SubscribersControllerRemoveSubscriberResponse;
+  operations.SubscribersV1ControllerRemoveSubscriberResponse;
 
 /**
  * Delete subscriber

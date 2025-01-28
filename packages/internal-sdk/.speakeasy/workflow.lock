@@ -14,7 +14,7 @@ targets:
         sourceRevisionDigest: sha256:64dd2fbd3eed651976ea14b35f30f479ae5571ae9fd086baa839f138037ac792
         sourceBlobDigest: sha256:68bac272e542ed83cb9c867ed90e4e682d4c03c54c0b12ddfe8ebb6a0ba9b103
         codeSamplesNamespace: json-development-internal-code-samples
-        codeSamplesRevisionDigest: sha256:a56eb0939eca60850fa1c2a90ccb6ecbe55f127cdc13ad4ee7d7721bf458db2b
+        codeSamplesRevisionDigest: sha256:0bbab039cbbf108c11de5944035f932575398f83494c18aa7ab8b60c31cb1584
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest

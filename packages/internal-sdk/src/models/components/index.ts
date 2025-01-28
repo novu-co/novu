@@ -57,6 +57,7 @@ export * from "./generatepreviewresponsedto.js";
 export * from "./getsubscriberpreferencesresponsedto.js";
 export * from "./gettopicresponsedto.js";
 export * from "./integrationresponsedto.js";
+export * from "./listsubscribersresponsedto.js";
 export * from "./markallmessageasrequestdto.js";
 export * from "./markmessageactionasseendto.js";
 export * from "./messageaction.js";

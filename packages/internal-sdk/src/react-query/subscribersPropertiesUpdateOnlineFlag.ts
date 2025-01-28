@@ -26,7 +26,7 @@ export type SubscribersPropertiesUpdateOnlineFlagMutationVariables = {
 };
 
 export type SubscribersPropertiesUpdateOnlineFlagMutationData =
-  operations.SubscribersControllerUpdateSubscriberOnlineFlagResponse;
+  operations.SubscribersV1ControllerUpdateSubscriberOnlineFlagResponse;
 
 /**
  * Update subscriber online status

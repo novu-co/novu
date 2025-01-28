@@ -28,11 +28,11 @@ import { Result } from "../types/fp.js";
  */
 export async function subscribersNotificationsFeed(
   client: NovuCore,
-  request: operations.SubscribersControllerGetNotificationsFeedRequest,
+  request: operations.SubscribersV1ControllerGetNotificationsFeedRequest,
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerGetNotificationsFeedResponse,
+    operations.SubscribersV1ControllerGetNotificationsFeedResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -49,7 +49,8 @@ export async function subscribersNotificationsFeed(
   const parsed = safeParse(
     request,
     (value) =>
-      operations.SubscribersControllerGetNotificationsFeedRequest$outboundSchema
+      operations
+        .SubscribersV1ControllerGetNotificationsFeedRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -91,7 +92,7 @@ export async function subscribersNotificationsFeed(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_getNotificationsFeed",
+    operationID: "SubscribersV1Controller_getNotificationsFeed",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -160,7 +161,7 @@ export async function subscribersNotificationsFeed(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerGetNotificationsFeedResponse,
+    operations.SubscribersV1ControllerGetNotificationsFeedResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -176,7 +177,7 @@ export async function subscribersNotificationsFeed(
     M.json(
       200,
       operations
-        .SubscribersControllerGetNotificationsFeedResponse$inboundSchema,
+        .SubscribersV1ControllerGetNotificationsFeedResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

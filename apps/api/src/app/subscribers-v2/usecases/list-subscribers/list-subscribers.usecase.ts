@@ -1,20 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InstrumentUsecase } from '@novu/application-generic';
 import { SubscriberRepository } from '@novu/dal';
-import { IListSubscribersResponseDto } from '@novu/shared';
 import { ListSubscribersCommand } from './list-subscribers.command';
+import { ListSubscribersResponseDto } from '../../dtos';
+import { DirectionEnum } from '../../../shared/dtos/base-responses';
 
 @Injectable()
 export class ListSubscribersUseCase {
   constructor(private subscriberRepository: SubscriberRepository) {}
 
   @InstrumentUsecase()
-  async execute(command: ListSubscribersCommand): Promise<IListSubscribersResponseDto> {
+  async execute(command: ListSubscribersCommand): Promise<ListSubscribersResponseDto> {
     const pagination = await this.subscriberRepository.listSubscribers({
       after: command.after,
       before: command.before,
       limit: command.limit,
-      sortDirection: command.orderDirection,
+      sortDirection: command.orderDirection || DirectionEnum.DESC,
       sortBy: command.orderBy,
       email: command.email,
       name: command.name,
@@ -25,7 +26,7 @@ export class ListSubscribersUseCase {
     });
 
     return {
-      subscribers: pagination.subscribers.map((subscriber) => ({
+      data: pagination.subscribers.map((subscriber) => ({
         _id: subscriber._id,
         firstName: subscriber.firstName,
         lastName: subscriber.lastName,

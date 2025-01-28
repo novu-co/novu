@@ -36,7 +36,7 @@ export async function subscribersDelete(
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerRemoveSubscriberResponse,
+    operations.SubscribersV1ControllerRemoveSubscriberResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -50,7 +50,7 @@ export async function subscribersDelete(
     | ConnectionError
   >
 > {
-  const input: operations.SubscribersControllerRemoveSubscriberRequest = {
+  const input: operations.SubscribersV1ControllerRemoveSubscriberRequest = {
     subscriberId: subscriberId,
     idempotencyKey: idempotencyKey,
   };
@@ -58,7 +58,7 @@ export async function subscribersDelete(
   const parsed = safeParse(
     input,
     (value) =>
-      operations.SubscribersControllerRemoveSubscriberRequest$outboundSchema
+      operations.SubscribersV1ControllerRemoveSubscriberRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -90,7 +90,7 @@ export async function subscribersDelete(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_removeSubscriber",
+    operationID: "SubscribersV1Controller_removeSubscriber",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -158,7 +158,7 @@ export async function subscribersDelete(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerRemoveSubscriberResponse,
+    operations.SubscribersV1ControllerRemoveSubscriberResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -173,7 +173,7 @@ export async function subscribersDelete(
   >(
     M.json(
       200,
-      operations.SubscribersControllerRemoveSubscriberResponse$inboundSchema,
+      operations.SubscribersV1ControllerRemoveSubscriberResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(

@@ -26,13 +26,13 @@ import {
 } from "./_types.js";
 
 export type SubscribersNotificationsFeedQueryData =
-  operations.SubscribersControllerGetNotificationsFeedResponse;
+  operations.SubscribersV1ControllerGetNotificationsFeedResponse;
 
 /**
  * Get in-app notification feed for a particular subscriber
  */
 export function useSubscribersNotificationsFeed(
-  request: operations.SubscribersControllerGetNotificationsFeedRequest,
+  request: operations.SubscribersV1ControllerGetNotificationsFeedRequest,
   options?: QueryHookOptions<SubscribersNotificationsFeedQueryData>,
 ): UseQueryResult<SubscribersNotificationsFeedQueryData, Error> {
   const client = useNovuContext();
@@ -50,7 +50,7 @@ export function useSubscribersNotificationsFeed(
  * Get in-app notification feed for a particular subscriber
  */
 export function useSubscribersNotificationsFeedSuspense(
-  request: operations.SubscribersControllerGetNotificationsFeedRequest,
+  request: operations.SubscribersV1ControllerGetNotificationsFeedRequest,
   options?: SuspenseQueryHookOptions<SubscribersNotificationsFeedQueryData>,
 ): UseSuspenseQueryResult<SubscribersNotificationsFeedQueryData, Error> {
   const client = useNovuContext();
@@ -67,7 +67,7 @@ export function useSubscribersNotificationsFeedSuspense(
 export function prefetchSubscribersNotificationsFeed(
   queryClient: QueryClient,
   client$: NovuCore,
-  request: operations.SubscribersControllerGetNotificationsFeedRequest,
+  request: operations.SubscribersV1ControllerGetNotificationsFeedRequest,
 ): Promise<void> {
   return queryClient.prefetchQuery({
     ...buildSubscribersNotificationsFeedQuery(
@@ -132,7 +132,7 @@ export function invalidateAllSubscribersNotificationsFeed(
 
 export function buildSubscribersNotificationsFeedQuery(
   client$: NovuCore,
-  request: operations.SubscribersControllerGetNotificationsFeedRequest,
+  request: operations.SubscribersV1ControllerGetNotificationsFeedRequest,
   options?: RequestOptions,
 ): {
   queryKey: QueryKey;

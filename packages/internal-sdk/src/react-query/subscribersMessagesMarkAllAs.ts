@@ -25,7 +25,7 @@ export type SubscribersMessagesMarkAllAsMutationVariables = {
 };
 
 export type SubscribersMessagesMarkAllAsMutationData =
-  operations.SubscribersControllerMarkMessagesAsResponse;
+  operations.SubscribersV1ControllerMarkMessagesAsResponse;
 
 /**
  * Mark a subscriber messages as seen, read, unseen or unread

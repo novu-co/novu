@@ -6,7 +6,7 @@
 import { TriggerReservedVariableResponse } from "@novu/api/models/components";
 
 let value: TriggerReservedVariableResponse = {
-  type: "actor",
+  type: "tenant",
   variables: [
     "<value>",
   ],
