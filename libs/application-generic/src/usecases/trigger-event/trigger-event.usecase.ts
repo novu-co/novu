@@ -224,27 +224,18 @@ export class TriggerEvent {
     organizationId: string;
     userId: string;
   }) {
+    const lastTriggeredAt = new Date();
+
     const workflow =
-      await this.notificationTemplateRepository.findByTriggerIdentifier(
+      await this.notificationTemplateRepository.findByTriggerIdentifierAndUpdate(
         command.environmentId,
         command.triggerIdentifier,
+        lastTriggeredAt,
       );
 
     if (workflow) {
       // We only consider trigger when it's coming from the backend SDK
       if (!command.payload?.__source) {
-        await this.notificationTemplateRepository.updateOne(
-          {
-            _id: workflow._id,
-            _environmentId: command.environmentId,
-          },
-          {
-            $set: {
-              lastTriggeredAt: new Date(),
-            },
-          },
-        );
-
         if (!workflow.lastTriggeredAt) {
           this.analyticsService.track(
             'Workflow Connected to Backend SDK - [API]',
@@ -257,6 +248,11 @@ export class TriggerEvent {
             },
           );
         }
+
+        /**
+         * Update the entry to cache it with the new lastTriggeredAt
+         */
+        workflow.lastTriggeredAt = lastTriggeredAt;
       }
     }
 
