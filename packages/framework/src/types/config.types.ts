@@ -23,4 +23,10 @@ export type ClientOptions = {
    * Defaults to true.
    */
   strictAuthentication?: boolean;
+
+  /**
+   * Whether to compile controls.
+   * Defaults to true.
+   */
+  compileControls?: boolean;
 };

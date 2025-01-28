@@ -19,6 +19,7 @@ import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-ren
 import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
 import { evaluateRules } from '../../../shared/services/query-parser/query-parser.service';
 import { isMatchingJsonSchema } from '../../../workflows-v2/util/jsonToSchema';
+import { parseLiquid, parseLiquidString } from '../../../shared/helpers/liquid';
 
 const LOG_CONTEXT = 'ConstructFrameworkWorkflow';
 
@@ -239,8 +240,8 @@ export class ConstructFrameworkWorkflow {
     if (_.isEmpty(skipRules)) {
       return false;
     }
-
-    const { result, error } = evaluateRules(skipRules, variables);
+    const compiledSkipRules = await parseLiquid(skipRules, variables);
+    const { result, error } = evaluateRules(compiledSkipRules, variables);
 
     if (error) {
       this.logger.error({ err: error }, 'Failed to evaluate skip rule', LOG_CONTEXT);

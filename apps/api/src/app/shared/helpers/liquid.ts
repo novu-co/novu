@@ -1,6 +1,13 @@
 import { Liquid } from 'liquidjs';
 
-export const parseLiquid = async (value: string, variables: object): Promise<string> => {
+export async function parseLiquid<T>(value: T, variables: object): Promise<T> {
+  const valueStringified = JSON.stringify(value);
+  const renderedString = await parseLiquidString(valueStringified, variables);
+
+  return JSON.parse(renderedString);
+}
+
+export async function parseLiquidString(value: string, variables: object): Promise<string> {
   const client = new Liquid({
     outputEscape: (output) => {
       return stringifyDataStructureWithSingleQuotes(output);
@@ -10,7 +17,7 @@ export const parseLiquid = async (value: string, variables: object): Promise<str
   const template = client.parse(value);
 
   return await client.render(template, variables);
-};
+}
 
 const stringifyDataStructureWithSingleQuotes = (value: unknown, spaces: number = 0): string => {
   if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {

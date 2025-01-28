@@ -71,11 +71,14 @@ export class Client {
 
   public strictAuthentication: boolean;
 
+  public compileControls: boolean;
+
   constructor(options?: ClientOptions) {
     const builtOpts = this.buildOptions(options);
     this.apiUrl = builtOpts.apiUrl;
     this.secretKey = builtOpts.secretKey;
     this.strictAuthentication = builtOpts.strictAuthentication;
+    this.compileControls = builtOpts.compileControls;
     this.templateEngine.registerFilter('json', (value, spaces) =>
       stringifyDataStructureWithSingleQuotes(value, spaces)
     );
@@ -86,6 +89,7 @@ export class Client {
       apiUrl: resolveApiUrl(providedOptions?.apiUrl),
       secretKey: resolveSecretKey(providedOptions?.secretKey),
       strictAuthentication: !isRuntimeInDevelopment(),
+      compileControls: providedOptions?.compileControls ?? true,
     };
 
     if (providedOptions?.strictAuthentication !== undefined) {
@@ -309,11 +313,20 @@ export class Client {
 
       const step = this.getStep(event.workflowId, stepId);
       const isPreview = event.action === PostActionEnum.PREVIEW;
+      let controls = {};
+
+      if (stepId === event.stepId) {
+        const templateControls = await this.createStepControls(step, event);
+
+        if (this.compileControls) {
+          controls = await this.renderTemplateControls(templateControls, event);
+        } else {
+          controls = templateControls;
+        }
+      }
 
       // Only evaluate a skip condition when the step is the current step and not in preview mode.
       if (!isPreview && stepId === event.stepId) {
-        const templateControls = await this.createStepControls(step, event);
-        const controls = await this.compileControls(templateControls, event);
         const shouldSkip = await this.shouldSkip(options?.skip as typeof step.options.skip, controls);
 
         if (shouldSkip) {
@@ -336,24 +349,28 @@ export class Client {
       const executeStepHandler = this.executeStep.bind(this);
       const handler = isPreview ? previewStepHandler : executeStepHandler;
 
-      let stepResult = await handler(event, {
-        ...step,
-        providers: step.providers.map((provider) => {
-          // TODO: Update return type to include ChannelStep and fix typings
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const providerResolve = (options as any)?.providers?.[provider.type] as typeof provider.resolve;
+      let stepResult = await handler(
+        event,
+        {
+          ...step,
+          providers: step.providers.map((provider) => {
+            // TODO: Update return type to include ChannelStep and fix typings
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const providerResolve = (options as any)?.providers?.[provider.type] as typeof provider.resolve;
 
-          if (!providerResolve) {
-            throw new ProviderNotFoundError(provider.type);
-          }
+            if (!providerResolve) {
+              throw new ProviderNotFoundError(provider.type);
+            }
 
-          return {
-            ...provider,
-            resolve: providerResolve,
-          };
-        }),
-        resolve: stepResolve as typeof step.resolve,
-      });
+            return {
+              ...provider,
+              resolve: providerResolve,
+            };
+          }),
+          resolve: stepResolve as typeof step.resolve,
+        },
+        controls
+      );
 
       if (
         Object.values(ChannelStepEnum).includes(step.type as ChannelStepEnum) &&
@@ -634,12 +651,11 @@ export class Client {
 
   private async executeStep(
     event: Event,
-    step: DiscoverStepOutput
+    step: DiscoverStepOutput,
+    controls: Record<string, unknown>
   ): Promise<Pick<ExecuteOutput, 'outputs' | 'providers'>> {
     if (event.stepId === step.stepId) {
       try {
-        const templateControls = await this.createStepControls(step, event);
-        const controls = await this.compileControls(templateControls, event);
         const output = await step.resolve(controls);
         const validatedOutput = await this.validate(
           output,
@@ -696,7 +712,7 @@ export class Client {
     }
   }
 
-  private async compileControls(templateControls: Record<string, unknown>, event: Event) {
+  private async renderTemplateControls(templateControls: Record<string, unknown>, event: Event) {
     try {
       const templateString = this.templateEngine.parse(JSON.stringify(templateControls));
 
@@ -734,10 +750,11 @@ export class Client {
 
   private async previewStep(
     event: Event,
-    step: DiscoverStepOutput
+    step: DiscoverStepOutput,
+    controls: Record<string, unknown>
   ): Promise<Pick<ExecuteOutput, 'outputs' | 'providers'>> {
     try {
-      return await this.constructStepForPreview(event, step);
+      return await this.constructStepForPreview(event, step, controls);
     } catch (error) {
       console.log(`  ${EMOJI.ERROR} Failed to preview stepId: \`${step.stepId}\``);
 
@@ -749,9 +766,9 @@ export class Client {
     }
   }
 
-  private async constructStepForPreview(event: Event, step: DiscoverStepOutput) {
+  private async constructStepForPreview(event: Event, step: DiscoverStepOutput, controls: Record<string, unknown>) {
     if (event.stepId === step.stepId) {
-      return await this.previewRequiredStep(step, event);
+      return await this.previewRequiredStep(step, event, controls);
     } else {
       return await this.extractMockDataForPreviousSteps(event, step);
     }
@@ -770,10 +787,7 @@ export class Client {
     };
   }
 
-  private async previewRequiredStep(step: DiscoverStepOutput, event: Event) {
-    const templateControls = await this.createStepControls(step, event);
-    const controls = await this.compileControls(templateControls, event);
-
+  private async previewRequiredStep(step: DiscoverStepOutput, event: Event, controls: Record<string, unknown>) {
     const previewOutput = await step.resolve(controls);
     const validatedOutput = await this.validate(
       previewOutput,

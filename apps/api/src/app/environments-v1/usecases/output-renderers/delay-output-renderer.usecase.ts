@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { DelayRenderOutput } from '@novu/shared';
 import { InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
+import { parseLiquid } from '../../../shared/helpers/liquid';
 
 @Injectable()
 export class DelayOutputRendererUsecase {
   @InstrumentUsecase()
-  execute(renderCommand: RenderCommand): DelayRenderOutput {
+  async execute(renderCommand: RenderCommand): Promise<DelayRenderOutput> {
     const { skip, ...outputControls } = renderCommand.controlValues ?? {};
+    const parsedOutputControls = await parseLiquid(outputControls, renderCommand.fullPayloadForRender);
 
-    return outputControls as any;
+    return parsedOutputControls as any;
   }
 }
