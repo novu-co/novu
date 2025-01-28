@@ -7,6 +7,7 @@ import { ApiCommonResponses } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { ListSubscribersCommand } from './usecases/list-subscribers/list-subscribers.command';
 import { ListSubscribersUseCase } from './usecases/list-subscribers/list-subscribers.usecase';
+import { SdkMethodName } from '../shared/framework/swagger/sdk.decorators';
 
 @Controller({ path: '/subscribers', version: '2' })
 @UseInterceptors(ClassSerializerInterceptor)
@@ -17,6 +18,7 @@ export class SubscriberController {
 
   @Get('')
   @UserAuthentication()
+  @SdkMethodName('search')
   async getSubscribers(
     @UserSession() user: UserSessionData,
     @Query() query: IListSubscribersRequestDto
