@@ -29,6 +29,7 @@ export type Language = keyof typeof languageMap;
 interface CodeBlockProps {
   code: string;
   language?: Language;
+  theme?: 'dark' | 'light';
   title?: string;
   className?: string;
   secretMask?: {
@@ -75,7 +76,14 @@ interface CodeBlockProps {
  *   title="Configuration"
  * />
  */
-export function CodeBlock({ code, language = 'typescript', title, className, secretMask = [] }: CodeBlockProps) {
+export function CodeBlock({
+  code,
+  language = 'typescript',
+  theme = 'dark',
+  title,
+  className,
+  secretMask = [],
+}: CodeBlockProps) {
   const [isCopied, setIsCopied] = useState(false);
   const [showSecrets, setShowSecrets] = useState(false);
 
@@ -112,14 +120,29 @@ export function CodeBlock({ code, language = 'typescript', title, className, sec
   };
 
   return (
-    <div className={cn('w-full rounded-xl border bg-neutral-800 p-[5px] pt-0', className)}>
-      <div className="flex items-center justify-between px-2 py-1">
-        {title && <span className="text-foreground-400 text-xs">{title}</span>}
+    <div
+      className={cn(
+        'w-full rounded-xl border p-[5px] pt-0',
+        theme === 'light' ? 'border-gray-200 bg-white' : 'border-neutral-700 bg-neutral-800',
+        className
+      )}
+    >
+      <div
+        className={cn('flex items-center justify-between px-2 py-1', theme === 'light' ? 'bg-white' : 'bg-neutral-800')}
+      >
+        {title && (
+          <span className={cn('text-xs', theme === 'light' ? 'text-gray-500' : 'text-foreground-400')}>{title}</span>
+        )}
         <div className="ml-auto flex items-center gap-1">
           {hasSecrets && (
             <button
               onClick={() => setShowSecrets(!showSecrets)}
-              className="text-foreground-400 hover:text-foreground-50 rounded-md p-2 transition-all duration-200 hover:bg-[#32424a] active:scale-95"
+              className={cn(
+                'rounded-md p-2 transition-all duration-200 active:scale-95',
+                theme === 'light'
+                  ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+                  : 'text-foreground-400 hover:text-foreground-50 hover:bg-[#32424a]'
+              )}
               title={showSecrets ? 'Hide secrets' : 'Reveal secrets'}
             >
               {showSecrets ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -127,7 +150,12 @@ export function CodeBlock({ code, language = 'typescript', title, className, sec
           )}
           <button
             onClick={copyToClipboard}
-            className="text-foreground-400 hover:text-foreground-50 rounded-md p-2 transition-all duration-200 hover:bg-[#32424a] active:scale-95"
+            className={cn(
+              'rounded-md p-2 transition-all duration-200 active:scale-95',
+              theme === 'light'
+                ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+                : 'text-foreground-400 hover:text-foreground-50 hover:bg-[#32424a]'
+            )}
             title="Copy code"
           >
             {isCopied ? <Check className="h-4 w-4" /> : <RiFileCopyLine className="h-4 w-4" />}
@@ -136,7 +164,7 @@ export function CodeBlock({ code, language = 'typescript', title, className, sec
       </div>
       <CodeMirror
         value={getMaskedCode()}
-        theme={materialDark}
+        theme={theme === 'dark' ? materialDark : undefined}
         extensions={[languageMap[language]()]}
         basicSetup={{
           lineNumbers: true,
