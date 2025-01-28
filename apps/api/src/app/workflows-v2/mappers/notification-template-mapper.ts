@@ -40,7 +40,7 @@ export function toResponseWorkflowDto(
     createdAt: workflow.createdAt || 'Missing Create At',
     status: workflow.status || WorkflowStatusEnum.ACTIVE,
     issues: workflow.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssueDto>,
-    lastTriggeredAt: workflow.lastTriggeredAt?.toISOString(),
+    lastTriggeredAt: workflow.lastTriggeredAt,
   };
 }
 
@@ -58,6 +58,7 @@ function toMinifiedWorkflowDto(template: NotificationTemplateEntity): WorkflowLi
     stepTypeOverviews: template.steps.map(buildStepTypeOverview).filter((stepTypeEnum) => !!stepTypeEnum),
     createdAt: template.createdAt || 'Missing Create At',
     status: template.status || WorkflowStatusEnum.ACTIVE,
+    lastTriggeredAt: template.lastTriggeredAt,
   };
 }
 

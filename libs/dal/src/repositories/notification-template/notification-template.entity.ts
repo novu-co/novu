@@ -90,7 +90,7 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   status?: WorkflowStatusEnum;
 
-  lastTriggeredAt?: Date;
+  lastTriggeredAt?: string;
 }
 export class RuntimeIssue {
   issueType: WorkflowIssueTypeEnum;
