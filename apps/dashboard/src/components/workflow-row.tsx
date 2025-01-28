@@ -223,13 +223,13 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           {formatDateSimple(workflow.updatedAt)}
         </TimeDisplayHoverCard>
       </WorkflowLinkTableCell>
-      <WorkflowLinkTableCell workflow={workflow} className="text-foreground-600 text-sm font-medium">
+      {/* <WorkflowLinkTableCell workflow={workflow} className="text-foreground-600 text-sm font-medium">
         {workflow.lastTriggeredAt ? (
           <TimeDisplayHoverCard date={workflow.lastTriggeredAt}>
             {formatDateSimple(workflow.lastTriggeredAt)}
           </TimeDisplayHoverCard>
         ) : null}
-      </WorkflowLinkTableCell>
+      </WorkflowLinkTableCell> */}
 
       <WorkflowLinkTableCell workflow={workflow} className="w-1">
         <DeleteWorkflowDialog

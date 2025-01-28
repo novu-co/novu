@@ -95,13 +95,13 @@ export function WorkflowList({
             >
               Last updated
             </TableHead>
-            <TableHead
+            {/*  <TableHead
               sortable
               sortDirection={orderBy === 'lastTriggeredAt' ? orderDirection : false}
               onSort={() => toggleSort('lastTriggeredAt')}
             >
               Last triggered
-            </TableHead>
+            </TableHead> */}
 
             <TableHead />
           </TableRow>
