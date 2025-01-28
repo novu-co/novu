@@ -61,16 +61,33 @@ export class PatchSubscriber {
       return subscriber;
     }
 
-    await this.subscriberRepository.update(
+    const updatedSubscriber = await this.subscriberRepository.findOneAndUpdate(
       { _id: subscriber._id, _environmentId: command.environmentId, _organizationId: command.organizationId },
-      { ...payload }
+      { ...payload },
+      {
+        new: true,
+        projection: {
+          _id: 1,
+          avatar: 1,
+          data: 1,
+          email: 1,
+          firstName: 1,
+          lastName: 1,
+          locale: 1,
+          phone: 1,
+          subscriberId: 1,
+          timezone: 1,
+          _organizationId: 1,
+          _environmentId: 1,
+        },
+      }
     );
 
-    return await this.fetchSubscriber({
-      subscriberId: command.subscriberId,
-      _environmentId: command.environmentId,
-      _organizationId: command.organizationId,
-    });
+    if (!updatedSubscriber) {
+      throw new NotFoundException(`Subscriber: ${command.subscriberId} was not found`);
+    }
+
+    return updatedSubscriber;
   }
 
   private async fetchSubscriber({

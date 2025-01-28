@@ -6,7 +6,7 @@ import { IGetSubscriberResponseDto } from '@novu/shared';
 const v2Prefix = '/v2';
 let session: UserSession;
 
-describe('Update Subscriber - /subscribers/:subscriberId (PATCH) #novu-v2', () => {
+describe('Update Subscriber - /subscribers/:subscriberId (PATCH) #novu-v3', () => {
   let subscriber: IGetSubscriberResponseDto;
 
   beforeEach(async () => {
