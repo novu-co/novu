@@ -219,7 +219,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       </WorkflowLinkTableCell>
 
       <WorkflowLinkTableCell workflow={workflow} className="text-foreground-600 min-w-[180px] text-sm font-medium">
-        <TimeDisplayHoverCard date={new Date(workflow.updatedAt)}>
+        <TimeDisplayHoverCard date={new Date(workflow.updatedAt)} className="relative z-10">
           {formatDateSimple(workflow.updatedAt)}
         </TimeDisplayHoverCard>
       </WorkflowLinkTableCell>
