@@ -35,7 +35,9 @@ describe('Novu Node.js package - Retries and idempotency-key', () => {
       },
     ]);
     novuClient = new Novu({
-      apiKey: 'fakeKey',
+      security: {
+        secretKey: 'fakeKey',
+      },
       serverURL: BACKEND_URL,
       httpClient: mockHTTPClient,
     });
@@ -62,7 +64,9 @@ describe('Novu Node.js package - Retries and idempotency-key', () => {
       },
     ]);
     novuClient = new Novu({
-      apiKey: 'fakeKey',
+      security: {
+        secretKey: 'fakeKey',
+      },
       serverURL: BACKEND_URL,
       httpClient,
     });
@@ -93,7 +97,9 @@ describe('Novu Node.js package - Retries and idempotency-key', () => {
       },
     ]);
     novuClient = new Novu({
-      apiKey: 'fakeKey',
+      security: {
+        secretKey: 'fakeKey',
+      },
       serverURL: BACKEND_URL,
       httpClient: mockHTTPClient,
     });
@@ -106,7 +112,9 @@ describe('Novu Node.js package - Retries and idempotency-key', () => {
 
   it('should fail after reaching max retries', async () => {
     novuClient = new Novu({
-      apiKey: 'fakeKey',
+      security: {
+        secretKey: 'fakeKey',
+      },
       serverURL: BACKEND_URL,
       httpClient: new MockHTTPClient([
         {
@@ -161,7 +169,9 @@ describe('Novu Node.js package - Retries and idempotency-key', () => {
   NON_RECOVERABLE_ERRORS.forEach(([status, message]) => {
     it('should not retry on non-recoverable %i error', async () => {
       novuClient = new Novu({
-        apiKey: 'fakeKey',
+        security: {
+          secretKey: 'fakeKey',
+        },
         serverURL: BACKEND_URL,
         httpClient: new MockHTTPClient([
           {
@@ -234,7 +244,9 @@ describe('Novu Node.js package - Retries and idempotency-key', () => {
     ]);
 
     novuClient = new Novu({
-      apiKey: 'fakeKey',
+      security: {
+        secretKey: 'fakeKey',
+      },
       serverURL: BACKEND_URL,
       httpClient: mockClient,
     });

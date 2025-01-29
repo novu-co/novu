@@ -33,7 +33,7 @@ export class InviteMember {
     const token = createGuid();
 
     if (process.env.NOVU_API_KEY && (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'production')) {
-      const novu = new Novu({ apiKey: process.env.NOVU_API_KEY });
+      const novu = new Novu({ security: { secretKey: process.env.NOVU_API_KEY } });
       await novu.trigger({
         name: process.env.NOVU_TEMPLATEID_INVITE_TO_ORGANISATION || 'invite-to-organization-wBnO8NpDn',
         to: [
