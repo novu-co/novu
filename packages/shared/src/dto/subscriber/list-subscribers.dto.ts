@@ -10,7 +10,7 @@ export interface IListSubscribersRequestDto {
 
   orderDirection: DirectionEnum;
 
-  orderBy: 'updatedAt' | 'createdAt';
+  orderBy: 'updatedAt' | '_id';
 
   email?: string;
 
