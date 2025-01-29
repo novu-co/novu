@@ -238,16 +238,21 @@ export function TestWorkflowInstructions({ isOpen, onClose, workflow, to, payloa
 
                 <InstructionStep
                   index={1}
-                  title="Copy API Keys to"
-                  code={`NOVU_SECRET_KEY = '${apiKey}'`}
+                  title="Add the Secret Key to your .env file"
+                  code={`# .env file
+NOVU_SECRET_KEY='${apiKey}'`}
                   codeTitle=".env"
-                  secretMask={[{ line: 1, maskStart, maskEnd }]}
+                  secretMask={[
+                    { line: 2, maskStart, maskEnd },
+                    { line: 5, maskStart: maskStart + 19, maskEnd: maskEnd + 19 },
+                  ]}
                 />
 
                 <InstructionStep
                   index={2}
                   title="Add trigger code to your application"
                   code={getSnippetForLanguage('php')}
+                  codeTitle="index.php"
                   codeLanguage={SNIPPET_TO_CODE_LANGUAGE.php}
                 >
                   <div className="text-foreground-400 mb-3 text-xs">
@@ -305,7 +310,7 @@ export function TestWorkflowInstructions({ isOpen, onClose, workflow, to, payloa
                 <InstructionStep
                   index={0}
                   title="Install"
-                  code="go get github.com/novuhq/go-novu"
+                  code="go get github.com/novuhq/novu-go"
                   codeTitle="Terminal"
                 />
 

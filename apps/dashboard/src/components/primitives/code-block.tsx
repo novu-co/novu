@@ -181,18 +181,13 @@ export function CodeBlock({
   return (
     <div
       className={cn(
-        'w-full rounded-xl border px-2 py-3',
+        'w-full rounded-xl border px-2 py-1',
         theme === 'light' ? 'border-neutral-200 bg-white' : 'border-neutral-700 bg-neutral-800',
         className
       )}
     >
       {title ? (
-        <div
-          className={cn(
-            '-mx-[5px] -mt-[5px] mb-0 flex items-center justify-between px-2 py-1',
-            theme === 'light' ? '' : 'bg-neutral-800'
-          )}
-        >
+        <div className={cn('-mx-[5px] -mt-[5px] mb-0 flex items-center justify-between px-2 py-1')}>
           <span className={cn('text-xs', theme === 'light' ? 'text-gray-600' : 'text-foreground-400')}>{title}</span>
           <div className="ml-auto flex items-center gap-1">
             <ActionButtons />
