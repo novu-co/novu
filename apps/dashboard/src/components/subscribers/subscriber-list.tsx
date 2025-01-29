@@ -50,8 +50,8 @@ const SubscriberListTable = (props: SubscriberListTableProps) => {
           <TableHead>Phone number</TableHead>
           <TableHead
             sortable
-            sortDirection={orderBy === 'createdAt' ? orderDirection : false}
-            onSort={() => toggleSort('createdAt')}
+            sortDirection={orderBy === '_id' ? orderDirection : false}
+            onSort={() => toggleSort('_id')}
           >
             Created at
           </TableHead>
