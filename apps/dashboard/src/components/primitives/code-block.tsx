@@ -183,6 +183,7 @@ export function CodeBlock({
       className={cn(
         'w-full rounded-xl border px-2 py-1',
         theme === 'light' ? 'border-neutral-200 bg-white' : 'border-neutral-700 bg-neutral-800',
+        !title && 'rounded-b-none py-3',
         className
       )}
     >
