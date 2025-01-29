@@ -28,7 +28,7 @@ import { TestWorkflowInstructions } from './test-workflow-instructions';
 import { SnippetLanguage } from './types';
 
 const tabsTriggerClassName = 'pt-1';
-const codePanelClassName = '';
+const codePanelClassName = 'h-full';
 
 const LANGUAGE_TO_SNIPPET_UTIL: Record<SnippetLanguage, (props: CodeSnippet) => string> = {
   shell: createCurlSnippet,

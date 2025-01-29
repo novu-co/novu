@@ -1,5 +1,7 @@
+import { tags as t } from '@lezer/highlight';
 import { langs, loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { materialDark } from '@uiw/codemirror-theme-material';
+import { createTheme } from '@uiw/codemirror-themes';
 import CodeMirror from '@uiw/react-codemirror';
 import { Check, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
@@ -25,6 +27,30 @@ const languageMap = {
 } as const;
 
 export type Language = keyof typeof languageMap;
+
+const lightTheme = createTheme({
+  theme: 'light',
+  settings: {
+    background: 'white',
+    foreground: '#24292e',
+    caret: '#24292e',
+    selection: '#0366d625',
+    lineHighlight: '#0366d608',
+  },
+  styles: [
+    { tag: t.keyword, color: '#FF5D00' },
+    { tag: t.operator, color: '#FF5D00' },
+    { tag: t.special(t.brace), color: '#24292e' },
+    { tag: t.propertyName, color: '#FB4BA3' },
+    { tag: t.definition(t.propertyName), color: '#24292e' },
+    { tag: t.string, color: '#8B41E1' },
+    { tag: t.comment, color: '#6e7781' },
+    { tag: t.variableName, color: '#24292e' },
+    { tag: [t.function(t.variableName), t.definition(t.variableName)], color: '#24292e' },
+    { tag: t.typeName, color: '#0550ae' },
+    { tag: t.className, color: '#0550ae' },
+  ],
+});
 
 interface CodeBlockProps {
   code: string;
@@ -119,52 +145,75 @@ export function CodeBlock({
     return lines.join('\n');
   };
 
+  const ActionButtons = () => (
+    <>
+      {hasSecrets && (
+        <button
+          type="button"
+          onClick={() => setShowSecrets(!showSecrets)}
+          className={cn(
+            'rounded-md p-2 transition-all duration-200 active:scale-95',
+            theme === 'light'
+              ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+              : 'text-foreground-400 hover:text-foreground-50 hover:bg-[#32424a]'
+          )}
+          title={showSecrets ? 'Hide secrets' : 'Reveal secrets'}
+        >
+          {showSecrets ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      )}
+      <button
+        onClick={copyToClipboard}
+        type="button"
+        className={cn(
+          'rounded-md p-2 transition-all duration-200 active:scale-95',
+          theme === 'light'
+            ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+            : 'text-foreground-400 hover:text-foreground-50 hover:bg-[#32424a]'
+        )}
+        title="Copy code"
+      >
+        {isCopied ? <Check className="h-4 w-4" /> : <RiFileCopyLine className="h-4 w-4" />}
+      </button>
+    </>
+  );
+
   return (
     <div
       className={cn(
-        'w-full rounded-xl border p-[5px] pt-0',
-        theme === 'light' ? 'border-gray-200 bg-white' : 'border-neutral-700 bg-neutral-800',
+        'w-full rounded-xl border px-2 py-3',
+        theme === 'light' ? 'border-neutral-200 bg-white' : 'border-neutral-700 bg-neutral-800',
         className
       )}
     >
-      <div
-        className={cn('flex items-center justify-between px-2 py-1', theme === 'light' ? 'bg-white' : 'bg-neutral-800')}
-      >
-        {title && (
-          <span className={cn('text-xs', theme === 'light' ? 'text-gray-500' : 'text-foreground-400')}>{title}</span>
-        )}
-        <div className="ml-auto flex items-center gap-1">
-          {hasSecrets && (
-            <button
-              onClick={() => setShowSecrets(!showSecrets)}
-              className={cn(
-                'rounded-md p-2 transition-all duration-200 active:scale-95',
-                theme === 'light'
-                  ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-                  : 'text-foreground-400 hover:text-foreground-50 hover:bg-[#32424a]'
-              )}
-              title={showSecrets ? 'Hide secrets' : 'Reveal secrets'}
-            >
-              {showSecrets ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
+      {title ? (
+        <div
+          className={cn(
+            '-mx-[5px] -mt-[5px] mb-0 flex items-center justify-between px-2 py-1',
+            theme === 'light' ? '' : 'bg-neutral-800'
           )}
-          <button
-            onClick={copyToClipboard}
-            className={cn(
-              'rounded-md p-2 transition-all duration-200 active:scale-95',
-              theme === 'light'
-                ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-                : 'text-foreground-400 hover:text-foreground-50 hover:bg-[#32424a]'
-            )}
-            title="Copy code"
-          >
-            {isCopied ? <Check className="h-4 w-4" /> : <RiFileCopyLine className="h-4 w-4" />}
-          </button>
+        >
+          <span className={cn('text-xs', theme === 'light' ? 'text-gray-600' : 'text-foreground-400')}>{title}</span>
+          <div className="ml-auto flex items-center gap-1">
+            <ActionButtons />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="relative">
+          <div
+            className={cn(
+              'absolute right-1 top-0 z-10 flex items-center gap-1 rounded-md',
+              theme === 'light' ? '' : 'bg-neutral-800/80',
+              'backdrop-blur-sm'
+            )}
+          >
+            <ActionButtons />
+          </div>
+        </div>
+      )}
       <CodeMirror
         value={getMaskedCode()}
-        theme={theme === 'dark' ? materialDark : undefined}
+        theme={theme === 'dark' ? materialDark : lightTheme}
         extensions={[languageMap[language]()]}
         basicSetup={{
           lineNumbers: true,
@@ -173,7 +222,10 @@ export function CodeBlock({
           foldGutter: false,
         }}
         editable={false}
-        className="overflow-hidden rounded-lg text-xs [&_.cm-gutters]:bg-[#263238] [&_.cm-scroller]:font-mono"
+        className={cn(
+          'overflow-hidden rounded-lg text-xs',
+          theme === 'light' ? '[&_.cm-scroller]:font-mono' : '[&_.cm-gutters]:bg-[#263238] [&_.cm-scroller]:font-mono'
+        )}
       />
     </div>
   );

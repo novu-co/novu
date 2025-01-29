@@ -175,13 +175,8 @@ export function TestWorkflowInstructions({ isOpen, onClose, workflow, to, payloa
 
             <div className="mt-5 space-y-8 p-3">
               <TabsContent value="nodejs" className="space-y-8">
-                <InstructionStep
-                  index={0}
-                  title="Install @novu/node"
-                  code="npm install @novu/node"
-                  codeTitle="Terminal"
-                >
-                  The npm package to use with novu and node.
+                <InstructionStep index={0} title="Install @novu/api" code="npm install @novu/api" codeTitle="Terminal">
+                  The npm package to use with novu and node.js.
                 </InstructionStep>
 
                 <InstructionStep

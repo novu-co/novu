@@ -20,12 +20,13 @@ const safeParsePayload = (payload: string) => {
 export const createNodeJsSnippet = ({ identifier, to, payload, secretKey }: CodeSnippet) => {
   const renderedSecretKey = secretKey ? `'${secretKey}'` : `process.env['${SECRET_KEY_ENV_KEY}']`;
 
-  return `import { Novu } from '@novu/node'; 
+  return `import { Novu } from '@novu/api'; 
 
-const novu = new Novu(${renderedSecretKey});
+const novu = new Novu({ apiKey: ${renderedSecretKey} });
 
-novu.trigger('${identifier}', ${JSON.stringify(
+novu.trigger(${JSON.stringify(
     {
+      name: identifier,
       to,
       payload: safeParsePayload(payload),
     },
