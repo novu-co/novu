@@ -1,4 +1,4 @@
-import { EnvironmentEnum, FeatureFlagsKeysEnum } from '@novu/shared';
+import { EnvironmentEnum, FeatureFlagsKeysEnum, WorkflowOriginEnum } from '@novu/shared';
 import {
   Background,
   BackgroundVariant,
@@ -259,6 +259,7 @@ const WorkflowCanvasChild = ({ steps, readOnly }: { steps: Step[]; readOnly?: bo
       </ReactFlow>
       {currentWorkflow &&
         currentEnvironment?.name === EnvironmentEnum.DEVELOPMENT &&
+        currentWorkflow.origin === WorkflowOriginEnum.NOVU_CLOUD &&
         !user?.unsafeMetadata?.workflowChecklistCompleted &&
         isWorkflowChecklistEnabled && <WorkflowChecklist steps={steps} workflow={currentWorkflow} />}
     </div>
