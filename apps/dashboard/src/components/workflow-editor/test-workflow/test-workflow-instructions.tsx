@@ -45,9 +45,9 @@ const LANGUAGE_TO_SNIPPET_UTIL: Record<SnippetLanguage, (props: CodeSnippet) => 
 const SNIPPET_TO_CODE_LANGUAGE: Record<SnippetLanguage, Language> = {
   shell: 'shell',
   typescript: 'typescript',
-  php: 'typescript', // Using typescript highlighting for PHP since we don't have PHP highlighting
-  go: 'typescript', // Using typescript highlighting for Go since we don't have Go highlighting
-  python: 'typescript', // Using typescript highlighting for Python since we don't have Python highlighting
+  php: 'php',
+  go: 'go',
+  python: 'python',
   framework: 'typescript',
 };
 
