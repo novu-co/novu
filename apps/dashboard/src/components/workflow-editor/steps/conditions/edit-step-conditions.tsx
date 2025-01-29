@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { FeatureFlagsKeysEnum, WorkflowOriginEnum } from '@novu/shared';
 
 import { CompactButton } from '@/components/primitives/button-compact';
+import { EditStepConditionsForm } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-form';
+import { EditStepConditionsFormSkeleton } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-skeleton';
 import { StepDrawer } from '@/components/workflow-editor/steps/step-drawer';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { EditStepConditionsForm } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-form';
-import { EditStepConditionsFormSkeleton } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-skeleton';
 
 export const EditStepConditions = () => {
   const navigate = useNavigate();
@@ -18,7 +18,10 @@ export const EditStepConditions = () => {
     return null;
   }
 
-  if (!isStepConditionsEnabled || workflow.origin !== WorkflowOriginEnum.NOVU_CLOUD) {
+  const { uiSchema } = step.controls ?? {};
+  const { skip } = uiSchema?.properties ?? {};
+
+  if (!isStepConditionsEnabled || !skip || workflow.origin !== WorkflowOriginEnum.NOVU_CLOUD) {
     navigate('..', { relative: 'path' });
     return null;
   }
