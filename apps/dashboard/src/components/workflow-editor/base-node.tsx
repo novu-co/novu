@@ -1,6 +1,5 @@
 import { ReactNode, useState } from 'react';
 import { RiErrorWarningFill } from 'react-icons/ri';
-import { RiPlayCircleLine } from 'react-icons/ri';
 import { cva, VariantProps } from 'class-variance-authority';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 
