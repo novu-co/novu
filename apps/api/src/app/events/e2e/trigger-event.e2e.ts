@@ -3238,10 +3238,10 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
       });
     });
 
-    it('should skip step based on skip', async function () {
+    it('should execute step based on conditions', async function () {
       const workflowBody: CreateWorkflowDto = {
-        name: 'Test Skip Workflow',
-        workflowId: 'test-skip-workflow',
+        name: 'Test Step Conditions Workflow',
+        workflowId: 'test-step-conditions-workflow',
         __source: WorkflowCreationSourceEnum.DASHBOARD,
         steps: [
           {
@@ -3250,7 +3250,7 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
             controlValues: {
               body: 'Hello {{subscriber.lastName}}, Welcome!',
               skip: {
-                '==': [{ var: 'payload.shouldSkip' }, true],
+                '==': [{ var: 'payload.shouldExecute' }, true],
               },
             },
           },
@@ -3265,7 +3265,7 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
         name: workflow.workflowId,
         to: [subscriber.subscriberId],
         payload: {
-          shouldSkip: true,
+          shouldExecute: false,
         },
       });
       await session.awaitRunningJobs(workflow._id);
@@ -3279,7 +3279,7 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
         name: workflow.workflowId,
         to: [subscriber.subscriberId],
         payload: {
-          shouldSkip: false,
+          shouldExecute: true,
         },
       });
       await session.awaitRunningJobs(workflow._id);
@@ -3354,10 +3354,10 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
     });
   });
 
-  it('should handle complex skip logic with subscriber data', async function () {
+  it('should handle complex conditions logic with subscriber data', async function () {
     const workflowBody: CreateWorkflowDto = {
-      name: 'Test Complex Skip Logic',
-      workflowId: 'test-complex-skip-workflow',
+      name: 'Test Complex Conditions Logic',
+      workflowId: 'test-complex-conditions-workflow',
       __source: WorkflowCreationSourceEnum.DASHBOARD,
       steps: [
         {
@@ -3390,7 +3390,7 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
     expect(response.status).to.equal(201);
     const workflow: WorkflowResponseDto = response.body.data;
 
-    // Should skip - matches all conditions
+    // Should execute step - matches all conditions
     subscriber = await subscriberService.createSubscriber({
       firstName: 'John',
       lastName: 'Doe',
@@ -3405,13 +3405,13 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
       },
     });
     await session.awaitRunningJobs(workflow._id);
-    const skippedMessages = await messageRepository.find({
+    const messages = await messageRepository.find({
       _environmentId: session.environment._id,
       _subscriberId: subscriber._id,
     });
-    expect(skippedMessages.length).to.equal(0);
+    expect(messages.length).to.equal(1);
 
-    // Should not skip - doesn't match lastName condition
+    // Should not execute step - doesn't match lastName condition
     subscriber = await subscriberService.createSubscriber({
       firstName: 'John',
       lastName: 'Smith',
@@ -3426,13 +3426,13 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
       },
     });
     await session.awaitRunningJobs(workflow._id);
-    const notSkippedMessages1 = await messageRepository.find({
+    const skippedMessages1 = await messageRepository.find({
       _environmentId: session.environment._id,
       _subscriberId: subscriber._id,
     });
-    expect(notSkippedMessages1.length).to.equal(1);
+    expect(skippedMessages1.length).to.equal(0);
 
-    // Should not skip - doesn't match score condition
+    // Should not execute step - doesn't match score condition
     subscriber = await subscriberService.createSubscriber({
       firstName: 'John',
       lastName: 'Doe',
@@ -3447,11 +3447,11 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
       },
     });
     await session.awaitRunningJobs(workflow._id);
-    const notSkippedMessages2 = await messageRepository.find({
+    const skippedMessages2 = await messageRepository.find({
       _environmentId: session.environment._id,
       _subscriberId: subscriber._id,
     });
-    expect(notSkippedMessages2.length).to.equal(1);
+    expect(skippedMessages2.length).to.equal(0);
   });
 
   it('should exit execution if skip condition execution throws an error', async function () {
