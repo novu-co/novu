@@ -26,12 +26,13 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { z } from 'zod';
-import { ColorPicker } from './primitives/color-picker';
-import { showErrorToast, showSuccessToast } from './primitives/sonner-helpers';
+import { ColorPicker } from '../primitives/color-picker';
+import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
 
+// TODO: Merge with CreateEnvironmentButton
 const editEnvironmentSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  color: z.string().min(1, 'Color is required'),
+  color: z.string().regex(/^\#[0-9a-fA-F]{6}$/, 'Enter a valid hex color, like #123456.'),
 });
 
 type EditEnvironmentFormData = z.infer<typeof editEnvironmentSchema>;

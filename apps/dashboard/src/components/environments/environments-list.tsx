@@ -6,9 +6,8 @@ import { useState } from 'react';
 import { RiDeleteBin2Line, RiMore2Fill } from 'react-icons/ri';
 import { DeleteEnvironmentDialog } from './delete-environment-dialog';
 import { EditEnvironmentSheet } from './edit-environment-sheet';
-import { Badge } from './primitives/badge';
-import { CompactButton } from './primitives/button-compact';
-import { CopyButton } from './primitives/copy-button';
+import { Badge } from '../primitives/badge';
+import { CompactButton } from '../primitives/button-compact';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +15,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './primitives/dropdown-menu';
-import { EnvironmentBranchIcon } from './primitives/environment-branch-icon';
-import { Skeleton } from './primitives/skeleton';
-import { showErrorToast, showSuccessToast } from './primitives/sonner-helpers';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './primitives/table';
-import { TimeDisplayHoverCard } from './time-display-hover-card';
-import TruncatedText from './truncated-text';
+} from '../primitives/dropdown-menu';
+import { EnvironmentBranchIcon } from '../primitives/environment-branch-icon';
+import { Skeleton } from '../primitives/skeleton';
+import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../primitives/table';
+import { TimeDisplayHoverCard } from '../time-display-hover-card';
+import TruncatedText from '../truncated-text';
 
 const EnvironmentRowSkeleton = () => (
   <TableRow>
@@ -74,7 +73,6 @@ export function EnvironmentsList({ environments, isLoading }: { environments: IE
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Identifier</TableHead>
             <TableHead>Last Updated</TableHead>
             <TableHead className="w-1"></TableHead>
           </TableRow>
@@ -95,19 +93,6 @@ export function EnvironmentsList({ environments, isLoading }: { environments: IE
                           </Badge>
                         )}
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1 transition-opacity duration-200">
-                      <TruncatedText className="text-foreground-400 font-code block text-xs">
-                        {environment.identifier}
-                      </TruncatedText>
-                      <CopyButton
-                        className="z-10 flex size-2 p-0 px-1 opacity-0 group-hover:opacity-100"
-                        valueToCopy={environment.identifier}
-                        size="2xs"
-                        mode="ghost"
-                      />
                     </div>
                   </TableCell>
                   <TableCell className={cn('text-foreground-600 min-w-[180px] text-sm font-medium')}>
