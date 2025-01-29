@@ -1,5 +1,10 @@
-import type { DirectionEnum, IEnvironment, IListSubscribersResponseDto } from '@novu/shared';
-import { getV2 } from './api.client';
+import type {
+  DirectionEnum,
+  IEnvironment,
+  IListSubscribersResponseDto,
+  IRemoveSubscriberResponseDto,
+} from '@novu/shared';
+import { delV2, getV2 } from './api.client';
 
 export const getSubscribers = async ({
   environment,
@@ -38,6 +43,19 @@ export const getSubscribers = async ({
   });
 
   const { data } = await getV2<{ data: IListSubscribersResponseDto }>(`/subscribers?${params}`, {
+    environment,
+  });
+  return data;
+};
+
+export const deleteSubscriber = async ({
+  environment,
+  subscriberId,
+}: {
+  environment: IEnvironment;
+  subscriberId: string;
+}) => {
+  const { data } = await delV2<{ data: IRemoveSubscriberResponseDto }>(`/subscribers/${subscriberId}`, {
     environment,
   });
   return data;

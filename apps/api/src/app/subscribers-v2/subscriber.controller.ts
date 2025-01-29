@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -16,6 +17,7 @@ import {
   IListSubscribersRequestDto,
   IListSubscribersResponseDto,
   IPatchSubscriberRequestDto,
+  IRemoveSubscriberResponseDto,
   UserSessionData,
 } from '@novu/shared';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
@@ -26,6 +28,8 @@ import { GetSubscriber } from './usecases/get-subscriber/get-subscriber.usecase'
 import { GetSubscriberCommand } from './usecases/get-subscriber/get-subscriber.command';
 import { PatchSubscriber } from './usecases/patch-subscriber/patch-subscriber.usecase';
 import { PatchSubscriberCommand } from './usecases/patch-subscriber/patch-subscriber.command';
+import { RemoveSubscriberCommand } from './usecases/remove-subscriber/remove-subscriber.command';
+import { RemoveSubscriber } from './usecases/remove-subscriber/remove-subscriber.usecase';
 
 @Controller({ path: '/subscribers', version: '2' })
 @UseInterceptors(ClassSerializerInterceptor)
@@ -35,7 +39,8 @@ export class SubscriberController {
   constructor(
     private listSubscribersUsecase: ListSubscribersUseCase,
     private getSubscriberUsecase: GetSubscriber,
-    private patchSubscriberUsecase: PatchSubscriber
+    private patchSubscriberUsecase: PatchSubscriber,
+    private removeSubscriberUsecase: RemoveSubscriber
   ) {}
 
   @Get('')
@@ -98,6 +103,25 @@ export class SubscriberController {
         organizationId: user.organizationId,
         subscriberId,
         ...body,
+      })
+    );
+  }
+
+  @Delete('/:subscriberId')
+  @UserAuthentication()
+  @ApiOperation({
+    summary: 'Delete subscriber',
+    description: 'Deletes a subscriber entity from the Novu platform',
+  })
+  async removeSubscriber(
+    @UserSession() user: UserSessionData,
+    @Param('subscriberId') subscriberId: string
+  ): Promise<IRemoveSubscriberResponseDto> {
+    return await this.removeSubscriberUsecase.execute(
+      RemoveSubscriberCommand.create({
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        subscriberId,
       })
     );
   }
