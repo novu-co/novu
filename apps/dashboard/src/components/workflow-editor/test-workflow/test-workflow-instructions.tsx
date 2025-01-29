@@ -213,8 +213,8 @@ export function TestWorkflowInstructions({ isOpen, onClose, workflow, to, payloa
 
               <TabsContent value="shell" className="space-y-8">
                 <InstructionStep
-                  index={2}
-                  title="Add trigger code to your application"
+                  index={0}
+                  title="Trigger from your terminal"
                   code={getSnippetForLanguage('shell')}
                   codeLanguage={SNIPPET_TO_CODE_LANGUAGE.shell}
                 >
@@ -225,18 +225,16 @@ export function TestWorkflowInstructions({ isOpen, onClose, workflow, to, payloa
                   <div className="text-foreground-400 mb-3 text-xs">
                     When the trigger happens, it sends the data the workflow needs to notify subscribers.
                   </div>
-                  <div className="text-foreground-400 text-xs">
-                    Note: The subscriberId uniquely identifies each user in your app. This will create subscribers
-                    dynamically when sending notifications.{' '}
-                    <a href="https://docs.novu.co/platform/subscribers" target="_blank" className="underline">
-                      Learn more
-                    </a>
-                  </div>
+                  <InlineToast
+                    variant="tip"
+                    title="Tip"
+                    description="A trigger is the starting point of every workflow — an action or event that kicks it off. To initiate this, you call the Novu API using workflow_id."
+                  />
                 </InstructionStep>
               </TabsContent>
 
               <TabsContent value="php" className="space-y-8">
-                <InstructionStep index={0} title="Install" code="composer require novu/novu-php" codeTitle="Terminal" />
+                <InstructionStep index={0} title="Install" code='composer require "novuhq/novu"' codeTitle="Terminal" />
 
                 <InstructionStep
                   index={1}
