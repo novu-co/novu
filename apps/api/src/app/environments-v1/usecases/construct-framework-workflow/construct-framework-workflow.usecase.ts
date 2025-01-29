@@ -58,8 +58,7 @@ export class ConstructFrameworkWorkflow {
           fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = await this.constructStep(
             step,
             staticStep,
-            fullPayloadForRender,
-            dbWorkflow.origin
+            fullPayloadForRender
           );
         }
       },
@@ -82,8 +81,7 @@ export class ConstructFrameworkWorkflow {
   private constructStep(
     step: Step,
     staticStep: NotificationStepEntity,
-    fullPayloadForRender: FullPayloadForRender,
-    workflowOrigin?: WorkflowOriginEnum
+    fullPayloadForRender: FullPayloadForRender
   ): StepOutput<Record<string, unknown>> {
     const stepTemplate = staticStep.template;
 
@@ -112,7 +110,7 @@ export class ConstructFrameworkWorkflow {
             return this.inAppOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           // Step options
-          this.constructChannelStepOptions(staticStep, fullPayloadForRender, workflowOrigin)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.EMAIL:
         return step.email(
@@ -120,7 +118,7 @@ export class ConstructFrameworkWorkflow {
           async (controlValues) => {
             return this.emailOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructChannelStepOptions(staticStep, fullPayloadForRender, workflowOrigin)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.SMS:
         return step.sms(
@@ -128,7 +126,7 @@ export class ConstructFrameworkWorkflow {
           async (controlValues) => {
             return this.smsOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructChannelStepOptions(staticStep, fullPayloadForRender, workflowOrigin)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.CHAT:
         return step.chat(
@@ -136,7 +134,7 @@ export class ConstructFrameworkWorkflow {
           async (controlValues) => {
             return this.chatOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructChannelStepOptions(staticStep, fullPayloadForRender, workflowOrigin)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.PUSH:
         return step.push(
@@ -144,7 +142,7 @@ export class ConstructFrameworkWorkflow {
           async (controlValues) => {
             return this.pushOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructChannelStepOptions(staticStep, fullPayloadForRender, workflowOrigin)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.DIGEST:
         return step.digest(
@@ -152,7 +150,7 @@ export class ConstructFrameworkWorkflow {
           async (controlValues) => {
             return this.digestOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructActionStepOptions(staticStep, fullPayloadForRender, workflowOrigin)
+          this.constructActionStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.DELAY:
         return step.delay(
@@ -160,7 +158,7 @@ export class ConstructFrameworkWorkflow {
           async (controlValues) => {
             return this.delayOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructActionStepOptions(staticStep, fullPayloadForRender, workflowOrigin)
+          this.constructActionStepOptions(staticStep, fullPayloadForRender)
         );
       default:
         throw new InternalServerErrorException(`Step type ${stepType} is not supported`);
@@ -170,11 +168,10 @@ export class ConstructFrameworkWorkflow {
   @Instrument()
   private constructChannelStepOptions(
     staticStep: NotificationStepEntity,
-    fullPayloadForRender: FullPayloadForRender,
-    workflowOrigin?: WorkflowOriginEnum
+    fullPayloadForRender: FullPayloadForRender
   ): Required<Parameters<ChannelStep>[2]> {
     return {
-      ...this.constructCommonStepOptions(staticStep, fullPayloadForRender, workflowOrigin),
+      ...this.constructCommonStepOptions(staticStep, fullPayloadForRender),
       // TODO: resolve this from the Step options
       disableOutputSanitization:
         (staticStep.controlVariables?.disableOutputSanitization as boolean | undefined) ?? false,
@@ -186,10 +183,9 @@ export class ConstructFrameworkWorkflow {
   @Instrument()
   private constructActionStepOptions(
     staticStep: NotificationStepEntity,
-    fullPayloadForRender: FullPayloadForRender,
-    workflowOrigin?: WorkflowOriginEnum
+    fullPayloadForRender: FullPayloadForRender
   ): Required<Parameters<ActionStep>[2]> {
-    const stepOptions = this.constructCommonStepOptions(staticStep, fullPayloadForRender, workflowOrigin);
+    const stepOptions = this.constructCommonStepOptions(staticStep, fullPayloadForRender);
 
     let controlSchema = stepOptions.controlSchema as JSONSchemaDefinition;
     const stepType = staticStep.template!.type;
@@ -214,14 +210,12 @@ export class ConstructFrameworkWorkflow {
   @Instrument()
   private constructCommonStepOptions(
     staticStep: NotificationStepEntity,
-    fullPayloadForRender: FullPayloadForRender,
-    workflowOrigin?: WorkflowOriginEnum
+    fullPayloadForRender: FullPayloadForRender
   ): Required<StepOptions> {
     return {
       // TODO: fix the `JSONSchemaDto` type to enforce a non-primitive schema type.
       controlSchema: staticStep.template!.controls!.schema as JsonSchema,
-      skip: (controlValues: Record<string, unknown>) =>
-        this.processSkipOption(controlValues, fullPayloadForRender, workflowOrigin),
+      skip: (controlValues: Record<string, unknown>) => this.processSkipOption(controlValues, fullPayloadForRender),
     };
   }
 
@@ -238,8 +232,7 @@ export class ConstructFrameworkWorkflow {
 
   private async processSkipOption(
     controlValues: { [x: string]: unknown },
-    variables: FullPayloadForRender,
-    workflowOrigin?: WorkflowOriginEnum
+    variables: FullPayloadForRender
   ): Promise<boolean> {
     const skipRules = controlValues.skip as RulesLogic<AdditionalOperation>;
 
@@ -254,7 +247,7 @@ export class ConstructFrameworkWorkflow {
     }
 
     // The Step Conditions in the Dashboard control the step execution, that's why we need to invert the result.
-    return workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD ? !result : result;
+    return !result;
   }
 }
 
