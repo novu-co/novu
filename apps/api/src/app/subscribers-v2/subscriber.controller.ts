@@ -12,6 +12,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ExternalApiAccessible, UserSession } from '@novu/application-generic';
 import {
   DirectionEnum,
+  IGetPreferencesResponseDto,
   IGetSubscriberResponseDto,
   IListSubscribersRequestDto,
   IListSubscribersResponseDto,
@@ -26,6 +27,8 @@ import { GetSubscriber } from './usecases/get-subscriber/get-subscriber.usecase'
 import { GetSubscriberCommand } from './usecases/get-subscriber/get-subscriber.command';
 import { PatchSubscriber } from './usecases/patch-subscriber/patch-subscriber.usecase';
 import { PatchSubscriberCommand } from './usecases/patch-subscriber/patch-subscriber.command';
+import { GetSubscriberPreferences } from './usecases/get-subscriber-preferences/get-subscriber-preferences.usecase';
+import { GetSubscriberPreferencesCommand } from './usecases/get-subscriber-preferences/get-subscriber-preferences.command';
 
 @Controller({ path: '/subscribers', version: '2' })
 @UseInterceptors(ClassSerializerInterceptor)
@@ -35,7 +38,8 @@ export class SubscriberController {
   constructor(
     private listSubscribersUsecase: ListSubscribersUseCase,
     private getSubscriberUsecase: GetSubscriber,
-    private patchSubscriberUsecase: PatchSubscriber
+    private patchSubscriberUsecase: PatchSubscriber,
+    private getSubscriberPreferencesUsecase: GetSubscriberPreferences
   ) {}
 
   @Get('')
@@ -98,6 +102,26 @@ export class SubscriberController {
         organizationId: user.organizationId,
         subscriberId,
         ...body,
+      })
+    );
+  }
+
+  @Get('/:subscriberId/preferences')
+  @UserAuthentication()
+  @ExternalApiAccessible()
+  @ApiOperation({
+    summary: 'Get subscriber preferences',
+    description: 'Get subscriber preferences',
+  })
+  async getSubscriberPreferences(
+    @UserSession() user: UserSessionData,
+    @Param('subscriberId') subscriberId: string
+  ): Promise<IGetPreferencesResponseDto> {
+    return await this.getSubscriberPreferencesUsecase.execute(
+      GetSubscriberPreferencesCommand.create({
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        subscriberId,
       })
     );
   }
