@@ -1,6 +1,5 @@
 import { tags as t } from '@lezer/highlight';
 import { langs, loadLanguage } from '@uiw/codemirror-extensions-langs';
-import { materialDark } from '@uiw/codemirror-theme-material';
 import { createTheme } from '@uiw/codemirror-themes';
 import CodeMirror from '@uiw/react-codemirror';
 import { Check, Eye, EyeOff } from 'lucide-react';
@@ -27,6 +26,34 @@ const languageMap = {
 } as const;
 
 export type Language = keyof typeof languageMap;
+
+const darkTheme = createTheme({
+  theme: 'dark',
+  settings: {
+    background: 'rgba(14, 18, 27, 0.90)',
+    foreground: '#EEFFFF',
+    caret: '#FFCC00',
+    selection: '#80CBC440',
+    lineHighlight: '#000000',
+    gutterBackground: 'rgba(14, 18, 27, 0.90)',
+    gutterForeground: '#545454',
+  },
+  styles: [
+    { tag: t.keyword, color: '#C792EA' },
+    { tag: t.operator, color: '#89DDFF' },
+    { tag: t.special(t.brace), color: '#89DDFF' },
+    { tag: t.propertyName, color: '#FFCB6B' },
+    { tag: t.definition(t.propertyName), color: '#82AAFF' },
+    { tag: t.string, color: '#C3E88D' },
+    { tag: t.comment, color: '#546E7A' },
+    { tag: t.variableName, color: '#EEFFFF' },
+    { tag: [t.function(t.variableName), t.definition(t.variableName)], color: '#82AAFF' },
+    { tag: t.typeName, color: '#F07178' },
+    { tag: t.className, color: '#FFCB6B' },
+    { tag: t.number, color: '#F78C6C' },
+    { tag: t.bool, color: '#F78C6C' },
+  ],
+});
 
 const lightTheme = createTheme({
   theme: 'light',
@@ -209,7 +236,7 @@ export function CodeBlock({
       )}
       <CodeMirror
         value={getMaskedCode()}
-        theme={theme === 'dark' ? materialDark : lightTheme}
+        theme={theme === 'dark' ? darkTheme : lightTheme}
         extensions={[languageMap[language]()]}
         basicSetup={{
           lineNumbers: true,
@@ -218,10 +245,7 @@ export function CodeBlock({
           foldGutter: false,
         }}
         editable={false}
-        className={cn(
-          'overflow-hidden rounded-lg text-xs',
-          theme === 'light' ? '[&_.cm-scroller]:font-mono' : '[&_.cm-gutters]:bg-[#263238] [&_.cm-scroller]:font-mono'
-        )}
+        className={cn('overflow-hidden rounded-lg text-xs [&_.cm-editor]:py-3 [&_.cm-scroller]:font-mono')}
       />
     </div>
   );
