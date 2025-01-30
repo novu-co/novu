@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ChannelTypeEnum, IPreferenceChannels, IPreferenceOverride, PreferenceOverrideSourceEnum } from '@novu/shared';
+import { Type } from 'class-transformer';
 
 export class PreferenceChannelsDto implements IPreferenceChannels {
   @ApiProperty({ description: 'Email channel preference' })
@@ -47,6 +48,7 @@ export class GlobalPreferenceDto {
   enabled: boolean;
 
   @ApiProperty({ description: 'Channel-specific preference settings', type: PreferenceChannelsDto })
+  @Type(() => PreferenceChannelsDto)
   channels: PreferenceChannelsDto;
 }
 
@@ -55,19 +57,24 @@ export class WorkflowPreferenceDto {
   enabled: boolean;
 
   @ApiProperty({ description: 'Channel-specific preference settings for this workflow', type: PreferenceChannelsDto })
+  @Type(() => PreferenceChannelsDto)
   channels: PreferenceChannelsDto;
 
   @ApiProperty({ description: 'List of preference overrides', type: [PreferenceOverride] })
+  @Type(() => PreferenceOverride)
   overrides: PreferenceOverride[];
 
   @ApiProperty({ description: 'Workflow information', type: WorkflowInfoDto })
+  @Type(() => WorkflowInfoDto)
   workflow: WorkflowInfoDto;
 }
 
 export class GetSubscriberPreferencesDto {
   @ApiProperty({ description: 'Global preference settings', type: GlobalPreferenceDto })
+  @Type(() => GlobalPreferenceDto)
   global: GlobalPreferenceDto;
 
   @ApiProperty({ description: 'Workflow-specific preference settings', type: [WorkflowPreferenceDto] })
+  @Type(() => WorkflowPreferenceDto)
   workflows: WorkflowPreferenceDto[];
 }

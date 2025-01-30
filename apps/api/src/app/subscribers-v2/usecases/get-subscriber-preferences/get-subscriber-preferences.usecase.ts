@@ -6,8 +6,13 @@ import {
   GetSubscriberPreferenceCommand,
 } from '@novu/application-generic';
 import { ISubscriberPreferenceResponse } from '@novu/shared';
+import { plainToInstance } from 'class-transformer';
 import { GetSubscriberPreferencesCommand } from './get-subscriber-preferences.command';
-import { GetSubscriberPreferencesDto } from '../../dtos/get-subscriber-preferences.dto';
+import {
+  GetSubscriberPreferencesDto,
+  GlobalPreferenceDto,
+  WorkflowPreferenceDto,
+} from '../../dtos/get-subscriber-preferences.dto';
 
 @Injectable()
 export class GetSubscriberPreferences {
@@ -20,13 +25,13 @@ export class GetSubscriberPreferences {
     const globalPreference = await this.fetchGlobalPreference(command);
     const workflowPreferences = await this.fetchWorkflowPreferences(command);
 
-    return {
+    return plainToInstance(GetSubscriberPreferencesDto, {
       global: globalPreference,
       workflows: workflowPreferences,
-    };
+    });
   }
 
-  private async fetchGlobalPreference(command: GetSubscriberPreferencesCommand) {
+  private async fetchGlobalPreference(command: GetSubscriberPreferencesCommand): Promise<GlobalPreferenceDto> {
     const { preference } = await this.getSubscriberGlobalPreference.execute(
       GetSubscriberGlobalPreferenceCommand.create({
         organizationId: command.organizationId,
@@ -55,7 +60,7 @@ export class GetSubscriberPreferences {
     return subscriberWorkflowPreferences.map(this.mapToWorkflowPreference);
   }
 
-  private mapToWorkflowPreference(subscriberWorkflowPreference: ISubscriberPreferenceResponse) {
+  private mapToWorkflowPreference(subscriberWorkflowPreference: ISubscriberPreferenceResponse): WorkflowPreferenceDto {
     const { preference, template } = subscriberWorkflowPreference;
 
     return {
