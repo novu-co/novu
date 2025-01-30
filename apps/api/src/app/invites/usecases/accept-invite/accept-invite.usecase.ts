@@ -59,7 +59,7 @@ export class AcceptInvite {
         const novu = new Novu({ security: { secretKey: process.env.NOVU_API_KEY } });
 
         await novu.trigger({
-          name: process.env.NOVU_TEMPLATEID_INVITE_ACCEPTED || 'invite-accepted-dEQAsKD1E',
+          workflowId: process.env.NOVU_TEMPLATEID_INVITE_ACCEPTED || 'invite-accepted-dEQAsKD1E',
           to: [
             {
               subscriberId: inviter._id,

@@ -38,7 +38,7 @@ export class ResendInvite {
 
       // cspell:disable-next
       await novu.trigger({
-        name: process.env.NOVU_TEMPLATEID_INVITE_TO_ORGANISATION || 'invite-to-organization-wBnO8NpDn',
+        workflowId: process.env.NOVU_TEMPLATEID_INVITE_TO_ORGANISATION || 'invite-to-organization-wBnO8NpDn',
         to: [
           {
             subscriberId: foundInvitee.invite.email,
