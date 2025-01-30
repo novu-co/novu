@@ -65,12 +65,14 @@ export function removeEndpointsWithoutApiKey<T>(openApiDocument: T): T {
 
   return parsedDocument;
 }
-export function transformDocument(inputDocument: OpenAPIObject) {
+export function transformDocument(inputDocument: OpenAPIObject, shouldRemoveBearer: boolean = true) {
   Nimma.query(inputDocument, {
     [jpath]: liftDataProperty,
   });
 
-  const openAPIObject = removeEndpointsWithoutApiKey(inputDocument) as OpenAPIObject;
+  const openAPIObject = shouldRemoveBearer
+    ? (removeEndpointsWithoutApiKey(inputDocument) as OpenAPIObject)
+    : inputDocument;
 
   return addIdempotencyKeyHeader(openAPIObject) as OpenAPIObject;
 }

@@ -2,12 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { addBreadcrumb } from '@sentry/node';
 
 import {
+  EnvironmentRepository,
   JobEntity,
   JobRepository,
+  NotificationTemplateEntity,
   NotificationTemplateRepository,
   SubscriberEntity,
-  NotificationTemplateEntity,
-  EnvironmentRepository,
 } from '@novu/dal';
 import {
   AddressingTypeEnum,
@@ -16,26 +16,26 @@ import {
   TriggerRecipientSubscriber,
   TriggerTenantContext,
 } from '@novu/shared';
-
-import { TriggerEventCommand } from './trigger-event.command';
-import {
-  ProcessSubscriber,
-  ProcessSubscriberCommand,
-} from '../process-subscriber';
-import { PinoLogger } from '../../logging';
 import { Instrument, InstrumentUsecase } from '../../instrumentation';
+import { PinoLogger } from '../../logging';
+import { AnalyticsService } from '../../services/analytics.service';
 import {
   buildNotificationTemplateIdentifierKey,
   CachedEntity,
 } from '../../services/cache';
 import { ApiException } from '../../utils/exceptions';
+import {
+  ProcessSubscriber,
+  ProcessSubscriberCommand,
+} from '../process-subscriber';
 import { ProcessTenant, ProcessTenantCommand } from '../process-tenant';
-import { TriggerBroadcast } from '../trigger-broadcast/trigger-broadcast.usecase';
 import { TriggerBroadcastCommand } from '../trigger-broadcast/trigger-broadcast.command';
+import { TriggerBroadcast } from '../trigger-broadcast/trigger-broadcast.usecase';
 import {
   TriggerMulticast,
   TriggerMulticastCommand,
 } from '../trigger-multicast';
+import { TriggerEventCommand } from './trigger-event.command';
 
 const LOG_CONTEXT = 'TriggerEventUseCase';
 
@@ -50,6 +50,7 @@ export class TriggerEvent {
     private logger: PinoLogger,
     private triggerBroadcast: TriggerBroadcast,
     private triggerMulticast: TriggerMulticast,
+    private analyticsService: AnalyticsService,
   ) {}
 
   @InstrumentUsecase()
@@ -94,9 +95,12 @@ export class TriggerEvent {
 
       let storedWorkflow: NotificationTemplateEntity | null = null;
       if (!command.bridgeWorkflow) {
-        storedWorkflow = await this.getNotificationTemplateByTriggerIdentifier({
+        storedWorkflow = await this.getAndUpdateWorkflowById({
           environmentId: mappedCommand.environmentId,
           triggerIdentifier: mappedCommand.identifier,
+          payload: mappedCommand.payload,
+          organizationId: mappedCommand.organizationId,
+          userId: mappedCommand.userId,
         });
       }
 
@@ -204,15 +208,50 @@ export class TriggerEvent {
         _environmentId: command.environmentId,
         templateIdentifier: command.triggerIdentifier,
       }),
+    options: {
+      ttl: 120, // seconds
+    },
   })
-  private async getNotificationTemplateByTriggerIdentifier(command: {
+  private async getAndUpdateWorkflowById(command: {
     triggerIdentifier: string;
     environmentId: string;
+    payload: Record<string, any>;
+    organizationId: string;
+    userId: string;
   }) {
-    return await this.notificationTemplateRepository.findByTriggerIdentifier(
-      command.environmentId,
-      command.triggerIdentifier,
-    );
+    const lastTriggeredAt = new Date();
+
+    const workflow =
+      await this.notificationTemplateRepository.findByTriggerIdentifierAndUpdate(
+        command.environmentId,
+        command.triggerIdentifier,
+        lastTriggeredAt,
+      );
+
+    if (workflow) {
+      // We only consider trigger when it's coming from the backend SDK
+      if (!command.payload?.__source) {
+        if (!workflow.lastTriggeredAt) {
+          this.analyticsService.track(
+            'Workflow Connected to Backend SDK - [API]',
+            command.userId,
+            {
+              name: workflow.name,
+              origin: workflow.origin,
+              _organization: command.organizationId,
+              _environment: command.environmentId,
+            },
+          );
+        }
+
+        /**
+         * Update the entry to cache it with the new lastTriggeredAt
+         */
+        workflow.lastTriggeredAt = lastTriggeredAt.toISOString();
+      }
+    }
+
+    return workflow;
   }
 
   @Instrument()

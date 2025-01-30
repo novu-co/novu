@@ -17,7 +17,7 @@ import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { ServerErrorPage } from './shared/server-error-page';
 
-export type SortableColumn = 'name' | 'updatedAt';
+export type SortableColumn = 'name' | 'updatedAt' | 'lastTriggeredAt';
 
 interface WorkflowListProps {
   data?: ListWorkflowResponse;
@@ -95,6 +95,14 @@ export function WorkflowList({
             >
               Last updated
             </TableHead>
+            {/*  <TableHead
+              sortable
+              sortDirection={orderBy === 'lastTriggeredAt' ? orderDirection : false}
+              onSort={() => toggleSort('lastTriggeredAt')}
+            >
+              Last triggered
+            </TableHead> */}
+
             <TableHead />
           </TableRow>
         </TableHeader>
@@ -115,6 +123,9 @@ export function WorkflowList({
                   </TableCell>
                   <TableCell>
                     <Skeleton className="h-5 w-[7ch] rounded-full" />
+                  </TableCell>
+                  <TableCell className="text-foreground-600 text-sm font-medium">
+                    <Skeleton className="h-5 w-[14ch] rounded-full" />
                   </TableCell>
                   <TableCell className="text-foreground-600 text-sm font-medium">
                     <Skeleton className="h-5 w-[14ch] rounded-full" />

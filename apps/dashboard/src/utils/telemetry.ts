@@ -48,5 +48,8 @@ export enum TelemetryEvent {
   ENVIRONMENTS_PAGE_VIEWED = 'Environments Page Viewed',
   CREATE_ENVIRONMENT_CLICK = 'Create Environment Click',
   UPGRADE_TO_BUSINESS_TIER_CLICK = 'Upgrade to Business Tier Click',
+  WORKFLOW_CHECKLIST_OPENED = 'Workflow checklist opened - [Workflow Editor]',
+  WORKFLOW_CHECKLIST_COMPLETED = 'Workflow checklist completed - [Workflow Editor]',
+  WORKFLOW_CHECKLIST_STEP_CLICKED = 'Workflow checklist step clicked - [Workflow Editor]',
   SUBSCRIBERS_PAGE_VISIT = 'Subscribers page visit',
 }
