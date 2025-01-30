@@ -262,6 +262,11 @@ function useSubmitQuestionnaire() {
       });
 
       if (currentUser && currentOrganization) {
+        const anonymousId = await segment.getAnonymousId();
+        if (anonymousId) {
+          segment.alias(anonymousId, currentUser._id);
+        }
+
         segment.identify(currentUser, {
           organizationType: data.organizationType,
           jobTitle: data.jobTitle,

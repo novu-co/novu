@@ -3,6 +3,7 @@ import { CheckIcon } from '@radix-ui/react-icons';
 
 import { Code2 } from '@/components/icons/code-2';
 import { cn } from '@/utils/ui';
+import TruncatedText from '@/components/truncated-text';
 
 const KeyboardItem = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return (
@@ -55,7 +56,7 @@ export const VariablesList = React.forwardRef<HTMLUListElement, VariablesListPro
               }}
             >
               <Code2 className="text-feature size-3 min-w-3" />
-              {option.label}
+              <TruncatedText>{option.label}</TruncatedText>
               <CheckIcon
                 className={cn('ml-auto size-4', selectedValue === option.value ? 'opacity-50' : 'opacity-0')}
               />

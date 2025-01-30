@@ -1,0 +1,37 @@
+{
+  "name": "@novu/api",
+  "version": "0.1.19",
+  "author": "Novu",
+  "main": "./index.js",
+  "sideEffects": false,
+  "scripts": {
+    "lint": "eslint --max-warnings=0 src",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5",
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19",
+    "zod": ">= 3"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {"optional":true},
+    "react": {"optional":true},
+    "react-dom": {"optional":true}
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "^5.61.4",
+    "@types/react": "^18.3.12",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "eslint": "^8.57.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "typescript": "^5.4.5",
+    "zod": "^3.23.4"
+  },
+  "dependencies": {
+    
+  }
+}

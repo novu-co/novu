@@ -3,14 +3,12 @@ import { Editor } from '@maily-to/core';
 import { VariableExtension, getVariableSuggestions } from '@maily-to/core/extensions';
 import type { AnyExtension, Editor as TiptapEditor } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
-import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { parseStepVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { ForExtension } from './extensions/for';
-import { DEFAULT_EDITOR_CONFIG, getEditorBlocks } from './maily-config';
+import { DEFAULT_EDITOR_BLOCKS, DEFAULT_EDITOR_CONFIG } from './maily-config';
 import { VariableView } from './extensions/variable-view';
 import { MailyVariablesList } from './extensions/maily-variables-list';
 
@@ -40,11 +38,7 @@ export const Maily = ({ value, onChange, className, ...rest }: MailyProps) => {
     () => mailyVariables.namespaces.map((v) => ({ name: v.label, required: false })),
     [mailyVariables.namespaces]
   );
-
   const [_, setEditor] = useState<TiptapEditor>();
-
-  const isForBlockEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_EMAIL_FOR_BLOCK_ENABLED);
-  const isShowEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_EMAIL_SHOW_ENABLED);
 
   const calculateVariables = useCallback(
     ({
@@ -127,18 +121,11 @@ export const Maily = ({ value, onChange, className, ...rest }: MailyProps) => {
 
   return (
     <>
-      {!isShowEnabled && (
-        <style>{`
-                  button:has(.lucide-eye) {
-                    display: none;
-                  }
-                `}</style>
-      )}
       <div className={cn('mx-auto flex h-full flex-col items-start', className)} {...rest}>
         <Editor
-          key={isForBlockEnabled ? 'for-block-enabled' : 'for-block-disabled'}
+          key="for-block-enabled"
           config={DEFAULT_EDITOR_CONFIG}
-          blocks={getEditorBlocks(isForBlockEnabled)}
+          blocks={DEFAULT_EDITOR_BLOCKS}
           extensions={extensions}
           variableTriggerCharacter={VARIABLE_TRIGGER_CHARACTER}
           variables={calculateVariables}
