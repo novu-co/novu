@@ -5,8 +5,9 @@ import {
   GetSubscriberPreference,
   GetSubscriberPreferenceCommand,
 } from '@novu/application-generic';
-import { IGetSubscriberPreferencesResponseDto, ISubscriberPreferenceResponse } from '@novu/shared';
+import { ISubscriberPreferenceResponse } from '@novu/shared';
 import { GetSubscriberPreferencesCommand } from './get-subscriber-preferences.command';
+import { GetSubscriberPreferencesResponseDto } from '../../dtos/get-subscriber-preferences.dto';
 
 @Injectable()
 export class GetSubscriberPreferences {
@@ -15,7 +16,7 @@ export class GetSubscriberPreferences {
     private getSubscriberPreference: GetSubscriberPreference
   ) {}
 
-  async execute(command: GetSubscriberPreferencesCommand): Promise<IGetSubscriberPreferencesResponseDto> {
+  async execute(command: GetSubscriberPreferencesCommand): Promise<GetSubscriberPreferencesResponseDto> {
     const globalPreference = await this.fetchGlobalPreference(command);
     const workflowPreferences = await this.fetchWorkflowPreferences(command);
 
