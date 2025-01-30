@@ -1,8 +1,8 @@
-import { AnalyticsBrowser } from '@segment/analytics-next';
-import type { IUserEntity } from '@novu/shared';
-import * as mixpanel from 'mixpanel-browser';
 import { MIXPANEL_KEY, SEGMENT_KEY } from '@/config';
+import type { IUserEntity } from '@novu/shared';
+import { AnalyticsBrowser } from '@segment/analytics-next';
 import * as Sentry from '@sentry/react';
+import * as mixpanel from 'mixpanel-browser';
 export class SegmentService {
   private _segment: AnalyticsBrowser | null = null;
   private _segmentEnabled: boolean;
@@ -144,6 +144,16 @@ export class SegmentService {
     }
 
     this._segment?.reset();
+  }
+
+  async getAnonymousId() {
+    if (!this.isSegmentEnabled()) {
+      return;
+    }
+
+    const user = await this._segment?.user();
+
+    return user?.anonymousId();
   }
 
   isSegmentEnabled(): boolean {

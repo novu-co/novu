@@ -126,7 +126,7 @@ export class UserSession {
       await this.addOrganizationCommunity();
     }
 
-    if (!options.noOrganization && !options?.noEnvironment && !options.noWidgetSession) {
+    if (!options.noOrganization && !options?.noEnvironment) {
       await this.createEnvironmentsAndFeeds();
     }
 

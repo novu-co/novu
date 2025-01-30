@@ -17,7 +17,6 @@ import { useDeleteSubscriber } from '@/hooks/use-delete-subscriber';
 import { formatDateSimple } from '@/utils/format-date';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { cn } from '@/utils/ui';
-import { ISubscriberResponseDto } from '@novu/shared';
 import { ComponentProps, useState } from 'react';
 import { RiDeleteBin2Line, RiFileCopyLine, RiMore2Fill, RiPulseFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
@@ -25,6 +24,7 @@ import { ExternalToast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '../primitives/avatar';
 import { CompactButton } from '../primitives/button-compact';
 import { CopyButton } from '../primitives/copy-button';
+import { SubscriberResponseDto } from '@novu/api/models/components';
 
 const toastOptions: ExternalToast = {
   position: 'bottom-right',
@@ -33,17 +33,17 @@ const toastOptions: ExternalToast = {
   },
 };
 
-const getSubscriberTitle = (subscriber: ISubscriberResponseDto) => {
+const getSubscriberTitle = (subscriber: SubscriberResponseDto) => {
   const fullName = `${subscriber.firstName || ''} ${subscriber.lastName || ''}`.trim();
   return fullName || subscriber.email || subscriber.phone || subscriber.subscriberId;
 };
 
 type SubscriberRowProps = {
-  subscriber: ISubscriberResponseDto;
+  subscriber: SubscriberResponseDto;
 };
 
 type SubscriberLinkTableCellProps = ComponentProps<typeof TableCell> & {
-  subscriber: ISubscriberResponseDto;
+  subscriber: SubscriberResponseDto;
 };
 
 const SubscriberLinkTableCell = (props: SubscriberLinkTableCellProps) => {

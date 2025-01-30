@@ -2,13 +2,13 @@ import { deleteSubscriber } from '@/api/subscribers';
 import { useEnvironment } from '@/context/environment/hooks';
 import { QueryKeys } from '@/utils/query-keys';
 import { OmitEnvironmentFromParameters } from '@/utils/types';
-import { IRemoveSubscriberResponseDto } from '@novu/shared';
+import { RemoveSubscriberResponseDto } from '@novu/api/models/components';
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
 
 type DeleteSubscriberParameters = OmitEnvironmentFromParameters<typeof deleteSubscriber>;
 
 export const useDeleteSubscriber = (
-  options?: UseMutationOptions<IRemoveSubscriberResponseDto, unknown, DeleteSubscriberParameters>
+  options?: UseMutationOptions<RemoveSubscriberResponseDto, unknown, DeleteSubscriberParameters>
 ) => {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();

@@ -1,9 +1,5 @@
-import type {
-  DirectionEnum,
-  IEnvironment,
-  IListSubscribersResponseDto,
-  IRemoveSubscriberResponseDto,
-} from '@novu/shared';
+import { ListSubscribersResponseDto, RemoveSubscriberResponseDto } from '@novu/api/models/components';
+import type { DirectionEnum, IEnvironment } from '@novu/shared';
 import { delV2, getV2 } from './api.client';
 
 export const getSubscribers = async ({
@@ -28,7 +24,7 @@ export const getSubscribers = async ({
   name?: string;
   orderDirection?: DirectionEnum;
   orderBy?: string;
-}): Promise<IListSubscribersResponseDto> => {
+}): Promise<ListSubscribersResponseDto> => {
   const params = new URLSearchParams({
     limit: limit.toString(),
     ...(after && { after }),
@@ -41,8 +37,7 @@ export const getSubscribers = async ({
     ...(orderBy && { orderBy }),
     ...(orderDirection && { orderDirection }),
   });
-
-  const { data } = await getV2<{ data: IListSubscribersResponseDto }>(`/subscribers?${params}`, {
+  const { data } = await getV2<{ data: ListSubscribersResponseDto }>(`/subscribers?${params}`, {
     environment,
   });
   return data;
@@ -55,7 +50,7 @@ export const deleteSubscriber = async ({
   environment: IEnvironment;
   subscriberId: string;
 }) => {
-  const { data } = await delV2<{ data: IRemoveSubscriberResponseDto }>(`/subscribers/${subscriberId}`, {
+  const { data } = await delV2<{ data: RemoveSubscriberResponseDto }>(`/subscribers/${subscriberId}`, {
     environment,
   });
   return data;
