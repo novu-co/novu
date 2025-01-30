@@ -81,9 +81,11 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
     expect(response.statusCode).to.equal(200);
     const { workflows } = response.body.data;
 
-    const newWorkflowPrefs = workflows.find((_wf) => _wf.workflow.identifier === newWorkflow.triggers[0].identifier);
+    const newWorkflowPreferences = workflows.find(
+      (_wf) => _wf.workflow.identifier === newWorkflow.triggers[0].identifier
+    );
     // New workflow should inherit global settings
-    expect(newWorkflowPrefs.channels).to.deep.equal({ email: false, in_app: true });
+    expect(newWorkflowPreferences.channels).to.deep.equal({ email: false, in_app: true });
   });
 });
 
