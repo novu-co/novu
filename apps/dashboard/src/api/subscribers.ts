@@ -37,10 +37,11 @@ export const getSubscribers = async ({
     ...(orderBy && { orderBy }),
     ...(orderDirection && { orderDirection }),
   });
-  const { data } = await getV2<{ data: ListSubscribersResponseDto }>(`/subscribers?${params}`, {
+  const response = await getV2<ListSubscribersResponseDto>(`/subscribers?${params}`, {
     environment,
   });
-  return data;
+
+  return response;
 };
 
 export const deleteSubscriber = async ({
@@ -50,8 +51,8 @@ export const deleteSubscriber = async ({
   environment: IEnvironment;
   subscriberId: string;
 }) => {
-  const { data } = await delV2<{ data: RemoveSubscriberResponseDto }>(`/subscribers/${subscriberId}`, {
+  const response = await delV2<RemoveSubscriberResponseDto>(`/subscribers/${subscriberId}`, {
     environment,
   });
-  return data;
+  return response;
 };
