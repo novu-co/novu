@@ -2,15 +2,24 @@ import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { FeatureFlagsKeysEnum, StepResponseDto } from '@novu/shared';
+import { FeatureFlagsKeysEnum, StepResponseDto, WorkflowOriginEnum } from '@novu/shared';
 import { useMemo } from 'react';
 import { RiArrowRightSLine, RiGuideFill } from 'react-icons/ri';
 import { RQBJsonLogic } from 'react-querybuilder';
 import { parseJsonLogic } from 'react-querybuilder/parseJsonLogic';
 import { Link } from 'react-router-dom';
 
-export function SkipConditionsButton({ step, inSidebar = false }: { step: StepResponseDto; inSidebar?: boolean }) {
-  const isStepConditionsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_STEP_CONDITIONS_ENABLED);
+export function SkipConditionsButton({
+  origin,
+  step,
+  inSidebar = false,
+}: {
+  origin: WorkflowOriginEnum;
+  step: StepResponseDto;
+  inSidebar?: boolean;
+}) {
+  const isStepConditionsFeatureEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_STEP_CONDITIONS_ENABLED);
+  const canEditStepConditions = isStepConditionsFeatureEnabled && origin === WorkflowOriginEnum.NOVU_CLOUD;
   const uiSchema = step.controls.uiSchema;
   const skip = uiSchema?.properties?.skip;
 
@@ -37,7 +46,7 @@ export function SkipConditionsButton({ step, inSidebar = false }: { step: StepRe
     </Link>
   );
 
-  if (!skip || !isStepConditionsEnabled) {
+  if (!skip || !canEditStepConditions) {
     return null;
   }
 

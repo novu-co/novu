@@ -152,6 +152,7 @@ export class TriggerEventRequestDto {
       { type: 'string', description: 'Unique identifier of a subscriber in your systems' },
       { $ref: getSchemaPath(SubscriberPayloadDto) },
     ],
+    required: false,
   })
   @IsOptional()
   @ValidateIf((_, value) => typeof value !== 'string')
@@ -166,6 +167,7 @@ export class TriggerEventRequestDto {
       { type: 'string', description: 'Unique identifier of a tenant in your system' },
       { $ref: getSchemaPath(TenantPayloadDto) },
     ],
+    required: false,
   })
   @IsOptional()
   @ValidateIf((_, value) => typeof value !== 'string')

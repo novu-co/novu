@@ -1,17 +1,22 @@
 /* eslint-disable max-len */
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
-import { API_KEY_SWAGGER_SECURITY_NAME } from '@novu/application-generic';
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { injectDocumentComponents } from './injection';
 import { removeEndpointsWithoutApiKey, transformDocument } from './open.api.manipulation.component';
 import metadata from '../../../../metadata';
+import { API_KEY_SWAGGER_SECURITY_NAME, BEARER_SWAGGER_SECURITY_NAME } from '@novu/application-generic';
 
 export const API_KEY_SECURITY_DEFINITIONS: SecuritySchemeObject = {
   type: 'apiKey',
   name: 'Authorization',
   in: 'header',
   description: 'API key authentication. Allowed headers-- "Authorization: ApiKey <api_key>".',
+};
+export const BEARER_SECURITY_DEFINITIONS: SecuritySchemeObject = {
+  type: 'http',
+  scheme: 'bearer',
+  bearerFormat: 'JWT',
 };
 const options = new DocumentBuilder()
   .setTitle('Novu API')
@@ -23,7 +28,10 @@ const options = new DocumentBuilder()
   .setLicense('MIT', 'https://opensource.org/license/mit')
   .addServer('https://api.novu.co')
   .addServer('https://eu.api.novu.co')
-  .addApiKey(API_KEY_SECURITY_DEFINITIONS, API_KEY_SWAGGER_SECURITY_NAME)
+  .addSecurity(API_KEY_SWAGGER_SECURITY_NAME, API_KEY_SECURITY_DEFINITIONS)
+  .addSecurity(BEARER_SWAGGER_SECURITY_NAME, BEARER_SECURITY_DEFINITIONS)
+  .addSecurityRequirements(API_KEY_SWAGGER_SECURITY_NAME)
+  .addSecurityRequirements(BEARER_SWAGGER_SECURITY_NAME)
   .addTag(
     'Events',
     `Events represent a change in state of a subscriber. They are used to trigger workflows, and enable you to send notifications to subscribers based on their actions.`,
@@ -136,7 +144,7 @@ export const setupSwagger = async (app: INestApplication) => {
     yamlDocumentUrl: 'openapi.yaml',
     explorer: process.env.NODE_ENV !== 'production',
   });
-  sdkSetup(app, document);
+  return sdkSetup(app, document);
 };
 function sdkSetup(app: INestApplication, document: OpenAPIObject) {
   // eslint-disable-next-line no-param-reassign
@@ -162,9 +170,12 @@ function sdkSetup(app: INestApplication, document: OpenAPIObject) {
     retryConnectionErrors: true,
   };
 
-  SwaggerModule.setup('openapi.sdk', app, transformDocument(document), {
+  const sdkDocument = transformDocument(document);
+  const sdkInternalDocument = transformDocument(document, false);
+  SwaggerModule.setup('openapi.sdk', app, sdkDocument, {
     jsonDocumentUrl: 'openapi.sdk.json',
     yamlDocumentUrl: 'openapi.sdk.yaml',
     explorer: process.env.NODE_ENV !== 'production',
   });
+  return sdkInternalDocument;
 }

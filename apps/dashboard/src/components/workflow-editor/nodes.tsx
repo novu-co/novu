@@ -1,3 +1,11 @@
+import { ComponentProps, useMemo } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Node as FlowNode, Handle, NodeProps, Position } from '@xyflow/react';
+import { RiFilter3Fill, RiPlayCircleLine } from 'react-icons/ri';
+import { parseJsonLogic } from 'react-querybuilder/parseJsonLogic';
+import { RQBJsonLogic } from 'react-querybuilder';
+import { WorkflowOriginEnum } from '@novu/shared';
+
 import { createStep } from '@/components/workflow-editor/step-utils';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
@@ -6,11 +14,6 @@ import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { getWorkflowIdFromSlug, STEP_DIVIDER } from '@/utils/step';
 import { cn } from '@/utils/ui';
-import { WorkflowOriginEnum } from '@novu/shared';
-import { Node as FlowNode, Handle, NodeProps, Position } from '@xyflow/react';
-import { ComponentProps } from 'react';
-import { RiPlayCircleLine } from 'react-icons/ri';
-import { Link, useNavigate, useParams } from 'react-router-dom';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
 import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './base-node';
@@ -39,11 +42,15 @@ export const TriggerNode = ({
   data,
 }: NodeProps<FlowNode<{ environmentSlug: string; workflowSlug: string; readOnly?: boolean }>>) => {
   const content = (
-    <Node className="relative rounded-tl-none [&>span]:rounded-tl-none">
-      <div className="border-neutral-alpha-200 text-foreground-600 absolute left-0 top-0 flex -translate-y-full items-center gap-1 rounded-t-lg border border-b-0 bg-neutral-50 px-2 py-1 text-xs font-medium">
-        <RiPlayCircleLine className="size-3" />
-        <span>TRIGGER</span>
-      </div>
+    <Node
+      className="relative rounded-tl-none [&>span]:rounded-tl-none"
+      pill={
+        <>
+          <RiPlayCircleLine className="size-3" />
+          <span>TRIGGER</span>
+        </>
+      }
+    >
       <NodeHeader type={StepTypeEnum.TRIGGER}>
         <NodeName>Workflow trigger</NodeName>
       </NodeHeader>
@@ -72,16 +79,48 @@ export const TriggerNode = ({
 
 type StepNodeProps = ComponentProps<typeof Node> & { data: NodeData };
 const StepNode = (props: StepNodeProps) => {
+  const navigate = useNavigate();
   const { className, data, ...rest } = props;
   const { stepSlug } = useParams<{
     stepSlug: string;
   }>();
+
+  const conditionsCount = useMemo(() => {
+    if (!data.controlValues?.skip) return 0;
+
+    const query = parseJsonLogic(data.controlValues.skip as RQBJsonLogic);
+
+    return query.rules.length;
+  }, [data.controlValues]);
 
   const isSelected =
     getWorkflowIdFromSlug({ slug: stepSlug ?? '', divider: STEP_DIVIDER }) ===
       getWorkflowIdFromSlug({ slug: data.stepSlug ?? '', divider: STEP_DIVIDER }) &&
     !!stepSlug &&
     !!data.stepSlug;
+
+  const hasConditions = conditionsCount > 0;
+
+  if (hasConditions) {
+    return (
+      <Node
+        aria-selected={isSelected}
+        className={cn('group rounded-tl-none [&>span]:rounded-tl-none', className)}
+        pill={
+          <>
+            <RiFilter3Fill className="text-foreground-400 size-3" />
+            <span className="text-foreground-400 text-xs">{conditionsCount}</span>
+          </>
+        }
+        onPillClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          navigate(buildRoute(ROUTES.EDIT_STEP_CONDITIONS, { stepSlug: data.stepSlug ?? '' }));
+        }}
+        {...rest}
+      />
+    );
+  }
 
   return <Node aria-selected={isSelected} className={cn('group', className)} {...rest} />;
 };
