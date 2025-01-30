@@ -70,8 +70,8 @@ describe('Novu Node.js package - Retries and idempotency-key', () => {
       serverURL: BACKEND_URL,
       httpClient,
     });
-    await novuClient.trigger({ name: 'fake-workflow', to: { subscriberId: '123' }, payload: {} });
-    await novuClient.trigger({ name: 'fake-workflow', to: { subscriberId: '123' }, payload: {} });
+    await novuClient.trigger({ workflowId: 'fake-workflow', to: { subscriberId: '123' }, payload: {} });
+    await novuClient.trigger({ workflowId: 'fake-workflow', to: { subscriberId: '123' }, payload: {} });
 
     const idempotencyRequestKeys = getIdempotencyRequestKeys(httpClient);
     expect(new Set(idempotencyRequestKeys).size, JSON.stringify(idempotencyRequestKeys)).to.be.eq(2);
@@ -104,7 +104,7 @@ describe('Novu Node.js package - Retries and idempotency-key', () => {
       httpClient: mockHTTPClient,
     });
 
-    await novuClient.trigger({ name: 'fake-workflow', to: { subscriberId: '123' }, payload: {} });
+    await novuClient.trigger({ workflowId: 'fake-workflow', to: { subscriberId: '123' }, payload: {} });
     expect(mockHTTPClient.getRecordedRequests().length).to.eq(4);
     const idempotencyKeys = getIdempotencyKeys(mockHTTPClient);
     expect(hasUniqueOnly(idempotencyKeys)).to.be.eq(true);
