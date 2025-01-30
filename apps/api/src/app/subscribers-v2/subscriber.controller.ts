@@ -12,7 +12,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ExternalApiAccessible, UserSession } from '@novu/application-generic';
 import {
   DirectionEnum,
-  IGetPreferencesResponseDto,
+  IGetSubscriberPreferencesResponseDto,
   IGetSubscriberResponseDto,
   IListSubscribersRequestDto,
   IListSubscribersResponseDto,
@@ -116,7 +116,7 @@ export class SubscriberController {
   async getSubscriberPreferences(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string
-  ): Promise<IGetPreferencesResponseDto> {
+  ): Promise<IGetSubscriberPreferencesResponseDto> {
     return await this.getSubscriberPreferencesUsecase.execute(
       GetSubscriberPreferencesCommand.create({
         environmentId: user.environmentId,

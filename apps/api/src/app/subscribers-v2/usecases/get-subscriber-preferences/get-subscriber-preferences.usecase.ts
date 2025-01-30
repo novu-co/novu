@@ -5,7 +5,7 @@ import {
   GetSubscriberPreference,
   GetSubscriberPreferenceCommand,
 } from '@novu/application-generic';
-import { IGetPreferencesResponseDto, ISubscriberPreferenceResponse } from '@novu/shared';
+import { IGetSubscriberPreferencesResponseDto, ISubscriberPreferenceResponse } from '@novu/shared';
 import { GetSubscriberPreferencesCommand } from './get-subscriber-preferences.command';
 
 @Injectable()
@@ -15,18 +15,14 @@ export class GetSubscriberPreferences {
     private getSubscriberPreference: GetSubscriberPreference
   ) {}
 
-  async execute(command: GetSubscriberPreferencesCommand): Promise<IGetPreferencesResponseDto> {
-    try {
-      const globalPreference = await this.fetchGlobalPreference(command);
-      const workflowPreferences = await this.fetchWorkflowPreferences(command);
+  async execute(command: GetSubscriberPreferencesCommand): Promise<IGetSubscriberPreferencesResponseDto> {
+    const globalPreference = await this.fetchGlobalPreference(command);
+    const workflowPreferences = await this.fetchWorkflowPreferences(command);
 
-      return {
-        global: globalPreference,
-        workflows: workflowPreferences,
-      };
-    } catch (error) {
-      throw new Error(`Failed to get preferences: ${error.message}`);
-    }
+    return {
+      global: globalPreference,
+      workflows: workflowPreferences,
+    };
   }
 
   private async fetchGlobalPreference(command: GetSubscriberPreferencesCommand) {
