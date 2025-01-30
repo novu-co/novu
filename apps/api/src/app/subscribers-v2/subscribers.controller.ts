@@ -31,7 +31,7 @@ import { SubscriberResponseDto } from '../subscribers/dtos';
 import { RemoveSubscriberCommand } from './usecases/remove-subscriber/remove-subscriber.command';
 import { RemoveSubscriber } from './usecases/remove-subscriber/remove-subscriber.usecase';
 import { RemoveSubscriberResponseDto } from './dtos/remove-subscriber.dto';
-import { GetSubscriberPreferencesResponseDto } from './dtos/get-subscriber-preferences.dto';
+import { GetSubscriberPreferencesDto } from './dtos/get-subscriber-preferences.dto';
 
 @Controller({ path: '/subscribers', version: '2' })
 @UseInterceptors(ClassSerializerInterceptor)
@@ -151,7 +151,7 @@ export class SubscribersController {
   async getSubscriberPreferences(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string
-  ): Promise<GetSubscriberPreferencesResponseDto> {
+  ): Promise<GetSubscriberPreferencesDto> {
     return await this.getSubscriberPreferencesUsecase.execute(
       GetSubscriberPreferencesCommand.create({
         environmentId: user.environmentId,

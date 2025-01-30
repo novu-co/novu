@@ -1,7 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IPreferenceChannels, IPreferenceOverride } from '@novu/shared';
+import { ChannelTypeEnum, IPreferenceChannels, IPreferenceOverride, PreferenceOverrideSourceEnum } from '@novu/shared';
 
-class WorkflowInfoDto {
+export class PreferenceChannelsDto implements IPreferenceChannels {
+  @ApiProperty({ description: 'Email channel preference' })
+  email?: boolean;
+
+  @ApiProperty({ description: 'SMS channel preference' })
+  sms?: boolean;
+
+  @ApiProperty({ description: 'In-app channel preference' })
+  in_app?: boolean;
+
+  @ApiProperty({ description: 'Push channel preference' })
+  push?: boolean;
+
+  @ApiProperty({ description: 'Chat channel preference' })
+  chat?: boolean;
+}
+
+export class PreferenceOverride implements IPreferenceOverride {
+  @ApiProperty({
+    enum: ChannelTypeEnum,
+    enumName: 'ChannelTypeEnum',
+    description: 'The channel type for the override',
+  })
+  channel: ChannelTypeEnum;
+
+  @ApiProperty({
+    enum: PreferenceOverrideSourceEnum,
+    enumName: 'PreferenceOverrideSourceEnum',
+    description: 'The source of the override',
+  })
+  source: PreferenceOverrideSourceEnum;
+}
+
+export class WorkflowInfoDto {
   @ApiProperty({ description: 'Unique identifier of the workflow' })
   identifier: string;
 
@@ -9,29 +42,29 @@ class WorkflowInfoDto {
   name: string;
 }
 
-class GlobalPreferenceDto {
+export class GlobalPreferenceDto {
   @ApiProperty({ description: 'Whether notifications are enabled globally' })
   enabled: boolean;
 
-  @ApiProperty({ description: 'Channel-specific preference settings' })
-  channels: IPreferenceChannels;
+  @ApiProperty({ description: 'Channel-specific preference settings', type: PreferenceChannelsDto })
+  channels: PreferenceChannelsDto;
 }
 
-class WorkflowPreferenceDto {
+export class WorkflowPreferenceDto {
   @ApiProperty({ description: 'Whether notifications are enabled for this workflow' })
   enabled: boolean;
 
-  @ApiProperty({ description: 'Channel-specific preference settings for this workflow' })
-  channels: IPreferenceChannels;
+  @ApiProperty({ description: 'Channel-specific preference settings for this workflow', type: PreferenceChannelsDto })
+  channels: PreferenceChannelsDto;
 
-  @ApiProperty({ description: 'List of preference overrides', isArray: true })
-  overrides: IPreferenceOverride[];
+  @ApiProperty({ description: 'List of preference overrides', type: [PreferenceOverride] })
+  overrides: PreferenceOverride[];
 
-  @ApiProperty({ description: 'Workflow information' })
+  @ApiProperty({ description: 'Workflow information', type: WorkflowInfoDto })
   workflow: WorkflowInfoDto;
 }
 
-export class GetSubscriberPreferencesResponseDto {
+export class GetSubscriberPreferencesDto {
   @ApiProperty({ description: 'Global preference settings', type: GlobalPreferenceDto })
   global: GlobalPreferenceDto;
 

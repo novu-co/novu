@@ -1,18 +1,19 @@
 import { expect } from 'chai';
 import { randomBytes } from 'crypto';
 import { UserSession } from '@novu/testing';
-import { ChannelTypeEnum, IGetSubscriberResponseDto } from '@novu/shared';
+import { ChannelTypeEnum } from '@novu/shared';
 import { NotificationTemplateEntity } from '@novu/dal';
 import {
   UpdateSubscriberGlobalPreferencesRequestDto,
   UpdateSubscriberPreferenceRequestDto,
+  SubscriberResponseDto,
 } from '@novu/api/models/components';
 
 const v2Prefix = '/v2';
 let session: UserSession;
 
 describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (GET) #novu-v2', () => {
-  let subscriber: IGetSubscriberResponseDto;
+  let subscriber: SubscriberResponseDto;
   let workflow: NotificationTemplateEntity;
 
   beforeEach(async () => {
