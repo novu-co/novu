@@ -36,6 +36,9 @@ export class PatchSubscriber {
           phone: 1,
           subscriberId: 1,
           timezone: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          deleted: 1,
         },
       }
     );

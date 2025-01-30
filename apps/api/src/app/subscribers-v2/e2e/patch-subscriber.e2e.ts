@@ -5,7 +5,6 @@ import { Novu } from '@novu/api';
 import { SubscriberResponseDto } from '../../subscribers/dtos';
 import { expectSdkExceptionGeneric, initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-const v2Prefix = '/v2';
 let session: UserSession;
 
 describe('Update Subscriber - /subscribers/:subscriberId (PATCH) #novu-v2', () => {
