@@ -6,6 +6,8 @@ import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/
 import { InputPure, InputRoot, InputWrapper } from '@/components/primitives/input';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { cn } from '@/utils/ui';
+import { VariableSelectCore } from './variable-select-core';
+import { VariableSelectInput } from './variable-select-input';
 
 const KeyboardItem = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return (
@@ -81,6 +83,7 @@ type VariableSelectProps = {
   onChange: (value: string) => void;
   leftIcon?: React.ReactNode;
   title?: string;
+  placeholder?: string;
 };
 
 /**
@@ -93,13 +96,14 @@ type VariableSelectProps = {
  * - Visual feedback for selected items
  * - Support for custom left icon
  */
-export const VariableSelect = ({
+export const VariableSelectLegacy = ({
   disabled,
   value,
   options: optionsProp,
   onChange,
   leftIcon,
   title = 'Variables',
+  placeholder = 'Field',
 }: VariableSelectProps) => {
   const [inputValue, setInputValue] = useState(value ?? '');
   const [filterValue, setFilterValue] = useState('');
@@ -224,27 +228,29 @@ export const VariableSelect = ({
   return (
     <Popover open={isOpen}>
       <PopoverAnchor asChild>
-        <InputRoot size="2xs" className="w-40">
-          <InputWrapper>
-            {leftIcon}
-            <InputPure
-              ref={inputRef}
-              value={inputValue}
-              onClick={onOpen}
-              onChange={onInputChange}
-              onFocusCapture={() => {
-                setHoveredOptionIndex(0);
-                scrollToOption(0);
-              }}
-              // use blur only when there are no filtered options, otherwise it closes the popover on keyboard navigation
-              onBlurCapture={filteredOptions.length === 0 ? onClose : undefined}
-              placeholder="Field"
-              disabled={disabled}
-              onKeyDown={onInputKeyDown}
-              {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-            />
-          </InputWrapper>
-        </InputRoot>
+        <div className="flex w-full items-center gap-1">
+          {/* <InputRoot size="2xs" className="w-40">
+          <InputWrapper> */}
+          {leftIcon}
+          <InputPure
+            ref={inputRef}
+            value={inputValue}
+            onClick={onOpen}
+            onChange={onInputChange}
+            onFocusCapture={() => {
+              setHoveredOptionIndex(0);
+              scrollToOption(0);
+            }}
+            // use blur only when there are no filtered options, otherwise it closes the popover on keyboard navigation
+            onBlurCapture={filteredOptions.length === 0 ? onClose : undefined}
+            placeholder={placeholder}
+            disabled={disabled}
+            onKeyDown={onInputKeyDown}
+            {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+          />
+          {/* </InputWrapper>
+        </InputRoot> */}
+        </div>
       </PopoverAnchor>
       {filteredOptions.length > 0 && (
         <PopoverContent
@@ -270,3 +276,22 @@ export const VariableSelect = ({
     </Popover>
   );
 };
+
+export function VariableSelect(props: VariableSelectProps) {
+  return <VariableSelectCore {...props} />;
+}
+
+export function VariableSelectBlank({ value, onChange, ...props }: VariableSelectProps) {
+  const displayValue = value?.replace('{{', '').replace('}}', '');
+
+  const handleChange = (newValue: string) => {
+    if (!newValue) {
+      return;
+    }
+    onChange(`{{${newValue}}}`);
+  };
+
+  return (
+    <VariableSelectCore {...props} value={displayValue} onChange={handleChange} InputComponent={VariableSelectInput} />
+  );
+}

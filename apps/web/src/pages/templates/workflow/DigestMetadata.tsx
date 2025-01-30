@@ -69,8 +69,8 @@ export const DigestMetadata = () => {
           multiline
           label={
             <>
-              Events aggregated by subscriberId by default, this can’t be changed. You may add additional aggregations
-              by typing the name of a variable.
+              Events grouped by subscriberId by default, this can’t be changed. You may add additional groupings by
+              typing the name of a variable.
             </>
           }
         >
@@ -82,7 +82,7 @@ export const DigestMetadata = () => {
                 </div>
                 <div>
                   <div>
-                    <b>Aggregated by subscriberId</b>
+                    <b>Grouped by subscriberId</b>
                   </div>
                   <When truthy={!digestKey}>
                     <div>Add another aggregation key</div>
