@@ -3,6 +3,7 @@
  */
 
 import * as z from "zod";
+import { remap as remap$ } from "../../lib/primitives.js";
 import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
@@ -62,7 +63,7 @@ export type TriggerEventRequestDto = {
   /**
    * The trigger identifier of the workflow you wish to send. This identifier can be found on the workflow page.
    */
-  name: string;
+  workflowId: string;
   /**
    * The payload object is used to pass additional custom information that could be
    *
@@ -332,6 +333,10 @@ export const TriggerEventRequestDto$inboundSchema: z.ZodType<
   actor: z.union([SubscriberPayloadDto$inboundSchema, z.string()]).optional(),
   tenant: z.union([TenantPayloadDto$inboundSchema, z.string()]).optional(),
   controls: WorkflowToStepControlValuesDto$inboundSchema.optional(),
+}).transform((v) => {
+  return remap$(v, {
+    "name": "workflowId",
+  });
 });
 
 /** @internal */
@@ -357,7 +362,7 @@ export const TriggerEventRequestDto$outboundSchema: z.ZodType<
   z.ZodTypeDef,
   TriggerEventRequestDto
 > = z.object({
-  name: z.string(),
+  workflowId: z.string(),
   payload: z.record(z.any()).optional(),
   bridgeUrl: z.string().optional(),
   overrides: z.record(z.record(z.any())).optional(),
@@ -377,6 +382,10 @@ export const TriggerEventRequestDto$outboundSchema: z.ZodType<
   actor: z.union([SubscriberPayloadDto$outboundSchema, z.string()]).optional(),
   tenant: z.union([TenantPayloadDto$outboundSchema, z.string()]).optional(),
   controls: WorkflowToStepControlValuesDto$outboundSchema.optional(),
+}).transform((v) => {
+  return remap$(v, {
+    workflowId: "name",
+  });
 });
 
 /**

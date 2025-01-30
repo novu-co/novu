@@ -9,6 +9,7 @@ import {
 } from '@novu/shared';
 import { CreateSubscriberRequestDto } from '../../subscribers/dtos';
 import { UpdateTenantRequestDto } from '../../tenant/dtos';
+import { SdkApiProperty } from '../../shared/framework/swagger/sdk.decorators';
 
 export class WorkflowToStepControlValuesDto {
   /**
@@ -46,11 +47,14 @@ export class TopicPayloadDto {
 
 @ApiExtraModels(SubscriberPayloadDto, TenantPayloadDto, TopicPayloadDto)
 export class TriggerEventRequestDto {
-  @ApiProperty({
-    description:
-      'The trigger identifier of the workflow you wish to send. This identifier can be found on the workflow page.',
-    example: 'workflow_identifier',
-  })
+  @SdkApiProperty(
+    {
+      description:
+        'The trigger identifier of the workflow you wish to send. This identifier can be found on the workflow page.',
+      example: 'workflow_identifier',
+    },
+    { nameOverride: 'workflowId' }
+  )
   @IsString()
   @IsDefined()
   name: string;
