@@ -17,6 +17,7 @@ import { useDeleteSubscriber } from '@/hooks/use-delete-subscriber';
 import { formatDateSimple } from '@/utils/format-date';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { cn } from '@/utils/ui';
+import { SubscriberResponseDto } from '@novu/api/models/components';
 import { ComponentProps, useState } from 'react';
 import { RiDeleteBin2Line, RiFileCopyLine, RiMore2Fill, RiPulseFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
@@ -24,7 +25,6 @@ import { ExternalToast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '../primitives/avatar';
 import { CompactButton } from '../primitives/button-compact';
 import { CopyButton } from '../primitives/copy-button';
-import { SubscriberResponseDto } from '@novu/api/models/components';
 
 const toastOptions: ExternalToast = {
   position: 'bottom-right',
@@ -178,8 +178,13 @@ export const SubscriberRow = ({ subscriber }: SubscriberRowProps) => {
           await deleteSubscriber({ subscriberId: subscriber.subscriberId });
           setIsDeleteModalOpen(false);
         }}
-        title={`Delete subscriber ${subscriberTitle}`}
-        description={`Are you sure you want to delete this subscriber? This action cannot be undone.`}
+        title={`Delete subscriber`}
+        description={
+          <span>
+            Are you sure you want to delete subscriber <span className="font-bold">{subscriberTitle}</span>? This action
+            cannot be undone.
+          </span>
+        }
         confirmButtonText="Delete subscriber"
         isLoading={isDeleteSubscriberPending}
       />
