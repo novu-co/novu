@@ -49,7 +49,7 @@ export class TierRestrictionsValidateUsecase {
         userId: 'system',
         environmentId: 'system',
         organizationId: command.organizationId,
-        key: FeatureFlagsKeysEnum.IS_TIER_DURATION_RESTRICTION_EXCLUDED,
+        key: FeatureFlagsKeysEnum.IS_TIER_DURATION_RESTRICTION_EXCLUDED_ENABLED,
       }),
     );
 
