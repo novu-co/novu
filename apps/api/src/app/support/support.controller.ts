@@ -7,8 +7,10 @@ import { PlainCardRequestDto } from './dto/plain-card.dto';
 import { PlainCardsCommand } from './usecases/plain-cards.command';
 import { CreateSupportThreadUsecase, PlainCardsUsecase } from './usecases';
 import { PlainCardsGuard } from './guards/plain-cards.guard';
+import { ApiExcludeController } from '@nestjs/swagger';
 
 @Controller('/support')
+@ApiExcludeController
 export class SupportController {
   constructor(
     private createSupportThreadUsecase: CreateSupportThreadUsecase,
