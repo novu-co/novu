@@ -25,12 +25,6 @@ import {
   TopicPayloadDto$Outbound,
   TopicPayloadDto$outboundSchema,
 } from "./topicpayloaddto.js";
-import {
-  WorkflowToStepControlValuesDto,
-  WorkflowToStepControlValuesDto$inboundSchema,
-  WorkflowToStepControlValuesDto$Outbound,
-  WorkflowToStepControlValuesDto$outboundSchema,
-} from "./workflowtostepcontrolvaluesdto.js";
 
 export type One = TopicPayloadDto | SubscriberPayloadDto | string;
 
@@ -73,10 +67,6 @@ export type TriggerEventRequestDto = {
    */
   payload?: { [k: string]: any } | undefined;
   /**
-   * A URL to bridge for additional processing.
-   */
-  bridgeUrl?: string | undefined;
-  /**
    * This could be used to override provider specific configurations
    */
   overrides?: { [k: string]: { [k: string]: any } } | undefined;
@@ -106,10 +96,6 @@ export type TriggerEventRequestDto = {
    *     Existing tenants will be updated with the provided details.
    */
   tenant?: TenantPayloadDto | string | undefined;
-  /**
-   * Additional control configurations.
-   */
-  controls?: WorkflowToStepControlValuesDto | undefined;
 };
 
 /** @internal */
@@ -315,7 +301,6 @@ export const TriggerEventRequestDto$inboundSchema: z.ZodType<
 > = z.object({
   name: z.string(),
   payload: z.record(z.any()).optional(),
-  bridgeUrl: z.string().optional(),
   overrides: z.record(z.record(z.any())).optional(),
   to: z.union([
     TopicPayloadDto$inboundSchema,
@@ -332,7 +317,6 @@ export const TriggerEventRequestDto$inboundSchema: z.ZodType<
   transactionId: z.string().optional(),
   actor: z.union([SubscriberPayloadDto$inboundSchema, z.string()]).optional(),
   tenant: z.union([TenantPayloadDto$inboundSchema, z.string()]).optional(),
-  controls: WorkflowToStepControlValuesDto$inboundSchema.optional(),
 }).transform((v) => {
   return remap$(v, {
     "name": "workflowId",
@@ -343,7 +327,6 @@ export const TriggerEventRequestDto$inboundSchema: z.ZodType<
 export type TriggerEventRequestDto$Outbound = {
   name: string;
   payload?: { [k: string]: any } | undefined;
-  bridgeUrl?: string | undefined;
   overrides?: { [k: string]: { [k: string]: any } } | undefined;
   to:
     | TopicPayloadDto$Outbound
@@ -353,7 +336,6 @@ export type TriggerEventRequestDto$Outbound = {
   transactionId?: string | undefined;
   actor?: SubscriberPayloadDto$Outbound | string | undefined;
   tenant?: TenantPayloadDto$Outbound | string | undefined;
-  controls?: WorkflowToStepControlValuesDto$Outbound | undefined;
 };
 
 /** @internal */
@@ -364,7 +346,6 @@ export const TriggerEventRequestDto$outboundSchema: z.ZodType<
 > = z.object({
   workflowId: z.string(),
   payload: z.record(z.any()).optional(),
-  bridgeUrl: z.string().optional(),
   overrides: z.record(z.record(z.any())).optional(),
   to: z.union([
     TopicPayloadDto$outboundSchema,
@@ -381,7 +362,6 @@ export const TriggerEventRequestDto$outboundSchema: z.ZodType<
   transactionId: z.string().optional(),
   actor: z.union([SubscriberPayloadDto$outboundSchema, z.string()]).optional(),
   tenant: z.union([TenantPayloadDto$outboundSchema, z.string()]).optional(),
-  controls: WorkflowToStepControlValuesDto$outboundSchema.optional(),
 }).transform((v) => {
   return remap$(v, {
     workflowId: "name",

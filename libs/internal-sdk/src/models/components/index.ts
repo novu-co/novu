@@ -123,4 +123,3 @@ export * from "./updatesubscriberpreferencerequestdto.js";
 export * from "./updatesubscriberpreferenceresponsedto.js";
 export * from "./updatesubscriberrequestdto.js";
 export * from "./workflowresponse.js";
-export * from "./workflowtostepcontrolvaluesdto.js";

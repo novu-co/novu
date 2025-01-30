@@ -1,6 +1,6 @@
 import { IsDefined, IsObject, IsOptional, IsString, ValidateIf, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiExtraModels, ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
+import { ApiExtraModels, ApiHideProperty, ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
 import {
   TriggerRecipientsPayload,
   TriggerRecipientsTypeEnum,
@@ -77,10 +77,7 @@ export class TriggerEventRequestDto {
   @IsOptional()
   payload?: Record<string, unknown>;
 
-  @ApiPropertyOptional({
-    description: 'A URL to bridge for additional processing.',
-    example: 'https://example.com/bridge',
-  })
+  @ApiHideProperty()
   @IsString()
   @IsOptional()
   bridgeUrl?: string;
@@ -179,10 +176,7 @@ export class TriggerEventRequestDto {
   @Type(() => TenantPayloadDto)
   tenant?: TriggerTenantContext;
 
-  @ApiPropertyOptional({
-    description: 'Additional control configurations.',
-    type: WorkflowToStepControlValuesDto,
-  })
+  @ApiHideProperty()
   controls?: WorkflowToStepControlValuesDto;
 }
 
