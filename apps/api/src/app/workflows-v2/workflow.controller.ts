@@ -41,8 +41,8 @@ import {
   BuildWorkflowTestDataUseCase,
   WorkflowTestDataCommand,
 } from './usecases';
-import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
-import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
+import { PreviewCommand } from './usecases/generate-preview/preview.command';
+import { PreviewUsecase } from './usecases/generate-preview/preview.usecase';
 import { GetWorkflowCommand } from './usecases/get-workflow/get-workflow.command';
 import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
 import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.usecase';
@@ -68,7 +68,7 @@ export class WorkflowController {
     private listWorkflowsUseCase: ListWorkflowsUseCase,
     private deleteWorkflowUsecase: DeleteWorkflowUseCase,
     private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
-    private generatePreviewUseCase: GeneratePreviewUsecase,
+    private previewUseCase: PreviewUsecase,
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private patchStepDataUsecase: PatchStepUsecase,
@@ -181,8 +181,8 @@ export class WorkflowController {
     @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string,
     @Body() generatePreviewRequestDto: GeneratePreviewRequestDto
   ): Promise<GeneratePreviewResponseDto> {
-    return await this.generatePreviewUseCase.execute(
-      GeneratePreviewCommand.create({
+    return await this.previewUseCase.execute(
+      PreviewCommand.create({
         user,
         workflowIdOrInternalId,
         stepIdOrInternalId,
