@@ -118,6 +118,7 @@ export class SubscribersController {
   @Delete('/:subscriberId')
   @ApiResponse(RemoveSubscriberResponseDto)
   @UserAuthentication()
+  @ExternalApiAccessible()
   @ApiOperation({
     summary: 'Delete subscriber',
     description: 'Deletes a subscriber entity from the Novu platform',
