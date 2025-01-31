@@ -166,7 +166,7 @@ export function GeneralSettings({
               Identifier
             </FormLabel>
             <FormControl>
-              <Input id="identifier" {...field} readOnly={mode === 'update'} hasError={!!fieldState.error} />
+              <Input id="identifier" {...field} hasError={!!fieldState.error} />
             </FormControl>
             <FormMessage />
           </FormItem>
