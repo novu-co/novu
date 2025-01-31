@@ -8,11 +8,14 @@ import {
   UpdateSubscriberPreferenceRequestDto,
   SubscriberResponseDto,
 } from '@novu/api/models/components';
+import { Novu } from '@novu/api';
+import { expectSdkExceptionGeneric, initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
 const v2Prefix = '/v2';
 let session: UserSession;
 
 describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (GET) #novu-v2', () => {
+  let novuClient: Novu;
   let subscriber: SubscriberResponseDto;
   let workflow: NotificationTemplateEntity;
 
@@ -20,6 +23,7 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
     const uuid = randomBytes(4).toString('hex');
     session = new UserSession();
     await session.initialize();
+    novuClient = initNovuClassSdk(session);
     subscriber = await createSubscriberAndValidate(uuid);
     workflow = await session.createTemplate({
       noFeedId: true,
@@ -27,13 +31,12 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
   });
 
   it('should fetch subscriber preferences with default values', async () => {
-    const response = await session.testAgent.get(`${v2Prefix}/subscribers/${subscriber.subscriberId}/preferences`);
+    const response = await novuClient.subscribers.preferences.retrieve(subscriber.subscriberId);
 
-    expect(response.statusCode).to.equal(200);
-    expect(response.body.data).to.have.property('global');
-    expect(response.body.data).to.have.property('workflows');
+    expect(response.result).to.have.property('global');
+    expect(response.result).to.have.property('workflows');
 
-    const { global, workflows } = response.body.data;
+    const { global, workflows } = response.result;
 
     // Validate global preferences
     expect(global).to.have.property('enabled');
@@ -46,9 +49,11 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
 
   it('should return 404 if subscriber does not exist', async () => {
     const invalidSubscriberId = `non-existent-${randomBytes(2).toString('hex')}`;
-    const response = await session.testAgent.get(`${v2Prefix}/subscribers/${invalidSubscriberId}/preferences`);
+    const { error } = await expectSdkExceptionGeneric(() =>
+      novuClient.subscribers.preferences.retrieve(invalidSubscriberId)
+    );
 
-    expect(response.statusCode).to.equal(404);
+    expect(error?.statusCode).to.equal(404);
   });
 
   it('should handle subscriber with modified workflow preferences', async () => {

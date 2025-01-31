@@ -148,6 +148,8 @@ export class SubscribersController {
     summary: 'Get subscriber preferences',
     description: 'Get subscriber preferences',
   })
+  @SdkGroupName('Subscribers.Preferences')
+  @SdkMethodName('retrieve')
   async getSubscriberPreferences(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string
