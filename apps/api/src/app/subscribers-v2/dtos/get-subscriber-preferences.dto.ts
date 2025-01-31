@@ -1,39 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ChannelTypeEnum, IPreferenceChannels, IPreferenceOverride, PreferenceOverrideSourceEnum } from '@novu/shared';
 import { Type } from 'class-transformer';
-
-export class PreferenceChannelsDto implements IPreferenceChannels {
-  @ApiProperty({ description: 'Email channel preference' })
-  email?: boolean;
-
-  @ApiProperty({ description: 'SMS channel preference' })
-  sms?: boolean;
-
-  @ApiProperty({ description: 'In-app channel preference' })
-  in_app?: boolean;
-
-  @ApiProperty({ description: 'Push channel preference' })
-  push?: boolean;
-
-  @ApiProperty({ description: 'Chat channel preference' })
-  chat?: boolean;
-}
-
-export class PreferenceOverride implements IPreferenceOverride {
-  @ApiProperty({
-    enum: ChannelTypeEnum,
-    enumName: 'ChannelTypeEnum',
-    description: 'The channel type for the override',
-  })
-  channel: ChannelTypeEnum;
-
-  @ApiProperty({
-    enum: PreferenceOverrideSourceEnum,
-    enumName: 'PreferenceOverrideSourceEnum',
-    description: 'The source of the override',
-  })
-  source: PreferenceOverrideSourceEnum;
-}
+import { PreferenceChannels } from '../../shared/dtos/preference-channels';
+import { Overrides } from '../../subscribers/dtos/get-subscriber-preferences-response.dto';
 
 export class WorkflowInfoDto {
   @ApiProperty({ description: 'Unique identifier of the workflow' })
@@ -47,22 +15,22 @@ export class GlobalPreferenceDto {
   @ApiProperty({ description: 'Whether notifications are enabled globally' })
   enabled: boolean;
 
-  @ApiProperty({ description: 'Channel-specific preference settings', type: PreferenceChannelsDto })
-  @Type(() => PreferenceChannelsDto)
-  channels: PreferenceChannelsDto;
+  @ApiProperty({ description: 'Channel-specific preference settings', type: PreferenceChannels })
+  @Type(() => PreferenceChannels)
+  channels: PreferenceChannels;
 }
 
 export class WorkflowPreferenceDto {
   @ApiProperty({ description: 'Whether notifications are enabled for this workflow' })
   enabled: boolean;
 
-  @ApiProperty({ description: 'Channel-specific preference settings for this workflow', type: PreferenceChannelsDto })
-  @Type(() => PreferenceChannelsDto)
-  channels: PreferenceChannelsDto;
+  @ApiProperty({ description: 'Channel-specific preference settings for this workflow', type: PreferenceChannels })
+  @Type(() => PreferenceChannels)
+  channels: PreferenceChannels;
 
-  @ApiProperty({ description: 'List of preference overrides', type: [PreferenceOverride] })
-  @Type(() => PreferenceOverride)
-  overrides: PreferenceOverride[];
+  @ApiProperty({ description: 'List of preference overrides', type: [Overrides] })
+  @Type(() => Overrides)
+  overrides: Overrides[];
 
   @ApiProperty({ description: 'Workflow information', type: WorkflowInfoDto })
   @Type(() => WorkflowInfoDto)

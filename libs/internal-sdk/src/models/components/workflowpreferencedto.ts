@@ -7,17 +7,17 @@ import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
 import {
-  PreferenceChannelsDto,
-  PreferenceChannelsDto$inboundSchema,
-  PreferenceChannelsDto$Outbound,
-  PreferenceChannelsDto$outboundSchema,
-} from "./preferencechannelsdto.js";
+  Overrides,
+  Overrides$inboundSchema,
+  Overrides$Outbound,
+  Overrides$outboundSchema,
+} from "./overrides.js";
 import {
-  PreferenceOverride,
-  PreferenceOverride$inboundSchema,
-  PreferenceOverride$Outbound,
-  PreferenceOverride$outboundSchema,
-} from "./preferenceoverride.js";
+  PreferenceChannels,
+  PreferenceChannels$inboundSchema,
+  PreferenceChannels$Outbound,
+  PreferenceChannels$outboundSchema,
+} from "./preferencechannels.js";
 import {
   WorkflowInfoDto,
   WorkflowInfoDto$inboundSchema,
@@ -33,11 +33,11 @@ export type WorkflowPreferenceDto = {
   /**
    * Channel-specific preference settings for this workflow
    */
-  channels: PreferenceChannelsDto;
+  channels: PreferenceChannels;
   /**
    * List of preference overrides
    */
-  overrides: Array<PreferenceOverride>;
+  overrides: Array<Overrides>;
   /**
    * Workflow information
    */
@@ -51,16 +51,16 @@ export const WorkflowPreferenceDto$inboundSchema: z.ZodType<
   unknown
 > = z.object({
   enabled: z.boolean(),
-  channels: PreferenceChannelsDto$inboundSchema,
-  overrides: z.array(PreferenceOverride$inboundSchema),
+  channels: PreferenceChannels$inboundSchema,
+  overrides: z.array(Overrides$inboundSchema),
   workflow: WorkflowInfoDto$inboundSchema,
 });
 
 /** @internal */
 export type WorkflowPreferenceDto$Outbound = {
   enabled: boolean;
-  channels: PreferenceChannelsDto$Outbound;
-  overrides: Array<PreferenceOverride$Outbound>;
+  channels: PreferenceChannels$Outbound;
+  overrides: Array<Overrides$Outbound>;
   workflow: WorkflowInfoDto$Outbound;
 };
 
@@ -71,8 +71,8 @@ export const WorkflowPreferenceDto$outboundSchema: z.ZodType<
   WorkflowPreferenceDto
 > = z.object({
   enabled: z.boolean(),
-  channels: PreferenceChannelsDto$outboundSchema,
-  overrides: z.array(PreferenceOverride$outboundSchema),
+  channels: PreferenceChannels$outboundSchema,
+  overrides: z.array(Overrides$outboundSchema),
   workflow: WorkflowInfoDto$outboundSchema,
 });
 
