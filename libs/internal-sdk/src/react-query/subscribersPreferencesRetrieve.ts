@@ -32,7 +32,7 @@ export type SubscribersPreferencesRetrieveQueryData =
  * Get subscriber preferences
  *
  * @remarks
- * Get subscriber preferences
+ * Get subscriber global and workflow specific preferences
  */
 export function useSubscribersPreferencesRetrieve(
   subscriberId: string,
@@ -55,7 +55,7 @@ export function useSubscribersPreferencesRetrieve(
  * Get subscriber preferences
  *
  * @remarks
- * Get subscriber preferences
+ * Get subscriber global and workflow specific preferences
  */
 export function useSubscribersPreferencesRetrieveSuspense(
   subscriberId: string,

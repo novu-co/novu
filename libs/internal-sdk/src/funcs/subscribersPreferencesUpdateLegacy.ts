@@ -3,7 +3,7 @@
  */
 
 import { NovuCore } from "../core.js";
-import { encodeSimple } from "../lib/encodings.js";
+import { encodeJSON, encodeSimple } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { safeParse } from "../lib/schemas.js";
@@ -24,19 +24,15 @@ import * as operations from "../models/operations/index.js";
 import { Result } from "../types/fp.js";
 
 /**
- * Get subscriber preferences
- *
- * @remarks
- * Get subscriber global and workflow specific preferences
+ * Update subscriber preference
  */
-export async function subscribersPreferencesRetrieve(
+export async function subscribersPreferencesUpdateLegacy(
   client: NovuCore,
-  subscriberId: string,
-  idempotencyKey?: string | undefined,
+  request: operations.SubscribersV1ControllerUpdateSubscriberPreferenceRequest,
   options?: RequestOptions,
 ): Promise<
   Result<
-    operations.SubscribersControllerGetSubscriberPreferencesResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberPreferenceResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -50,17 +46,11 @@ export async function subscribersPreferencesRetrieve(
     | ConnectionError
   >
 > {
-  const input: operations.SubscribersControllerGetSubscriberPreferencesRequest =
-    {
-      subscriberId: subscriberId,
-      idempotencyKey: idempotencyKey,
-    };
-
   const parsed = safeParse(
-    input,
+    request,
     (value) =>
       operations
-        .SubscribersControllerGetSubscriberPreferencesRequest$outboundSchema
+        .SubscribersV1ControllerUpdateSubscriberPreferenceRequest$outboundSchema
         .parse(value),
     "Input validation failed",
   );
@@ -68,20 +58,29 @@ export async function subscribersPreferencesRetrieve(
     return parsed;
   }
   const payload = parsed.value;
-  const body = null;
+  const body = encodeJSON(
+    "body",
+    payload.UpdateSubscriberPreferenceRequestDto,
+    { explode: true },
+  );
 
   const pathParams = {
     subscriberId: encodeSimple("subscriberId", payload.subscriberId, {
       explode: false,
       charEncoding: "percent",
     }),
+    parameter: encodeSimple("parameter", payload.workflowId, {
+      explode: false,
+      charEncoding: "percent",
+    }),
   };
 
-  const path = pathToFunc("/v2/subscribers/{subscriberId}/preferences")(
-    pathParams,
-  );
+  const path = pathToFunc(
+    "/v1/subscribers/{subscriberId}/preferences/{parameter}",
+  )(pathParams);
 
   const headers = new Headers(compactMap({
+    "Content-Type": "application/json",
     Accept: "application/json",
     "idempotency-key": encodeSimple(
       "idempotency-key",
@@ -94,7 +93,7 @@ export async function subscribersPreferencesRetrieve(
   const requestSecurity = resolveGlobalSecurity(securityInput);
 
   const context = {
-    operationID: "SubscribersController_getSubscriberPreferences",
+    operationID: "SubscribersV1Controller_updateSubscriberPreference",
     oAuth2Scopes: [],
 
     resolvedSecurity: requestSecurity,
@@ -118,7 +117,7 @@ export async function subscribersPreferencesRetrieve(
 
   const requestRes = client._createRequest(context, {
     security: requestSecurity,
-    method: "GET",
+    method: "PATCH",
     baseURL: options?.serverURL,
     path: path,
     headers: headers,
@@ -162,7 +161,7 @@ export async function subscribersPreferencesRetrieve(
   };
 
   const [result] = await M.match<
-    operations.SubscribersControllerGetSubscriberPreferencesResponse,
+    operations.SubscribersV1ControllerUpdateSubscriberPreferenceResponse,
     | errors.ErrorDto
     | errors.ErrorDto
     | errors.ValidationErrorDto
@@ -178,7 +177,7 @@ export async function subscribersPreferencesRetrieve(
     M.json(
       200,
       operations
-        .SubscribersControllerGetSubscriberPreferencesResponse$inboundSchema,
+        .SubscribersV1ControllerUpdateSubscriberPreferenceResponse$inboundSchema,
       { hdrs: true, key: "Result" },
     ),
     M.jsonErr(414, errors.ErrorDto$inboundSchema),

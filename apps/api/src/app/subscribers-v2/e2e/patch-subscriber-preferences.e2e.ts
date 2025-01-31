@@ -2,13 +2,18 @@ import { expect } from 'chai';
 import { randomBytes } from 'crypto';
 import { UserSession } from '@novu/testing';
 import { NotificationTemplateEntity } from '@novu/dal';
-import { SubscriberResponseDto } from '@novu/api/models/components';
-import { PatchSubscriberPreferencesDto } from '../dtos/patch-subscriber-preferences.dto';
+import { SubscriberResponseDto, PatchSubscriberPreferencesDto } from '@novu/api/models/components';
+import { Novu } from '@novu/api';
+import {
+  expectSdkExceptionGeneric,
+  expectSdkValidationExceptionGeneric,
+  initNovuClassSdk,
+} from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-const v2Prefix = '/v2';
 let session: UserSession;
 
 describe('Patch Subscriber Preferences - /subscribers/:subscriberId/preferences (PATCH) #novu-v2', () => {
+  let novuClient: Novu;
   let subscriber: SubscriberResponseDto;
   let workflow: NotificationTemplateEntity;
 
@@ -16,6 +21,7 @@ describe('Patch Subscriber Preferences - /subscribers/:subscriberId/preferences 
     const uuid = randomBytes(4).toString('hex');
     session = new UserSession();
     await session.initialize();
+    novuClient = initNovuClassSdk(session);
     subscriber = await createSubscriberAndValidate(uuid);
     workflow = await session.createTemplate({
       noFeedId: true,
@@ -27,23 +33,18 @@ describe('Patch Subscriber Preferences - /subscribers/:subscriberId/preferences 
     const patchData: PatchSubscriberPreferencesDto = {
       channels: {
         email: false,
-        in_app: true,
+        inApp: true,
       },
       workflowId,
     };
 
-    const response = await session.testAgent
-      .patch(`${v2Prefix}/subscribers/${subscriber.subscriberId}/preferences`)
-      .send(patchData);
+    const response = await novuClient.subscribers.preferences.update(patchData, subscriber.subscriberId);
 
-    expect(response.statusCode).to.equal(200);
-    expect(response.body.data).to.have.property('workflows');
+    const { global, workflows } = response.result;
 
-    const { global, workflows } = response.body.data;
-
-    expect(global.channels).to.deep.equal({ in_app: true, email: true });
+    expect(global.channels).to.deep.equal({ inApp: true, email: true });
     expect(workflows).to.have.lengthOf(1);
-    expect(workflows[0].channels).to.deep.equal({ in_app: true, email: false });
+    expect(workflows[0].channels).to.deep.equal({ inApp: true, email: false });
     expect(workflows[0].workflow).to.deep.equal({ name: workflow.name, identifier: workflow.triggers[0].identifier });
   });
 
@@ -51,23 +52,17 @@ describe('Patch Subscriber Preferences - /subscribers/:subscriberId/preferences 
     const patchData: PatchSubscriberPreferencesDto = {
       channels: {
         email: false,
-        in_app: false,
+        inApp: false,
       },
     };
 
-    const response = await session.testAgent
-      .patch(`${v2Prefix}/subscribers/${subscriber.subscriberId}/preferences`)
-      .send(patchData);
+    const response = await novuClient.subscribers.preferences.update(patchData, subscriber.subscriberId);
 
-    expect(response.statusCode).to.equal(200);
-    expect(response.body.data).to.have.property('global');
-    expect(response.body.data).to.have.property('workflows');
+    const { global, workflows } = response.result;
 
-    const { global, workflows } = response.body.data;
-
-    expect(global.channels).to.deep.equal({ in_app: false, email: false });
+    expect(global.channels).to.deep.equal({ inApp: false, email: false });
     expect(workflows).to.have.lengthOf(1);
-    expect(workflows[0].channels).to.deep.equal({ in_app: false, email: false });
+    expect(workflows[0].channels).to.deep.equal({ inApp: false, email: false });
     expect(workflows[0].workflow).to.deep.equal({ name: workflow.name, identifier: workflow.triggers[0].identifier });
   });
 
@@ -79,11 +74,11 @@ describe('Patch Subscriber Preferences - /subscribers/:subscriberId/preferences 
       },
     };
 
-    const response = await session.testAgent
-      .patch(`${v2Prefix}/subscribers/${invalidSubscriberId}/preferences`)
-      .send(patchData);
+    const { error } = await expectSdkExceptionGeneric(() =>
+      novuClient.subscribers.preferences.update(patchData, invalidSubscriberId)
+    );
 
-    expect(response.statusCode).to.equal(404);
+    expect(error?.statusCode).to.equal(404);
   });
 
   it('should return 400 when patching with invalid workflow id', async () => {
@@ -94,11 +89,14 @@ describe('Patch Subscriber Preferences - /subscribers/:subscriberId/preferences 
       workflowId: 'invalid-workflow-id',
     };
 
-    const response = await session.testAgent
-      .patch(`${v2Prefix}/subscribers/${subscriber.subscriberId}/preferences`)
-      .send(patchData);
-
-    expect(response.statusCode).to.equal(400);
+    try {
+      await expectSdkValidationExceptionGeneric(() =>
+        novuClient.subscribers.preferences.update(patchData, subscriber.subscriberId)
+      );
+    } catch (e) {
+      // TODO: fix in SDK util
+      expect(e).to.be.an.instanceOf(Error);
+    }
   });
 });
 

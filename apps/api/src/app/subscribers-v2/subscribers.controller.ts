@@ -175,6 +175,9 @@ export class SubscribersController {
     summary: 'Update subscriber global or workflow specific preferences',
     description: 'Update subscriber global or workflow specific preferences',
   })
+  @ApiResponse(GetSubscriberPreferencesDto)
+  @SdkGroupName('Subscribers.Preferences')
+  @SdkMethodName('update')
   async updateSubscriberPreferences(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,

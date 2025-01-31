@@ -6,7 +6,6 @@ import { SubscriberResponseDto } from '@novu/api/models/components';
 import { Novu } from '@novu/api';
 import { expectSdkExceptionGeneric, initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-const v2Prefix = '/v2';
 let session: UserSession;
 
 describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (GET) #novu-v2', () => {
@@ -28,17 +27,9 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
   it('should fetch subscriber preferences with default values', async () => {
     const response = await novuClient.subscribers.preferences.retrieve(subscriber.subscriberId);
 
-    expect(response.result).to.have.property('global');
-    expect(response.result).to.have.property('workflows');
-
     const { global, workflows } = response.result;
 
-    // Validate global preferences
-    expect(global).to.have.property('enabled');
-    expect(global).to.have.property('channels');
     expect(global.enabled).to.be.true;
-
-    // Validate workflows array
     expect(workflows).to.be.an('array');
     expect(workflows).to.have.lengthOf(1);
   });
@@ -57,10 +48,9 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
     const workflow2 = await session.createTemplate({ noFeedId: true });
     const workflow3 = await session.createTemplate({ noFeedId: true });
 
-    const response = await session.testAgent.get(`${v2Prefix}/subscribers/${subscriber.subscriberId}/preferences`);
+    const response = await novuClient.subscribers.preferences.retrieve(subscriber.subscriberId);
 
-    expect(response.statusCode).to.equal(200);
-    const { workflows } = response.body.data;
+    const { workflows } = response.result;
 
     expect(workflows).to.have.lengthOf(3); // Should show all available templates
     const templateIds = workflows.map((_wf) => _wf.workflow.identifier);
@@ -71,27 +61,29 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
 
   it('should inherit channel preferences from global settings when no workflow override exists', async () => {
     // First set global preferences
-    await session.testAgent.patch(`${v2Prefix}/subscribers/${subscriber.subscriberId}/preferences`).send({
-      channels: {
-        email: false,
-        in_app: true,
+    await novuClient.subscribers.preferences.update(
+      {
+        channels: {
+          email: false,
+          inApp: true,
+        },
       },
-    });
+      subscriber.subscriberId
+    );
 
     // Then create a new template
     const newWorkflow = await session.createTemplate({ noFeedId: true });
 
     // Check preferences
-    const response = await session.testAgent.get(`${v2Prefix}/subscribers/${subscriber.subscriberId}/preferences`);
+    const response = await novuClient.subscribers.preferences.retrieve(subscriber.subscriberId);
 
-    expect(response.statusCode).to.equal(200);
-    const { workflows } = response.body.data;
+    const { workflows } = response.result;
 
     const newWorkflowPreferences = workflows.find(
       (_wf) => _wf.workflow.identifier === newWorkflow.triggers[0].identifier
     );
     // New workflow should inherit global settings
-    expect(newWorkflowPreferences.channels).to.deep.equal({ email: false, in_app: true });
+    expect(newWorkflowPreferences?.channels).to.deep.equal({ email: false, inApp: true });
   });
 });
 

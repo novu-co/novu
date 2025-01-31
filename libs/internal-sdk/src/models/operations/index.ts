@@ -25,6 +25,7 @@ export * from "./subscriberscontrollergetsubscriberpreferences.js";
 export * from "./subscriberscontrollerpatchsubscriber.js";
 export * from "./subscriberscontrollerremovesubscriber.js";
 export * from "./subscriberscontrollersearchsubscribers.js";
+export * from "./subscriberscontrollerupdatesubscriberpreferences.js";
 export * from "./subscribersv1controllerbulkcreatesubscribers.js";
 export * from "./subscribersv1controllerchataccessoauth.js";
 export * from "./subscribersv1controllerchatoauthcallback.js";

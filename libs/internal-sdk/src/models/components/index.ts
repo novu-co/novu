@@ -85,6 +85,8 @@ export * from "./notificationtriggervariable.js";
 export * from "./notificationtriggervariableresponse.js";
 export * from "./ordinalenum.js";
 export * from "./ordinalvalueenum.js";
+export * from "./patchpreferencechannelsdto.js";
+export * from "./patchsubscriberpreferencesdto.js";
 export * from "./patchsubscriberrequestdto.js";
 export * from "./preference.js";
 export * from "./preferencechannels.js";

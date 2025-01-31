@@ -41,6 +41,7 @@ export * from "./subscribersPreferencesRetrieve.js";
 export * from "./subscribersPreferencesRetrieveByLevel.js";
 export * from "./subscribersPreferencesUpdate.js";
 export * from "./subscribersPreferencesUpdateGlobal.js";
+export * from "./subscribersPreferencesUpdateLegacy.js";
 export * from "./subscribersPropertiesUpdateOnlineFlag.js";
 export * from "./subscribersRetrieve.js";
 export * from "./subscribersRetrieveLegacy.js";
