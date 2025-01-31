@@ -4,7 +4,7 @@ import { Label } from '@/components/primitives/label';
 import { Separator } from '@/components/primitives/separator';
 import { useAuth } from '@/context/auth/hooks';
 import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
-import { IIntegration, IProviderConfig } from '@novu/shared';
+import { IIntegration } from '@novu/shared';
 import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { RiInputField } from 'react-icons/ri';
@@ -14,6 +14,7 @@ import { EnvironmentDropdown } from '../../side-navigation/environment-dropdown'
 import { CredentialsSection } from './integration-credentials';
 import { GeneralSettings } from './integration-general-settings';
 import { isDemoIntegration } from './utils/helpers';
+import { IProviderConfig } from '@novu/shared';
 
 type IntegrationFormData = {
   name: string;
@@ -23,6 +24,7 @@ type IntegrationFormData = {
   check: boolean;
   primary: boolean;
   environmentId: string;
+  removeNovuBranding?: boolean;
 };
 
 type IntegrationConfigurationProps = {
@@ -64,6 +66,7 @@ export function IntegrationConfiguration({
           primary: integration.primary ?? false,
           credentials: integration.credentials as Record<string, string>,
           environmentId: integration._environmentId,
+          removeNovuBranding: integration.removeNovuBranding,
         }
       : {
           name: provider?.displayName ?? '',
@@ -72,6 +75,7 @@ export function IntegrationConfiguration({
           primary: true,
           credentials: {},
           environmentId: currentEnvironment?._id ?? '',
+          removeNovuBranding: false,
         },
   });
 
@@ -125,6 +129,8 @@ export function IntegrationConfiguration({
                 mode={mode}
                 hidePrimarySelector={!isChannelSupportPrimary}
                 disabledPrimary={!hasOtherProviders && integration?.primary}
+                // TODO: This is an ugly hack. The GeneralSettigns section should be redefined for in-app step.
+                isForInAppStep={provider?.channel === 'in_app'}
               />
             </AccordionContent>
           </AccordionItem>
