@@ -48,10 +48,19 @@ type SubscriberLinkTableCellProps = ComponentProps<typeof TableCell> & {
 
 const SubscriberLinkTableCell = (props: SubscriberLinkTableCellProps) => {
   const { subscriber, children, className, ...rest } = props;
+  const { currentEnvironment } = useEnvironment();
+
+  const editSubscriberLink = buildRoute(ROUTES.EDIT_SUBSCRIBER, {
+    environmentSlug: currentEnvironment?.slug ?? '',
+    subscriberId: subscriber.subscriberId,
+  });
 
   return (
     <TableCell className={cn('group-hover:bg-neutral-alpha-50 text-text-sub relative', className)} {...rest}>
       {children}
+      <Link to={editSubscriberLink} className={cn('absolute inset-0')}>
+        <span className="sr-only">Edit subscriber</span>
+      </Link>
     </TableCell>
   );
 };
