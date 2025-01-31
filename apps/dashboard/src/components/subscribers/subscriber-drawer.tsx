@@ -16,6 +16,7 @@ export function SubscriberDrawer({ children, open }: SubscriberDrawerProps) {
   const handleCloseSheet = () => {
     navigate(-1);
   };
+
   return (
     <Sheet modal={false} open={open}>
       <motion.div

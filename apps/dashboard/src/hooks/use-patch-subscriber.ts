@@ -2,13 +2,13 @@ import { patchSubscriber } from '@/api/subscribers';
 import { useEnvironment } from '@/context/environment/hooks';
 import { QueryKeys } from '@/utils/query-keys';
 import { OmitEnvironmentFromParameters } from '@/utils/types';
-import type { IGetSubscriberResponseDto } from '@novu/shared';
+import { SubscriberResponseDto } from '@novu/api/models/components';
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
 
 type PatchSubscriberParameters = OmitEnvironmentFromParameters<typeof patchSubscriber>;
 
 export const usePatchSubscriber = (
-  options?: UseMutationOptions<IGetSubscriberResponseDto, unknown, PatchSubscriberParameters>
+  options?: UseMutationOptions<SubscriberResponseDto, unknown, PatchSubscriberParameters>
 ) => {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();

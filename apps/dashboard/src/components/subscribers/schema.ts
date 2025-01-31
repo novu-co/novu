@@ -4,7 +4,7 @@ import { isValidPhoneNumber } from 'react-phone-number-input';
 export const SubscriberFormSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  email: z.string().email().optional(),
+  email: z.string().email().optional().nullable(),
   phone: z
     .string()
     .refine(isValidPhoneNumber, { message: 'Invalid phone number' })

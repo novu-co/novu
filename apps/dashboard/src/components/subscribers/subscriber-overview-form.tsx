@@ -1,4 +1,3 @@
-import useFetchSubscriber from '@/hooks/use-fetch-subscriber';
 import { formatDateSimple } from '@/utils/format-date';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
@@ -18,23 +17,44 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { Link } from 'react-router-dom';
 import { usePatchSubscriber } from '@/hooks/use-patch-subscriber';
 import { showSuccessToast } from '../primitives/sonner-helpers';
+import { SubscriberResponseDto } from '@novu/api/models/components';
+import { Skeleton } from '../primitives/skeleton';
+import { CopyButton } from '../primitives/copy-button';
+import { SubscriberOverviewSkeleton } from './subscriber-overview-skeleton';
 
 const extensions = [loadLanguage('json')?.extension ?? []];
 const basicSetup = { lineNumbers: true, defaultKeymap: true };
 
-export default function SubscriberOverviewForm({ subscriberId }: { subscriberId: string }) {
-  const { data } = useFetchSubscriber({ subscriberId });
+export default function SubscriberOverviewForm({
+  subscriberId,
+  subscriber,
+  isFetching,
+}: {
+  subscriberId: string;
+  subscriber?: SubscriberResponseDto;
+  isFetching: boolean;
+}) {
   const { patchSubscriber } = usePatchSubscriber({
     onSuccess: () => {
       showSuccessToast('Subscriber updated successfully');
     },
   });
 
+  /**
+   * Needed to forcefully reset the form when switching subscriber
+   * Without this, the form will keep the previous subscriber's data for undefined fields of current one
+   */
+  const subscriberDetails = isFetching ? undefined : subscriber;
+
   const form = useForm<z.infer<typeof SubscriberFormSchema>>({
-    values: { ...data, data: JSON.stringify(data?.data, null, 2) },
+    values: { ...subscriberDetails, data: JSON.stringify(subscriberDetails?.data, null, 2) },
     resolver: zodResolver(SubscriberFormSchema),
     shouldFocusError: false,
   });
+
+  if (isFetching) {
+    return <SubscriberOverviewSkeleton />;
+  }
 
   const onSubmit = async (formData: z.infer<typeof SubscriberFormSchema>) => {
     const dirtyFields = form.formState.dirtyFields;
@@ -76,7 +96,7 @@ export default function SubscriberOverviewForm({ subscriberId }: { subscriberId:
                   }}
                 >
                   <Avatar className="size-[3.75rem]">
-                    <AvatarImage src={data?.avatar || undefined} />
+                    <AvatarImage src={subscriber?.avatar || undefined} />
                     <AvatarFallback className="bg-neutral-alpha-100">
                       <Avatar className="size-full">
                         <AvatarImage src="/images/avatar.svg" />
@@ -88,7 +108,6 @@ export default function SubscriberOverviewForm({ subscriberId }: { subscriberId:
                   Subscriber profile Image can only be updated via API
                 </TooltipContent>
               </Tooltip>
-
               <div className="flex flex-1 items-center gap-2.5">
                 <FormField
                   control={form.control}
@@ -149,7 +168,7 @@ export default function SubscriberOverviewForm({ subscriberId }: { subscriberId:
                     </Link>
                   </span>
                 </div>
-                <Input value={subscriberId} readOnly />
+                <Input value={subscriberId} readOnly trailingNode={<CopyButton valueToCopy={subscriberId} />} />
               </FormItem>
             </div>
 
@@ -166,7 +185,7 @@ export default function SubscriberOverviewForm({ subscriberId }: { subscriberId:
                         type="email"
                         placeholder={field.name}
                         id={field.name}
-                        value={field.value}
+                        value={field.value || undefined}
                         onChange={field.onChange}
                         hasError={!!fieldState.error}
                       />
@@ -221,7 +240,6 @@ export default function SubscriberOverviewForm({ subscriberId }: { subscriberId:
                 )}
               />
             </div>
-
             <FormField
               control={form.control}
               name="data"
@@ -250,10 +268,10 @@ export default function SubscriberOverviewForm({ subscriberId }: { subscriberId:
           </div>
           <Separator />
 
-          {data?.updatedAt && (
+          {subscriberDetails?.updatedAt && (
             <span className="text-2xs px-5 py-1 text-neutral-400">
               Updated at{' '}
-              {formatDateSimple(data?.updatedAt, {
+              {formatDateSimple(subscriberDetails?.updatedAt, {
                 month: 'short',
                 day: '2-digit',
                 year: 'numeric',
@@ -275,7 +293,7 @@ export default function SubscriberOverviewForm({ subscriberId }: { subscriberId:
               <Button
                 variant="secondary"
                 type="submit"
-                disabled={!form.formState.isDirty || Object.keys(form.formState.dirtyFields).length === 0}
+                disabled={!form.formState.isDirty || Object.keys(form.formState.dirtyFields).length === 0 || isFetching}
               >
                 Save changes
               </Button>
