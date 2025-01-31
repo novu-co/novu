@@ -7,11 +7,11 @@ import { safeParse } from "../../lib/schemas.js";
 import { Result as SafeParseResult } from "../../types/fp.js";
 import { SDKValidationError } from "../errors/sdkvalidationerror.js";
 import {
-  PreferenceChannelsDto,
-  PreferenceChannelsDto$inboundSchema,
-  PreferenceChannelsDto$Outbound,
-  PreferenceChannelsDto$outboundSchema,
-} from "./preferencechannelsdto.js";
+  PreferenceChannels,
+  PreferenceChannels$inboundSchema,
+  PreferenceChannels$Outbound,
+  PreferenceChannels$outboundSchema,
+} from "./preferencechannels.js";
 
 export type GlobalPreferenceDto = {
   /**
@@ -21,7 +21,7 @@ export type GlobalPreferenceDto = {
   /**
    * Channel-specific preference settings
    */
-  channels: PreferenceChannelsDto;
+  channels: PreferenceChannels;
 };
 
 /** @internal */
@@ -31,13 +31,13 @@ export const GlobalPreferenceDto$inboundSchema: z.ZodType<
   unknown
 > = z.object({
   enabled: z.boolean(),
-  channels: PreferenceChannelsDto$inboundSchema,
+  channels: PreferenceChannels$inboundSchema,
 });
 
 /** @internal */
 export type GlobalPreferenceDto$Outbound = {
   enabled: boolean;
-  channels: PreferenceChannelsDto$Outbound;
+  channels: PreferenceChannels$Outbound;
 };
 
 /** @internal */
@@ -47,7 +47,7 @@ export const GlobalPreferenceDto$outboundSchema: z.ZodType<
   GlobalPreferenceDto
 > = z.object({
   enabled: z.boolean(),
-  channels: PreferenceChannelsDto$outboundSchema,
+  channels: PreferenceChannels$outboundSchema,
 });
 
 /**
