@@ -3,7 +3,7 @@ import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
 import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { injectDocumentComponents } from './injection';
-import { overloadDocumentforSdkGeneration, removeEndpointsWithoutApiKey } from './open.api.manipulation.component';
+import { overloadDocumentForSdkGeneration, removeEndpointsWithoutApiKey } from './open.api.manipulation.component';
 import metadata from '../../../../metadata';
 import { API_KEY_SWAGGER_SECURITY_NAME, BEARER_SWAGGER_SECURITY_NAME } from '@novu/application-generic';
 
@@ -206,7 +206,7 @@ function publishSdkSpecificDocumentAndReturnDocument(
 ) {
   overloadNamingGuidlines(document);
   overloadGlobalSdkRetrySettings(document);
-  let sdkDocument: OpenAPIObject = overloadDocumentforSdkGeneration(document, internalSdkGeneration);
+  let sdkDocument: OpenAPIObject = overloadDocumentForSdkGeneration(document, internalSdkGeneration);
   SwaggerModule.setup('openapi.sdk', app, sdkDocument, {
     jsonDocumentUrl: 'openapi.sdk.json',
     yamlDocumentUrl: 'openapi.sdk.yaml',

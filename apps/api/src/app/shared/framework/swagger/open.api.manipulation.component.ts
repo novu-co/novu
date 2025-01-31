@@ -82,7 +82,7 @@ function filterBearerOnlyIfExternal(isForInternalSdk: boolean, inputDocument: Op
   }
 }
 
-export function overloadDocumentforSdkGeneration(inputDocument: OpenAPIObject, isForInternalSdk: boolean = false) {
+export function overloadDocumentForSdkGeneration(inputDocument: OpenAPIObject, isForInternalSdk: boolean = false) {
   unwrapDataAttribute(inputDocument);
   const openAPIObject = filterBearerOnlyIfExternal(isForInternalSdk, inputDocument);
 
