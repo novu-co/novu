@@ -37,6 +37,7 @@ export * from "./subscribersNotificationsFeed.js";
 export * from "./subscribersNotificationsUnseenCount.js";
 export * from "./subscribersPatch.js";
 export * from "./subscribersPreferencesList.js";
+export * from "./subscribersPreferencesRetrieve.js";
 export * from "./subscribersPreferencesRetrieveByLevel.js";
 export * from "./subscribersPreferencesUpdate.js";
 export * from "./subscribersPreferencesUpdateGlobal.js";

@@ -3,6 +3,7 @@
  */
 
 import { subscribersPreferencesList } from "../funcs/subscribersPreferencesList.js";
+import { subscribersPreferencesRetrieve } from "../funcs/subscribersPreferencesRetrieve.js";
 import { subscribersPreferencesRetrieveByLevel } from "../funcs/subscribersPreferencesRetrieveByLevel.js";
 import { subscribersPreferencesUpdate } from "../funcs/subscribersPreferencesUpdate.js";
 import { subscribersPreferencesUpdateGlobal } from "../funcs/subscribersPreferencesUpdateGlobal.js";
@@ -83,6 +84,25 @@ export class Preferences extends ClientSDK {
     return unwrapAsync(subscribersPreferencesUpdate(
       this,
       request,
+      options,
+    ));
+  }
+
+  /**
+   * Get subscriber preferences
+   *
+   * @remarks
+   * Get subscriber preferences
+   */
+  async retrieve(
+    subscriberId: string,
+    idempotencyKey?: string | undefined,
+    options?: RequestOptions,
+  ): Promise<operations.SubscribersControllerGetSubscriberPreferencesResponse> {
+    return unwrapAsync(subscribersPreferencesRetrieve(
+      this,
+      subscriberId,
+      idempotencyKey,
       options,
     ));
   }
