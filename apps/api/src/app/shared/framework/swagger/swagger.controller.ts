@@ -173,7 +173,7 @@ export const setupSwagger = async (app: INestApplication, internalSdkGeneration?
   return publishSdkSpecificDocumentAndReturnDocument(app, document, internalSdkGeneration);
 };
 
-function overloadNamingGuidlines(document: OpenAPIObject) {
+function overloadNamingGuidelines(document: OpenAPIObject) {
   document['x-speakeasy-name-override'] = [
     { operationId: '^.*get.*', methodNameOverride: 'retrieve' },
     { operationId: '^.*retrieve.*', methodNameOverride: 'retrieve' },
@@ -204,7 +204,7 @@ function publishSdkSpecificDocumentAndReturnDocument(
   document: OpenAPIObject,
   internalSdkGeneration?: boolean
 ) {
-  overloadNamingGuidlines(document);
+  overloadNamingGuidelines(document);
   overloadGlobalSdkRetrySettings(document);
   let sdkDocument: OpenAPIObject = overloadDocumentForSdkGeneration(document, internalSdkGeneration);
   SwaggerModule.setup('openapi.sdk', app, sdkDocument, {
