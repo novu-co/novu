@@ -16,12 +16,19 @@ import { TimezoneSelect } from './timezone-select';
 import { Avatar, AvatarFallback, AvatarImage } from '../primitives/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { Link } from 'react-router-dom';
+import { usePatchSubscriber } from '@/hooks/use-patch-subscriber';
+import { showSuccessToast } from '../primitives/sonner-helpers';
 
 const extensions = [loadLanguage('json')?.extension ?? []];
 const basicSetup = { lineNumbers: true, defaultKeymap: true };
 
 export default function SubscriberOverviewForm({ subscriberId }: { subscriberId: string }) {
   const { data } = useFetchSubscriber({ subscriberId });
+  const { patchSubscriber } = usePatchSubscriber({
+    onSuccess: () => {
+      showSuccessToast('Subscriber updated successfully');
+    },
+  });
 
   const form = useForm<z.infer<typeof SubscriberFormSchema>>({
     values: { ...data, data: JSON.stringify(data?.data, null, 2) },
@@ -29,14 +36,35 @@ export default function SubscriberOverviewForm({ subscriberId }: { subscriberId:
     shouldFocusError: false,
   });
 
-  const onSubmit = (data: z.infer<typeof SubscriberFormSchema>) => {
-    console.log(data);
+  const onSubmit = async (formData: z.infer<typeof SubscriberFormSchema>) => {
+    const dirtyFields = form.formState.dirtyFields;
+
+    const dirtyPayload = Object.keys(dirtyFields).reduce<Partial<typeof formData>>((acc, key) => {
+      const typedKey = key as keyof typeof formData;
+      if (typedKey === 'data') {
+        return { ...acc, data: JSON.parse(formData.data) };
+      }
+      return { ...acc, [typedKey]: formData[typedKey] };
+    }, {});
+
+    if (!Object.keys(dirtyPayload).length) {
+      return;
+    }
+
+    await patchSubscriber({ subscriberId, subscriber: dirtyPayload });
   };
 
   return (
     <div className="flex h-full flex-col items-stretch">
       <Form {...form}>
-        <form autoComplete="off" noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col">
+        <form
+          autoComplete="off"
+          noValidate
+          onSubmit={form.handleSubmit(onSubmit, (err) => {
+            console.log({ err });
+          })}
+          className="flex h-full flex-col"
+        >
           <div className="flex flex-col items-stretch gap-6 p-5">
             <div className="flex items-center gap-3">
               <Tooltip>
@@ -244,7 +272,13 @@ export default function SubscriberOverviewForm({ subscriberId }: { subscriberId:
               <Button type="submit" variant="primary" mode="ghost" leadingIcon={RiDeleteBin2Line}>
                 Delete subscriber
               </Button>
-              <Button variant="secondary">Save changes</Button>
+              <Button
+                variant="secondary"
+                type="submit"
+                disabled={!form.formState.isDirty || Object.keys(form.formState.dirtyFields).length === 0}
+              >
+                Save changes
+              </Button>
             </div>
           </div>
         </form>

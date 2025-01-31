@@ -4,7 +4,7 @@ import { VisuallyHidden } from '../primitives/visually-hidden';
 import { useNavigate } from 'react-router-dom';
 import { PropsWithChildren } from 'react';
 
-const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
+const transitionSetting = { duration: 0.4 };
 
 type SubscriberDrawerProps = PropsWithChildren<{
   open: boolean;
