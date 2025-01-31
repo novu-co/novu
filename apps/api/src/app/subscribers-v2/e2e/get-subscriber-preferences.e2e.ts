@@ -43,7 +43,7 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
     expect(error?.statusCode).to.equal(404);
   });
 
-  it('should show all available templates in preferences response', async () => {
+  it('should show all available workflowsin preferences response', async () => {
     // Create multiple templates
     const workflow2 = await session.createTemplate({ noFeedId: true });
     const workflow3 = await session.createTemplate({ noFeedId: true });
@@ -52,11 +52,11 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
 
     const { workflows } = response.result;
 
-    expect(workflows).to.have.lengthOf(3); // Should show all available templates
-    const templateIds = workflows.map((_wf) => _wf.workflow.identifier);
-    expect(templateIds).to.include(workflow.triggers[0].identifier);
-    expect(templateIds).to.include(workflow2.triggers[0].identifier);
-    expect(templateIds).to.include(workflow3.triggers[0].identifier);
+    expect(workflows).to.have.lengthOf(3); // Should show all available workflows
+    const workflowIdentifiers = workflows.map((_wf) => _wf.workflow.identifier);
+    expect(workflowIdentifiers).to.include(workflow.triggers[0].identifier);
+    expect(workflowIdentifiers).to.include(workflow2.triggers[0].identifier);
+    expect(workflowIdentifiers).to.include(workflow3.triggers[0].identifier);
   });
 
   it('should inherit channel preferences from global settings when no workflow override exists', async () => {

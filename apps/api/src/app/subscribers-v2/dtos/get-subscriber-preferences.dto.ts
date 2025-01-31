@@ -4,6 +4,9 @@ import { PreferenceChannels } from '../../shared/dtos/preference-channels';
 import { Overrides } from '../../subscribers/dtos/get-subscriber-preferences-response.dto';
 
 export class WorkflowInfoDto {
+  @ApiProperty({ description: 'Workflow slug' })
+  slug: string;
+
   @ApiProperty({ description: 'Unique identifier of the workflow' })
   identifier: string;
 

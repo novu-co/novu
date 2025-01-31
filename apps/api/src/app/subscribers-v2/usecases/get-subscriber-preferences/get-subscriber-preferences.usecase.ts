@@ -5,7 +5,7 @@ import {
   GetSubscriberPreference,
   GetSubscriberPreferenceCommand,
 } from '@novu/application-generic';
-import { ISubscriberPreferenceResponse } from '@novu/shared';
+import { ISubscriberPreferenceResponse, ShortIsPrefixEnum } from '@novu/shared';
 import { plainToInstance } from 'class-transformer';
 import { GetSubscriberPreferencesCommand } from './get-subscriber-preferences.command';
 import {
@@ -13,6 +13,7 @@ import {
   GlobalPreferenceDto,
   WorkflowPreferenceDto,
 } from '../../dtos/get-subscriber-preferences.dto';
+import { buildSlug } from '../../../shared/helpers/build-slug';
 
 @Injectable()
 export class GetSubscriberPreferences {
@@ -68,6 +69,7 @@ export class GetSubscriberPreferences {
       channels: preference.channels,
       overrides: preference.overrides,
       workflow: {
+        slug: buildSlug(template.name, ShortIsPrefixEnum.WORKFLOW, template._id),
         identifier: template.triggers[0].identifier,
         name: template.name,
       },

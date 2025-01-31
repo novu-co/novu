@@ -30,6 +30,7 @@ describe('Patch Subscriber Preferences - /subscribers/:subscriberId/preferences 
 
   it('should patch workflow channel preferences', async () => {
     const workflowId = workflow._id;
+
     const patchData: PatchSubscriberPreferencesDto = {
       channels: {
         email: false,
@@ -45,7 +46,7 @@ describe('Patch Subscriber Preferences - /subscribers/:subscriberId/preferences 
     expect(global.channels).to.deep.equal({ inApp: true, email: true });
     expect(workflows).to.have.lengthOf(1);
     expect(workflows[0].channels).to.deep.equal({ inApp: true, email: false });
-    expect(workflows[0].workflow).to.deep.equal({ name: workflow.name, identifier: workflow.triggers[0].identifier });
+    expect(workflows[0].workflow).to.deep.include({ name: workflow.name, identifier: workflow.triggers[0].identifier });
   });
 
   it('should patch global channel preferences', async () => {
@@ -63,7 +64,7 @@ describe('Patch Subscriber Preferences - /subscribers/:subscriberId/preferences 
     expect(global.channels).to.deep.equal({ inApp: false, email: false });
     expect(workflows).to.have.lengthOf(1);
     expect(workflows[0].channels).to.deep.equal({ inApp: false, email: false });
-    expect(workflows[0].workflow).to.deep.equal({ name: workflow.name, identifier: workflow.triggers[0].identifier });
+    expect(workflows[0].workflow).to.deep.include({ name: workflow.name, identifier: workflow.triggers[0].identifier });
   });
 
   it('should return 404 when patching non-existent subscriber preferences', async () => {
