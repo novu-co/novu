@@ -18,7 +18,6 @@ import { Link } from 'react-router-dom';
 import { usePatchSubscriber } from '@/hooks/use-patch-subscriber';
 import { showSuccessToast } from '../primitives/sonner-helpers';
 import { SubscriberResponseDto } from '@novu/api/models/components';
-import { Skeleton } from '../primitives/skeleton';
 import { CopyButton } from '../primitives/copy-button';
 import { SubscriberOverviewSkeleton } from './subscriber-overview-skeleton';
 
