@@ -45,6 +45,7 @@ describe('Get Subscriber Preferences - /subscribers/:subscriberId/preferences (G
 
     // Validate workflows array
     expect(workflows).to.be.an('array');
+    expect(workflows).to.have.lengthOf(1);
   });
 
   it('should return 404 if subscriber does not exist', async () => {

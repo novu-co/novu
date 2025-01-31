@@ -148,6 +148,7 @@ export class SubscribersController {
     summary: 'Get subscriber preferences',
     description: 'Get subscriber preferences',
   })
+  @ApiResponse(GetSubscriberPreferencesDto)
   @SdkGroupName('Subscribers.Preferences')
   @SdkMethodName('retrieve')
   async getSubscriberPreferences(
