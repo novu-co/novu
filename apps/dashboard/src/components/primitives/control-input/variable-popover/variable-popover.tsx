@@ -19,7 +19,7 @@ import { Separator } from '../../separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../tooltip';
 import { FilterItem } from './components/filter-item';
 import { FilterPreview } from './components/filter-preview';
-import { FiltersList } from './components/filters-list';
+import { ReorderFiltersGroup } from './components/reorder-filters-group';
 import { useFilterManager } from './hooks/use-filter-manager';
 import { useVariableParser } from './hooks/use-variable-parser';
 import type { FilterWithParam, VariablePopoverProps } from './types';
@@ -79,16 +79,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
     [parseRawInput]
   );
 
-  const {
-    dragOverIndex,
-    draggingItem,
-    handleDragStart,
-    handleDragEnd,
-    handleDrag,
-    handleFilterToggle,
-    handleParamChange,
-    getFilteredFilters,
-  } = useFilterManager({
+  const { handleReorder, handleFilterToggle, handleParamChange, getFilteredFilters } = useFilterManager({
     initialFilters: filters,
     onUpdate: setFilters,
   });
@@ -155,7 +146,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                     <TooltipContent side="right" className="max-w-sm">
                       <p>
                         LiquidJS filters modify the variable output in sequence, with each filter using the previous
-                        one’s result. Reorder them by dragging and dropping.
+                        one's result. Reorder them by dragging and dropping.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -210,13 +201,9 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
             </FormControl>
           </FormItem>
 
-          <FiltersList
+          <ReorderFiltersGroup
             filters={filters}
-            dragOverIndex={dragOverIndex}
-            draggingItem={draggingItem}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDrag={handleDrag}
+            onReorder={handleReorder}
             onRemove={handleFilterToggle}
             onParamChange={handleParamChange}
           />

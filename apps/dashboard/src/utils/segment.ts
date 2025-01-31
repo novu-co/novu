@@ -3,6 +3,7 @@ import type { IUserEntity } from '@novu/shared';
 import { AnalyticsBrowser } from '@segment/analytics-next';
 import * as Sentry from '@sentry/react';
 import * as mixpanel from 'mixpanel-browser';
+
 export class SegmentService {
   private _segment: AnalyticsBrowser | null = null;
   private _segmentEnabled: boolean;
@@ -31,6 +32,7 @@ export class SegmentService {
       this._segment = AnalyticsBrowser.load({
         writeKey: SEGMENT_KEY as string,
       });
+
       if (!this._mixpanelEnabled) {
         return;
       }
@@ -106,7 +108,6 @@ export class SegmentService {
     this._segment?.setAnonymousId(anonymousId);
   }
 
-  // @ts-expect-error event is unused at the moment until we do the /v1/telemetry/measure API call
   async track(event: string, data?: Record<string, unknown>) {
     if (!this.isSegmentEnabled()) {
       return;
@@ -123,11 +124,7 @@ export class SegmentService {
       };
     }
 
-    // TODO: Add api call
-    // await api.post("/v1/telemetry/measure", {
-    //   event: `${event} - [WEB]`,
-    //   data,
-    // });
+    this._segment?.track(event, data);
   }
 
   pageView(url: string) {
