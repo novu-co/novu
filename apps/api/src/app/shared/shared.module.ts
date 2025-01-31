@@ -39,7 +39,6 @@ import {
   featureFlagsService,
   GetDecryptedSecretKey,
   getFeatureFlag,
-  injectCommunityAuthProviders,
   InvalidateCacheService,
   LoggerModule,
   QueuesModule,
@@ -48,6 +47,7 @@ import {
 
 import { isClerkEnabled, JobTopicNameEnum } from '@novu/shared';
 import { JwtModule } from '@nestjs/jwt';
+import { injectCommunityAuthProviders } from '../auth/inject-auth-providers';
 import packageJson from '../../../package.json';
 
 function getDynamicAuthProviders() {
