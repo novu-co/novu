@@ -79,7 +79,7 @@ export function GeneralSettings({
                   Remove "Powered by Novu" branding
                 </FormLabel>
                 <FormControl>
-                  {disabled ? (
+                  {isFreePlan ? (
                     <HoverCard openDelay={100} closeDelay={100}>
                       <HoverCardTrigger asChild>{switchControl}</HoverCardTrigger>
                       <HoverCardPortal>
