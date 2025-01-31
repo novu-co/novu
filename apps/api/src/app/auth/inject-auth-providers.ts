@@ -10,14 +10,10 @@ import {
   MemberRepository,
   OrganizationRepository,
 } from '@novu/dal';
-import { PinoLogger } from '../logging';
-import {
-  AnalyticsService,
-  CommunityAuthService,
-  CommunityUserAuthGuard,
-} from '../services';
-import { CreateUser, SwitchOrganization } from '../usecases';
-
+import { PinoLogger, CreateUser, AnalyticsService } from '@novu/application-generic';
+import { CommunityUserAuthGuard } from './framework/community.user.auth.guard';
+import { SwitchOrganization } from './usecases/switch-organization/switch-organization.usecase';
+import { CommunityAuthService } from './services/community.auth.service';
 /**
  * Injects community auth providers, or providers handling user management (services, repositories, guards ...) into the application.
  * This function is closely related to its enterprise counterpart:
@@ -28,7 +24,7 @@ import { CreateUser, SwitchOrganization } from '../usecases';
 export function injectCommunityAuthProviders(
   { repositoriesOnly }: { repositoriesOnly?: boolean } = {
     repositoriesOnly: true,
-  },
+  }
 ) {
   const userRepositoryProvider = {
     provide: 'USER_REPOSITORY',
@@ -56,7 +52,7 @@ export function injectCommunityAuthProviders(
       organizationRepository: OrganizationRepository,
       environmentRepository: EnvironmentRepository,
       memberRepository: MemberRepository,
-      switchOrganizationUsecase: SwitchOrganization,
+      switchOrganizationUsecase: SwitchOrganization
     ) => {
       return new CommunityAuthService(
         userRepository,
@@ -67,7 +63,7 @@ export function injectCommunityAuthProviders(
         organizationRepository,
         environmentRepository,
         memberRepository,
-        switchOrganizationUsecase,
+        switchOrganizationUsecase
       );
     },
     inject: [
@@ -92,11 +88,7 @@ export function injectCommunityAuthProviders(
   };
 
   if (repositoriesOnly) {
-    return [
-      userRepositoryProvider,
-      memberRepositoryProvider,
-      organizationRepositoryProvider,
-    ];
+    return [userRepositoryProvider, memberRepositoryProvider, organizationRepositoryProvider];
   }
 
   return [

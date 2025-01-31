@@ -4,7 +4,6 @@ import { PassportModule } from '@nestjs/passport';
 import passport from 'passport';
 
 import { AuthProviderEnum, PassportStrategyEnum } from '@novu/shared';
-import { AuthService, RolesGuard, injectCommunityAuthProviders } from '@novu/application-generic';
 
 import { JwtStrategy } from './services/passport/jwt.strategy';
 import { AuthController } from './auth.controller';
@@ -17,6 +16,9 @@ import { EnvironmentsModuleV1 } from '../environments-v1/environments-v1.module'
 import { JwtSubscriberStrategy } from './services/passport/subscriber-jwt.strategy';
 import { RootEnvironmentGuard } from './framework/root-environment-guard.service';
 import { ApiKeyStrategy } from './services/passport/apikey.strategy';
+import { injectCommunityAuthProviders } from './inject-auth-providers';
+import { AuthService } from './services/auth.service';
+import { RolesGuard } from './framework/roles.guard';
 
 const AUTH_STRATEGIES: Provider[] = [JwtStrategy, ApiKeyStrategy, JwtSubscriberStrategy];
 
