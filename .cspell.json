@@ -724,7 +724,9 @@
     "facated",
     "dotenvcreate",
     "querybuilder",
-    "liquified"
+    "liquified",
+    "autoload",
+    "novugo"
   ],
   "flagWords": [],
   "patterns": [
