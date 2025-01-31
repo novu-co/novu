@@ -7,6 +7,8 @@ import { useFetchSubscription } from '@/hooks/use-fetch-subscription';
 import { Control } from 'react-hook-form';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { HoverCard, HoverCardPortal, HoverCardContent, HoverCardTrigger } from '@/components/primitives/hover-card';
+import { ROUTES } from '@/utils/routes';
+import { Link } from 'react-router-dom';
 
 type IntegrationFormData = {
   name: string;
@@ -80,18 +82,18 @@ export function GeneralSettings({
                   {disabled ? (
                     <HoverCard openDelay={100} closeDelay={100}>
                       <HoverCardTrigger asChild>{switchControl}</HoverCardTrigger>
-                      {disabled && (
-                        <HoverCardPortal>
-                          <HoverCardContent className="w-fit" align="end" sideOffset={4}>
-                            <div className="flex max-w-52 flex-col gap-2 text-wrap text-xs">
-                              <span>Upgrade your billing plan to remove Novu branding</span>
+                      <HoverCardPortal>
+                        <HoverCardContent className="w-fit" align="end" sideOffset={4}>
+                          <div className="flex max-w-52 flex-col gap-2 text-wrap text-xs">
+                            <span>Upgrade your billing plan to remove Novu branding</span>
+                            <Link to={ROUTES.SETTINGS_BILLING}>
                               <Button variant="primary" mode="lighter" size="xs">
                                 Upgrade now
                               </Button>
-                            </div>
-                          </HoverCardContent>
-                        </HoverCardPortal>
-                      )}
+                            </Link>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCardPortal>
                     </HoverCard>
                   ) : (
                     switchControl
