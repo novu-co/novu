@@ -24,7 +24,6 @@ export * from './get-tenant';
 export * from './process-tenant';
 export * from './conditions-filter';
 export * from './normalize-variables';
-export * from './create-user';
 export * from './get-subscriber-global-preference';
 export * from './get-topic-subscribers';
 export * from './create-change';

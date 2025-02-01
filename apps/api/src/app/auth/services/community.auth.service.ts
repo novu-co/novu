@@ -1,5 +1,5 @@
 import { createHash } from 'crypto';
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, forwardRef, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import {
@@ -27,8 +27,6 @@ import {
   AnalyticsService,
   ApiException,
   Instrument,
-  CreateUser,
-  CreateUserCommand,
   buildSubscriberKey,
   buildUserKey,
   CachedEntity,
@@ -36,6 +34,8 @@ import {
 } from '@novu/application-generic';
 import { SwitchOrganization } from '../usecases/switch-organization/switch-organization.usecase';
 import { SwitchOrganizationCommand } from '../usecases/switch-organization/switch-organization.command';
+import { CreateUser } from '../../user/usecases/create-user/create-user.usecase';
+import { CreateUserCommand } from '../../user/usecases/create-user/create-user.command';
 
 @Injectable()
 export class CommunityAuthService implements IAuthService {
@@ -48,6 +48,7 @@ export class CommunityAuthService implements IAuthService {
     private organizationRepository: OrganizationRepository,
     private environmentRepository: EnvironmentRepository,
     private memberRepository: MemberRepository,
+    @Inject(forwardRef(() => SwitchOrganization))
     private switchOrganizationUsecase: SwitchOrganization
   ) {}
 

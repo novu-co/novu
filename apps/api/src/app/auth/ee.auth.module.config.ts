@@ -5,8 +5,6 @@ import { RootEnvironmentGuard } from './framework/root-environment-guard.service
 import { ApiKeyStrategy } from './services/passport/apikey.strategy';
 import { JwtSubscriberStrategy } from './services/passport/subscriber-jwt.strategy';
 import { OrganizationModule } from '../organization/organization.module';
-import { SwitchEnvironment } from './usecases/switch-environment/switch-environment.usecase';
-import { SwitchOrganization } from './usecases/switch-organization/switch-organization.usecase';
 import { AuthService } from './services/auth.service';
 import { RolesGuard } from './framework/roles.guard';
 
@@ -35,8 +33,6 @@ export function getEEModuleConfig(): ModuleMetadata {
       JwtSubscriberStrategy,
       AuthService,
       cacheService,
-      SwitchEnvironment,
-      SwitchOrganization,
       RolesGuard,
       RootEnvironmentGuard,
     ],
