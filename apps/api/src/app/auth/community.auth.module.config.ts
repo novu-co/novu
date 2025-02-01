@@ -39,7 +39,6 @@ export function getCommunityAuthModuleConfig(): ModuleMetadata {
     }),
   ];
 
-  // Start with essential providers only
   const baseProviders = [...AUTH_STRATEGIES, AuthService, RolesGuard, RootEnvironmentGuard, JwtService];
 
   // Wherever is the string token used, override it with the provider
