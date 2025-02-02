@@ -22,7 +22,6 @@ import {
   BuildVariableSchemaUsecase,
   BuildStepDataUsecase,
   BuildWorkflowTestDataUseCase,
-  GeneratePreviewUsecase,
   GetWorkflowUseCase,
   ListWorkflowsUseCase,
   SyncToEnvironmentUseCase,
@@ -33,6 +32,7 @@ import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase'
 import { ExtractVariables } from './usecases/extract-variables/extract-variables.usecase';
 import { BuildStepIssuesUsecase } from './usecases/build-step-issues/build-step-issues.usecase';
 import { WorkflowController } from './workflow.controller';
+import { PreviewUsecase } from './usecases/generate-preview/preview.usecase';
 
 const DAL_REPOSITORIES = [CommunityOrganizationRepository];
 
@@ -53,7 +53,7 @@ const DAL_REPOSITORIES = [CommunityOrganizationRepository];
     GetWorkflowByIdsUseCase,
     SyncToEnvironmentUseCase,
     BuildStepDataUsecase,
-    GeneratePreviewUsecase,
+    PreviewUsecase,
     BuildWorkflowTestDataUseCase,
     GetWorkflowUseCase,
     BuildVariableSchemaUsecase,
