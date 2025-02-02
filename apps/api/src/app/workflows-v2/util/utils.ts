@@ -248,7 +248,7 @@ export function mergeCommonObjectKeys(
           sourceValue as Record<string, unknown>
         );
       } else {
-        merged[key] = sourceValue ?? targetValue;
+        merged[key] = key in source ? sourceValue : targetValue;
       }
 
       return merged;

@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@uiw/react-codemirror';
+import { cn } from '@/utils/ui';
+import { cva } from 'class-variance-authority';
 
 import { Editor } from '@/components/primitives/editor';
 import { Popover, PopoverTrigger } from '@/components/primitives/popover';
@@ -10,7 +12,19 @@ import { useVariables } from './hooks/use-variables';
 import { createVariableExtension } from './variable-plugin';
 import { variablePillTheme } from './variable-plugin/variable-theme';
 import { VariablePopover } from './variable-popover';
-import { cn } from '@/utils/ui';
+
+const variants = cva('relative w-full', {
+  variants: {
+    size: {
+      md: 'p-2.5',
+      sm: 'p-2.5',
+      '2xs': 'px-2 py-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'sm',
+  },
+});
 
 type CompletionRange = {
   from: number;
@@ -18,12 +32,13 @@ type CompletionRange = {
 };
 
 type ControlInputProps = {
+  className?: string;
   value: string;
   onChange: (value: string) => void;
   variables: LiquidVariable[];
   placeholder?: string;
   autoFocus?: boolean;
-  size?: 'default' | 'lg';
+  size?: 'md' | 'sm' | '2xs';
   id?: string;
   multiline?: boolean;
   indentWithTab?: boolean;
@@ -33,11 +48,12 @@ export function ControlInput({
   value,
   onChange,
   variables,
+  className,
   placeholder,
   autoFocus,
-  size = 'default',
   id,
   multiline = false,
+  size = 'sm',
   indentWithTab,
 }: ControlInputProps) {
   const viewRef = useRef<EditorView | null>(null);
@@ -86,12 +102,13 @@ export function ControlInput({
   );
 
   return (
-    <div className="relative">
+    <div className={variants({ size, className })}>
       <Editor
         fontFamily="inherit"
         multiline={multiline}
         indentWithTab={indentWithTab}
         size={size}
+        // TODO for Sokratis
         className={cn('flex-1', { 'overflow-hidden': !multiline })}
         autoFocus={autoFocus}
         placeholder={placeholder}
