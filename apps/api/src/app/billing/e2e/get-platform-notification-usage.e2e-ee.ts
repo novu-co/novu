@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import { expect } from 'chai';
 import { EnvironmentRepository, NotificationRepository, CommunityOrganizationRepository } from '@novu/dal';
 import { UserSession } from '@novu/testing';
-import { ApiServiceLevelEnum, isClerkEnabled } from '@novu/shared';
+import { ApiServiceLevelEnum } from '@novu/shared';
 
 describe('GetPlatformNotificationUsage #novu-v2', () => {
   const eeBilling = require('@novu/ee-billing');
@@ -84,7 +84,7 @@ describe('GetPlatformNotificationUsage #novu-v2', () => {
       notificationsCount: org.notificationsCount,
     }));
 
-    if (isClerkEnabled()) {
+    if (process.env.NOVU_ENTERPRISE === 'true' || process.env.CI_EE_TEST === 'true') {
       // we have just one organization in Clerk - we don't create new ones on initialize()
       expectedResult = [expectedResult[expectedResult.length - 1]];
     }

@@ -6,7 +6,6 @@ import { Client, NovuModule } from '@novu/framework/nest';
 
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
-import { isClerkEnabled } from '@novu/shared';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { usageLimitsWorkflow } from '@novu/notifications';
@@ -120,7 +119,7 @@ const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | Forward
 
 const enterpriseModules = enterpriseImports();
 
-if (!isClerkEnabled()) {
+if (process.env.NOVU_ENTERPRISE === 'true' || process.env.CI_EE_TEST === 'true') {
   const communityModules = [InvitesModule];
   baseModules.push(...communityModules);
 }

@@ -46,12 +46,12 @@ import {
   storageService,
 } from '@novu/application-generic';
 
-import { isClerkEnabled, JobTopicNameEnum } from '@novu/shared';
+import { JobTopicNameEnum } from '@novu/shared';
 import { JwtModule } from '@nestjs/jwt';
 import packageJson from '../../../package.json';
 
 function getDynamicAuthProviders() {
-  if (isClerkEnabled()) {
+  if (process.env.NOVU_ENTERPRISE === 'true' || process.env.CI_EE_TEST === 'true') {
     const eeAuthPackage = require('@novu/ee-auth');
 
     return eeAuthPackage.injectEEAuthProviders();
