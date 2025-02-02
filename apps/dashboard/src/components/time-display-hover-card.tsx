@@ -2,12 +2,18 @@ import { HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger } from '
 import { formatDistanceToNow } from 'date-fns';
 
 interface TimeDisplayHoverCardProps {
-  date: Date;
+  date: Date | string | undefined;
   children?: React.ReactNode;
   className?: string;
 }
 
 export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayHoverCardProps) {
+  if (!date) {
+    return <span className={className}>{children}</span>;
+  }
+
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
   const dateConfig: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short',
@@ -24,9 +30,9 @@ export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayH
     timeZone: 'UTC',
   });
 
-  const utcTime = utcFormat.format(date);
-  const localTime = dateTimeFormat.format(date);
-  const timeAgo = formatDistanceToNow(date, { addSuffix: true });
+  const utcTime = utcFormat.format(dateObj);
+  const localTime = dateTimeFormat.format(dateObj);
+  const timeAgo = formatDistanceToNow(dateObj, { addSuffix: true });
 
   return (
     <HoverCard openDelay={100} closeDelay={100}>

@@ -93,7 +93,7 @@ export function ActivityTable({
                 <TableHead className="h-9 px-3 py-0">Event</TableHead>
                 <TableHead className="h-9 px-3 py-0">Status</TableHead>
                 <TableHead className="h-9 px-3 py-0">Steps</TableHead>
-                <TableHead className="h-9 px-3 py-0">Triggered At</TableHead>
+                <TableHead className="h-9 px-3 py-0">Triggered at</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
