@@ -119,7 +119,7 @@ const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | Forward
 
 const enterpriseModules = enterpriseImports();
 
-if (process.env.NOVU_ENTERPRISE === 'true' || process.env.CI_EE_TEST === 'true') {
+if (process.env.NOVU_ENTERPRISE !== 'true' && process.env.CI_EE_TEST !== 'true') {
   const communityModules = [InvitesModule];
   baseModules.push(...communityModules);
 }
