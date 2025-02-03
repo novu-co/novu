@@ -8,7 +8,6 @@ import {
   EmailBlockTypeEnum,
   IApiRateLimitMaximum,
   IEmailBlock,
-  isClerkEnabled,
   JobTopicNameEnum,
   StepTypeEnum,
 } from '@novu/shared';
@@ -37,6 +36,8 @@ import { EEUserService } from './ee/ee.user.service';
 import { EEOrganizationService } from './ee/ee.organization.service';
 import { TEST_USER_PASSWORD } from './constants';
 import { ClerkJwtPayload } from './ee/types';
+
+const isEnterprise = process.env.NOVU_ENTERPRISE === 'true' || process.env.CI_EE_TEST === 'true';
 
 type UserSessionOptions = {
   noOrganization?: boolean;
@@ -94,7 +95,7 @@ export class UserSession {
   }
 
   async initialize(options?: UserSessionOptions) {
-    if (isClerkEnabled()) {
+    if (isEnterprise) {
       // The ids of pre-seeded Clerk resources (MongoDB: clerk_users, clerk_organizations, clerk_organization_memberships)
       await this.initializeEE(options);
     } else {
@@ -215,7 +216,7 @@ export class UserSession {
   }
 
   async fetchJWT() {
-    if (isClerkEnabled()) {
+    if (isEnterprise) {
       await this.fetchJwtEE();
     } else {
       await this.fetchJwtCommunity();
@@ -223,7 +224,7 @@ export class UserSession {
   }
 
   async addOrganization() {
-    if (isClerkEnabled()) {
+    if (isEnterprise) {
       return await this.addOrganizationEE('clerk_org_1');
     } else {
       return await this.addOrganizationCommunity();
@@ -404,7 +405,7 @@ export class UserSession {
       this.environment = environment;
       await this.testAgent.post(`/v1/auth/environments/${environmentId}/switch`);
 
-      if (isClerkEnabled()) {
+      if (isEnterprise) {
         await this.fetchJwtEE();
       } else {
         await this.fetchJwtCommunity();
@@ -463,7 +464,7 @@ export class UserSession {
   }
 
   public async updateOrganizationServiceLevel(serviceLevel: ApiServiceLevelEnum) {
-    const organizationService = isClerkEnabled() ? new EEOrganizationService() : new OrganizationService();
+    const organizationService = isEnterprise ? new EEOrganizationService() : new OrganizationService();
 
     await organizationService.updateServiceLevel(this.organization._id, serviceLevel);
   }

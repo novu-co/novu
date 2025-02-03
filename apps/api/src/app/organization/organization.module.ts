@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Type } from '@nestjs/common/interfaces/type.interface';
-import { isClerkEnabled } from '@novu/shared';
 import { EnvironmentsModuleV1 } from '../environments-v1/environments-v1.module';
 import { IntegrationModule } from '../integrations/integrations.module';
 import { SharedModule } from '../shared/shared.module';
@@ -37,7 +36,7 @@ const enterpriseImports = (): Array<Type | DynamicModule | Promise<DynamicModule
 };
 
 function getControllers() {
-  if (isClerkEnabled()) {
+  if (process.env.NOVU_ENTERPRISE === 'true' || process.env.CI_EE_TEST === 'true') {
     return [EEOrganizationController];
   }
 

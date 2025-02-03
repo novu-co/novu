@@ -1,4 +1,3 @@
-import { isClerkEnabled } from '@novu/shared';
 import { CreateOrganization } from './create-organization/create-organization.usecase';
 import { GetOrganization } from './get-organization/get-organization.usecase';
 import { AddMember } from './membership/add-member/add-member.usecase';
@@ -13,7 +12,7 @@ import { SyncExternalOrganization } from './create-organization/sync-external-or
 
 // TODO: move ee.organization.controller.ts to EE package
 function getEnterpriseUsecases() {
-  if (isClerkEnabled()) {
+  if (process.env.NOVU_ENTERPRISE === 'true' || process.env.CI_EE_TEST === 'true') {
     return [
       {
         provide: 'SyncOrganizationUsecase',

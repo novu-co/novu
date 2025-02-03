@@ -14,7 +14,6 @@ import {
   EmailProviderIdEnum,
   ChangeEntityTypeEnum,
   INotificationTemplateStep,
-  isClerkEnabled,
   WorkflowTypeEnum,
 } from '@novu/shared';
 import {
@@ -550,7 +549,7 @@ describe('Create Notification template from blueprint - /notification-templates 
 
     const blueprint = (await session.testAgent.get(`/v1/blueprints/${blueprintId}`).send()).body.data;
 
-    if (isClerkEnabled()) {
+    if (process.env.NOVU_ENTERPRISE === 'true' || process.env.CI_EE_TEST === 'true') {
       process.env.BLUEPRINT_CREATOR = session.organization._id;
     } else {
       const blueprintOrg = await organizationRepository.create({ name: 'Blueprint Org' });

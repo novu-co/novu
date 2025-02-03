@@ -1,6 +1,5 @@
 /* eslint-disable global-require */
 import { CommunityOrganizationRepository, CommunityUserRepository, CommunityMemberRepository } from '@novu/dal';
-import { isClerkEnabled } from '@novu/shared';
 import { ClerkClientMock } from './clerk-client.mock';
 
 /**
@@ -11,7 +10,7 @@ import { ClerkClientMock } from './clerk-client.mock';
  *
  */
 export function getEERepository<T>(className: 'OrganizationRepository' | 'MemberRepository' | 'UserRepository'): T {
-  if (isClerkEnabled()) {
+  if (process.env.NOVU_ENTERPRISE === 'true' || process.env.CI_EE_TEST === 'true') {
     switch (className) {
       case 'OrganizationRepository':
         return getEEOrganizationRepository();

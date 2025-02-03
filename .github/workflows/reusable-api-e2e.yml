@@ -108,7 +108,6 @@ jobs:
         env:
           LAUNCH_DARKLY_SDK_KEY: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
           CI_EE_TEST: true
-          CLERK_ENABLED: true
           CLERK_ISSUER_URL: ${{ vars.CLERK_ISSUER_URL }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET }}
