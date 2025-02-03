@@ -42,7 +42,6 @@ export const VariablesList = forwardRef<HTMLUListElement, VariablesListProps>(
               key={option.value}
               value={option.value}
               onClick={() => {
-                console.log('onClick onSelect option.value', option.value);
                 onSelect(option.value ?? '');
               }}
             >

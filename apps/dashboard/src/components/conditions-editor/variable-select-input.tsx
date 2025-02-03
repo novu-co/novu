@@ -15,16 +15,12 @@ export interface VariableSelectInputProps {
 }
 
 export const VariableSelectInput = forwardRef<HTMLInputElement, VariableSelectInputProps>(
-  (
-    { inputValue, onOpen, onInputChange, onFocusCapture, onBlurCapture, placeholder, disabled, onKeyDown, leftIcon },
-    ref
-  ) => {
+  ({ onOpen, onInputChange, onFocusCapture, onBlurCapture, placeholder, disabled, onKeyDown, leftIcon }, ref) => {
     return (
       <div className="flex w-full items-center gap-1">
         {leftIcon}
         <InputPure
           ref={ref}
-          value={inputValue}
           onClick={onOpen}
           onChange={onInputChange}
           onFocusCapture={onFocusCapture}

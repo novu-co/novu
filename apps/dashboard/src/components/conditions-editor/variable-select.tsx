@@ -3,11 +3,13 @@ import { CheckIcon } from '@radix-ui/react-icons';
 
 import { Code2 } from '@/components/icons/code-2';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
-import { InputPure, InputRoot, InputWrapper } from '@/components/primitives/input';
+import { InputPure } from '@/components/primitives/input';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { cn } from '@/utils/ui';
 import { VariableSelectCore } from './variable-select-core';
-import { VariableSelectInput } from './variable-select-input';
+import { VariableSelectInput, type VariableSelectInputProps } from './variable-select-input';
+import { useFormContext } from 'react-hook-form';
+import { DIGEST_KEY_KEY } from '../workflow-editor/steps/digest/keys';
 
 const KeyboardItem = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return (
@@ -81,9 +83,11 @@ type VariableSelectProps = {
   value?: string;
   options: Array<{ label: string; value: string }>;
   onChange: (value: string) => void;
+  onSelect: () => void;
   leftIcon?: React.ReactNode;
   title?: string;
   placeholder?: string;
+  InputComponent?: React.ForwardRefExoticComponent<VariableSelectInputProps & React.RefAttributes<HTMLInputElement>>;
 };
 
 /**
@@ -277,12 +281,16 @@ export const VariableSelectLegacy = ({
   );
 };
 
-export function VariableSelect(props: VariableSelectProps) {
-  return <VariableSelectCore {...props} />;
+export function VariableSelect({ value, ...props }: VariableSelectProps) {
+  const [inputValue, setInputValue] = useState(value ?? '');
+
+  return <VariableSelectCore {...props} value={value} inputValue={inputValue} onInputValueChange={setInputValue} />;
 }
 
 export function VariableSelectBlank({ value, onChange, ...props }: VariableSelectProps) {
-  const displayValue = value?.replace('{{', '').replace('}}', '');
+  const { getValues } = useFormContext();
+  const digestKeyField = getValues(`${DIGEST_KEY_KEY}`);
+  const variableExists = Boolean(digestKeyField?.replace('{{', '').replace('}}', '').trim());
 
   const handleChange = (newValue: string) => {
     if (!newValue) {
@@ -292,6 +300,12 @@ export function VariableSelectBlank({ value, onChange, ...props }: VariableSelec
   };
 
   return (
-    <VariableSelectCore {...props} value={displayValue} onChange={handleChange} InputComponent={VariableSelectInput} />
+    <VariableSelectCore
+      {...props}
+      onChange={handleChange}
+      InputComponent={VariableSelectInput}
+      placeholder={variableExists ? 'Variable already selected' : props.placeholder}
+      disabled={props.disabled || variableExists}
+    />
   );
 }

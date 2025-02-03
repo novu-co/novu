@@ -14,6 +14,9 @@ interface VariableSelectCoreProps {
   title?: string;
   placeholder?: string;
   InputComponent?: React.ForwardRefExoticComponent<VariableSelectInputProps & React.RefAttributes<HTMLInputElement>>;
+  inputValue?: string;
+  onInputValueChange?: (value: string) => void;
+  onSelect?: () => void;
 }
 
 const WrappedVariableSelectInput = forwardRef<HTMLInputElement, VariableSelectInputProps>(
@@ -54,8 +57,10 @@ export function VariableSelectCore({
   title = 'Variables',
   placeholder = 'Field',
   InputComponent = WrappedVariableSelectInput,
+  inputValue = '',
+  onInputValueChange,
+  onSelect,
 }: VariableSelectCoreProps) {
-  const [inputValue, setInputValue] = useState(value ?? '');
   const [filterValue, setFilterValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [options, setOptions] = useState(optionsProp);
@@ -133,24 +138,24 @@ export function VariableSelectCore({
     } else if (e.key === 'Enter') {
       if (hoveredOptionIndex !== -1) {
         e.preventDefault();
-        onSelect(filteredOptions[hoveredOptionIndex].value ?? '');
+        handleOnSelect(filteredOptions[hoveredOptionIndex].value ?? '');
         setHoveredOptionIndex(-1);
       }
     }
   };
 
   const addOption = () => {
-    if (hasNoInputOption) {
-      setOptions((oldOptions) => [{ label: inputValue, value: inputValue, name: inputValue }, ...oldOptions]);
+    if (hasNoInputOption && inputValue) {
+      setOptions((oldOptions) => [{ label: inputValue, value: inputValue }, ...oldOptions]);
     }
   };
 
-  const onSelect = (newValue: string) => {
-    console.log('onSelect newValue', newValue);
+  const handleOnSelect = (newValue: string) => {
     setIsOpen(false);
     setFilterValue('');
-    setInputValue(newValue);
+    onInputValueChange?.(newValue);
     onChange(newValue);
+    onSelect?.();
   };
 
   const onOpen = () => {
@@ -163,16 +168,14 @@ export function VariableSelectCore({
     setIsOpen(false);
     setFilterValue('');
     const newInputValue = inputValue !== '' ? inputValue : (value ?? '');
-    console.log('onClose newInputValue', newInputValue);
-    setInputValue(newInputValue);
+    onInputValueChange?.(newInputValue);
     onChange(newInputValue);
   };
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value.trim();
     if (newValue !== inputValue) {
-      console.log('onInputChange newValue', newValue);
-      setInputValue(newValue);
+      onInputValueChange?.(newValue);
       setFilterValue(newValue);
     }
   };
@@ -211,7 +214,7 @@ export function VariableSelectCore({
             ref={variablesListRef}
             hoveredOptionIndex={hoveredOptionIndex}
             options={filteredOptions}
-            onSelect={onSelect}
+            onSelect={handleOnSelect}
             selectedValue={value}
             title={title}
           />
