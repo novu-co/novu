@@ -426,7 +426,7 @@ export class SubscribersV1Controller {
     description:
       'A flag which specifies if the inactive workflow channels should be included in the retrieved preferences. Default is true',
   })
-  @SdkGroupName('Subscribers.Preferences')
+  @SdkGroupName('Subscribers.Preferences.legacy')
   @SdkMethodName('list')
   async listSubscriberPreferences(
     @UserSession() user: UserSessionData,
@@ -469,7 +469,7 @@ export class SubscribersV1Controller {
     description:
       'A flag which specifies if the inactive workflow channels should be included in the retrieved preferences. Default is true',
   })
-  @SdkGroupName('Subscribers.Preferences')
+  @SdkGroupName('Subscribers.Preferences.legacy')
   @SdkMethodName('retrieveByLevel')
   async getSubscriberPreferenceByLevel(
     @UserSession() user: UserSessionData,
@@ -504,8 +504,8 @@ export class SubscribersV1Controller {
   @ApiOperation({
     summary: 'Update subscriber preference',
   })
-  @SdkGroupName('Subscribers.Preferences')
-  @SdkMethodName('updateLegacy')
+  @SdkGroupName('Subscribers.Preferences.legacy')
+  @SdkMethodName('update')
   async updateSubscriberPreference(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,
@@ -553,7 +553,7 @@ export class SubscribersV1Controller {
   @ApiOperation({
     summary: 'Update subscriber global preferences',
   })
-  @SdkGroupName('Subscribers.Preferences')
+  @SdkGroupName('Subscribers.Preferences.legacy')
   @SdkMethodName('updateGlobal')
   async updateSubscriberGlobalPreferences(
     @UserSession() user: UserSessionData,

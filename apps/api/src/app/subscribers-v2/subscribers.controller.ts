@@ -153,8 +153,8 @@ export class SubscribersController {
     description: 'Get subscriber global and workflow specific preferences',
   })
   @ApiResponse(GetSubscriberPreferencesDto)
-  @SdkGroupName('Subscribers.Preferences')
-  @SdkMethodName('retrieve')
+  @SdkGroupName('Subscribers')
+  @SdkMethodName('retrievePreferences')
   async getSubscriberPreferences(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string
@@ -176,8 +176,8 @@ export class SubscribersController {
     description: 'Update subscriber global or workflow specific preferences',
   })
   @ApiResponse(GetSubscriberPreferencesDto)
-  @SdkGroupName('Subscribers.Preferences')
-  @SdkMethodName('update')
+  @SdkGroupName('Subscribers')
+  @SdkMethodName('updatePreferences')
   async updateSubscriberPreferences(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,
