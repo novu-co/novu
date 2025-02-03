@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { CompactButton } from '../primitives/button-compact';
 import { Separator } from '../primitives/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../primitives/tabs';
-import SubscriberOverviewForm from './subscriber-overview-form';
-import useFetchSubscriber from '@/hooks/use-fetch-subscriber';
+import { SubscriberOverviewForm } from './subscriber-overview-form';
+import { useFetchSubscriber } from '@/hooks/use-fetch-subscriber';
 import TruncatedText from '../truncated-text';
 
 const tabTriggerClasses =
