@@ -1,9 +1,9 @@
 import {
+  CreateAndUpdateSubscriberUseCase,
+  GetSubscriberGlobalPreference,
   GetSubscriberPreference,
   GetSubscriberTemplatePreference,
   UpdateSubscriber,
-  CreateSubscriber,
-  GetSubscriberGlobalPreference,
   UpdateSubscriberChannel,
 } from '@novu/application-generic';
 
@@ -28,7 +28,7 @@ export {
 } from './search-by-external-subscriber-ids';
 
 export const USE_CASES = [
-  CreateSubscriber,
+  CreateAndUpdateSubscriberUseCase,
   GetSubscribers,
   GetSubscriber,
   GetSubscriberPreference,

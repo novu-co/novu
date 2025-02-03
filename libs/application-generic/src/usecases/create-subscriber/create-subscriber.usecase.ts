@@ -20,10 +20,10 @@ import {
   UpdateSubscriber,
   UpdateSubscriberCommand,
 } from '../update-subscriber';
-import { CreateSubscriberCommand } from './create-subscriber.command';
+import { CreateOrUpdateSubscriberCommand } from './create-or-update-subscriber.command';
 
 @Injectable()
-export class CreateSubscriber {
+export class CreateAndUpdateSubscriberUseCase {
   constructor(
     private invalidateCache: InvalidateCacheService,
     private subscriberRepository: SubscriberRepository,
@@ -32,7 +32,7 @@ export class CreateSubscriber {
     private analyticsService: AnalyticsService,
   ) {}
 
-  async execute(command: CreateSubscriberCommand) {
+  async execute(command: CreateOrUpdateSubscriberCommand) {
     let subscriber =
       command.subscriber ??
       (await this.fetchSubscriber({
@@ -83,7 +83,7 @@ export class CreateSubscriber {
     return subscriber;
   }
 
-  private async updateCredentials(command: CreateSubscriberCommand) {
+  private async updateCredentials(command: CreateOrUpdateSubscriberCommand) {
     for (const channel of command.channels) {
       await this.updateSubscriberChannel.execute(
         UpdateSubscriberChannelCommand.create({
@@ -100,7 +100,7 @@ export class CreateSubscriber {
     }
   }
 
-  private async createSubscriber(command: CreateSubscriberCommand) {
+  private async createSubscriber(command: CreateOrUpdateSubscriberCommand) {
     try {
       await this.invalidateCache.invalidateByKey({
         key: buildSubscriberKey({

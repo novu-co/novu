@@ -15,8 +15,8 @@ import {
   Res,
 } from '@nestjs/common';
 import {
-  CreateSubscriber,
-  CreateSubscriberCommand,
+  CreateAndUpdateSubscriberUseCase,
+  CreateOrUpdateSubscriberCommand,
   OAuthHandlerEnum,
   UpdateSubscriber,
   UpdateSubscriberChannel,
@@ -119,7 +119,7 @@ import { BulkCreateSubscriberResponseDto } from './dtos/bulk-create-subscriber-r
 @Controller('/subscribers')
 export class SubscribersV1Controller {
   constructor(
-    private createSubscriberUsecase: CreateSubscriber,
+    private createSubscriberUsecase: CreateAndUpdateSubscriberUseCase,
     private bulkCreateSubscribersUsecase: BulkCreateSubscribers,
     private updateSubscriberUsecase: UpdateSubscriber,
     private updateSubscriberChannelUsecase: UpdateSubscriberChannel,
@@ -209,7 +209,7 @@ export class SubscribersV1Controller {
     @Body() body: CreateSubscriberRequestDto
   ): Promise<SubscriberResponseDto> {
     return await this.createSubscriberUsecase.execute(
-      CreateSubscriberCommand.create({
+      CreateOrUpdateSubscriberCommand.create({
         environmentId: user.environmentId,
         organizationId: user.organizationId,
         subscriberId: body.subscriberId,

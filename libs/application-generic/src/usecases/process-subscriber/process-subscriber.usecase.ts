@@ -1,102 +1,124 @@
 import { Injectable } from '@nestjs/common';
-import { SubscriberRepository, SubscriberEntity } from '@novu/dal';
-import { ISubscribersDefine } from '@novu/shared';
+import { SubscriberEntity, SubscriberRepository } from '@novu/dal';
 
+import { ISubscribersDefine } from '@novu/shared';
 import {
-  CreateSubscriber,
-  CreateSubscriberCommand,
+  CreateAndUpdateSubscriberUseCase,
+  CreateOrUpdateSubscriberCommand,
 } from '../create-subscriber';
 import { InstrumentUsecase } from '../../instrumentation';
 import { ProcessSubscriberCommand } from './process-subscriber.command';
-import { buildSubscriberKey, CachedEntity } from '../../services/cache';
+import { buildDedupSubscriberKey, CacheService } from '../../services/cache';
 
 @Injectable()
 export class ProcessSubscriber {
+  private localCache: Set<string> = new Set();
+  private retryCount = 0;
   constructor(
-    private createSubscriberUsecase: CreateSubscriber,
+    private createOrUpdateSubscriberUsecase: CreateAndUpdateSubscriberUseCase,
     private subscriberRepository: SubscriberRepository,
+    private cacheService: CacheService,
   ) {}
 
   @InstrumentUsecase()
   public async execute(
     command: ProcessSubscriberCommand,
   ): Promise<SubscriberEntity | undefined> {
-    const { environmentId, organizationId, subscriber } = command;
-
-    const subscriberEntity = await this.getSubscriber(
-      environmentId,
-      organizationId,
-      subscriber,
+    const subscriberEntity = await this.subscriberRepository.findBySubscriberId(
+      command.environmentId,
+      command.subscriber.subscriberId,
+      false,
     );
 
-    if (subscriberEntity === null) {
-      return undefined;
-    }
-
-    return subscriberEntity;
-  }
-
-  private async getSubscriber(
-    environmentId: string,
-    organizationId: string,
-    subscriberPayload: ISubscribersDefine,
-  ): Promise<SubscriberEntity> {
-    const subscriber = await this.getSubscriberBySubscriberId({
-      _environmentId: environmentId,
-      subscriberId: subscriberPayload.subscriberId,
-    });
-
-    return await this.createOrUpdateSubscriber(
-      environmentId,
-      organizationId,
-      subscriberPayload,
-      subscriber,
-    );
+    return await this.createOrUpdateSubscriber(command, subscriberEntity);
   }
 
   private async createOrUpdateSubscriber(
-    environmentId: string,
-    organizationId: string,
-    subscriberPayload,
-    // TODO: Getting rid of this null would be amazing
-    subscriber?: SubscriberEntity | null,
+    command: ProcessSubscriberCommand,
+    existingSubscriber?: SubscriberEntity,
   ): Promise<SubscriberEntity> {
-    return await this.createSubscriberUsecase.execute(
-      CreateSubscriberCommand.create({
-        environmentId,
-        organizationId,
-        subscriberId: subscriberPayload?.subscriberId,
-        email: subscriberPayload?.email,
-        firstName: subscriberPayload?.firstName,
-        lastName: subscriberPayload?.lastName,
-        phone: subscriberPayload?.phone,
-        avatar: subscriberPayload?.avatar,
-        locale: subscriberPayload?.locale,
-        subscriber: subscriber ?? undefined,
-        data: subscriberPayload?.data,
-        channels: subscriberPayload?.channels,
-      }),
+    if (!existingSubscriber) {
+      if (await this.isCreateInProcess(command)) {
+        return await this.retryIfNotExceeded(command);
+      }
+    }
+
+    return await this.callCreateOrUpdateUsecase(
+      command.environmentId,
+      command.organizationId,
+      command.subscriber,
+      existingSubscriber,
     );
   }
 
-  @CachedEntity({
-    builder: (command: { subscriberId: string; _environmentId: string }) =>
-      buildSubscriberKey({
-        _environmentId: command._environmentId,
-        subscriberId: command.subscriberId,
-      }),
-  })
-  private async getSubscriberBySubscriberId({
-    subscriberId,
-    _environmentId,
-  }: {
-    subscriberId: string;
-    _environmentId: string;
-  }) {
-    return await this.subscriberRepository.findBySubscriberId(
-      _environmentId,
-      subscriberId,
-      true,
+  private async isCreateInProcess(command: ProcessSubscriberCommand) {
+    const cacheKey = buildDedupSubscriberKey({
+      subscriberId: command.subscriber.subscriberId,
+      _environmentId: command.environmentId,
+    });
+
+    let isCached = this.localCache.has(cacheKey);
+    if (isCached) {
+      return true;
+    }
+    this.localCache.add(cacheKey);
+    isCached = !!(await this.cacheService.get(cacheKey));
+    if (isCached) {
+      return true;
+    }
+    await this.cacheService.set(cacheKey, 'true', { ttl: 100 });
+
+    return false;
+  }
+
+  private async retryIfNotExceeded(command: ProcessSubscriberCommand) {
+    if (this.retryCount > 1) {
+      return;
+    }
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+    this.retryCount += 1;
+
+    return this.execute(command);
+  }
+
+  private async callCreateOrUpdateUsecase(
+    environmentId: string,
+    organizationId: string,
+    subscriberPayload: ISubscribersDefine,
+    existingSubscriber,
+  ) {
+    return await this.createOrUpdateSubscriberUsecase.execute(
+      this.buildCommand(
+        environmentId,
+        organizationId,
+        subscriberPayload,
+        existingSubscriber,
+      ),
     );
+  }
+
+  private buildCommand(
+    environmentId: string,
+    organizationId: string,
+    subscriberPayload: ISubscribersDefine,
+    existingSubscriber,
+  ) {
+    return CreateOrUpdateSubscriberCommand.create({
+      environmentId,
+      organizationId,
+      subscriberId: subscriberPayload?.subscriberId,
+      email: subscriberPayload?.email,
+      firstName: subscriberPayload?.firstName,
+      lastName: subscriberPayload?.lastName,
+      phone: subscriberPayload?.phone,
+      avatar: subscriberPayload?.avatar,
+      locale: subscriberPayload?.locale,
+      subscriber: existingSubscriber || undefined,
+      data: subscriberPayload?.data,
+      channels: subscriberPayload?.channels,
+    });
   }
 }
