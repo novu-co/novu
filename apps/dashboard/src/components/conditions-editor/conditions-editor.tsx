@@ -70,6 +70,7 @@ function InternalConditionsEditor({
       controlClassnames={controlClassnames}
       translations={translations}
       accessibleDescriptionGenerator={() => ''}
+      resetOnFieldChange={false}
     />
   );
 }

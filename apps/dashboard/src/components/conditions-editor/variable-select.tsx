@@ -82,6 +82,7 @@ type VariableSelectProps = {
   onChange: (value: string) => void;
   leftIcon?: React.ReactNode;
   title?: string;
+  error?: string;
 };
 
 /**
@@ -97,24 +98,18 @@ type VariableSelectProps = {
 export const VariableSelect = ({
   disabled,
   value,
-  options: optionsProp,
+  options,
   onChange,
   leftIcon,
   title = 'Variables',
+  error,
 }: VariableSelectProps) => {
   const [inputValue, setInputValue] = useState(value ?? '');
   const [filterValue, setFilterValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [options, setOptions] = useState(optionsProp);
   const [hoveredOptionIndex, setHoveredOptionIndex] = useState(0);
   const variablesListRef = useRef<HTMLUListElement>(null);
 
-  const hasNoInputOption = useMemo(
-    () =>
-      inputValue !== '' &&
-      !options.find((option) => option.value?.toLocaleLowerCase() === inputValue.toLocaleLowerCase()),
-    [inputValue, options]
-  );
   const filteredOptions = useMemo(() => {
     if (!filterValue) {
       return options;
@@ -195,12 +190,6 @@ export const VariableSelect = ({
     }
   };
 
-  const addOption = () => {
-    if (hasNoInputOption) {
-      setOptions((oldOptions) => [{ label: inputValue, value: inputValue, name: inputValue }, ...oldOptions]);
-    }
-  };
-
   const onSelect = (newValue: string) => {
     setIsOpen(false);
     setFilterValue('');
@@ -214,7 +203,6 @@ export const VariableSelect = ({
   };
 
   const onClose = () => {
-    addOption();
     setIsOpen(false);
     setFilterValue('');
     const newInputValue = inputValue !== '' ? inputValue : (value ?? '');
@@ -225,27 +213,30 @@ export const VariableSelect = ({
   return (
     <Popover open={isOpen}>
       <PopoverAnchor asChild>
-        <InputRoot size="2xs" className="w-40">
-          <InputWrapper>
-            {leftIcon}
-            <InputPure
-              ref={inputRef}
-              value={inputValue}
-              onClick={onOpen}
-              onChange={onInputChange}
-              onFocusCapture={() => {
-                setHoveredOptionIndex(0);
-                scrollToOption(0);
-              }}
-              // use blur only when there are no filtered options, otherwise it closes the popover on keyboard navigation
-              onBlurCapture={filteredOptions.length === 0 ? onClose : undefined}
-              placeholder="Field"
-              disabled={disabled}
-              onKeyDown={onInputKeyDown}
-              {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-            />
-          </InputWrapper>
-        </InputRoot>
+        <div className="flex w-40 flex-col gap-1">
+          <InputRoot size="2xs" hasError={!!error}>
+            <InputWrapper>
+              {leftIcon}
+              <InputPure
+                ref={inputRef}
+                value={inputValue}
+                onClick={onOpen}
+                onChange={onInputChange}
+                onFocusCapture={() => {
+                  setHoveredOptionIndex(0);
+                  scrollToOption(0);
+                }}
+                // use blur only when there are no filtered options, otherwise it closes the popover on keyboard navigation
+                onBlurCapture={filteredOptions.length === 0 ? onClose : undefined}
+                placeholder="Field"
+                disabled={disabled}
+                onKeyDown={onInputKeyDown}
+                {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+              />
+            </InputWrapper>
+          </InputRoot>
+          {error && <span className="text-destructive text-xs">{error}</span>}
+        </div>
       </PopoverAnchor>
       {filteredOptions.length > 0 && (
         <PopoverContent
