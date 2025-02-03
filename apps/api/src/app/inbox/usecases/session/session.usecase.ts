@@ -3,12 +3,12 @@ import { EnvironmentRepository, IntegrationRepository } from '@novu/dal';
 import { ChannelTypeEnum, InAppProviderIdEnum } from '@novu/shared';
 import {
   AnalyticsService,
-  LogDecorator,
-  CreateSubscriber,
-  CreateSubscriberCommand,
-  SelectIntegrationCommand,
-  SelectIntegration,
   AuthService,
+  CreateAndUpdateSubscriberUseCase,
+  CreateOrUpdateSubscriberCommand,
+  LogDecorator,
+  SelectIntegration,
+  SelectIntegrationCommand,
 } from '@novu/application-generic';
 
 import { ApiException } from '../../../shared/exceptions/api.exception';
@@ -23,7 +23,7 @@ import { NotificationsCountCommand } from '../notifications-count/notifications-
 export class Session {
   constructor(
     private environmentRepository: EnvironmentRepository,
-    private createSubscriber: CreateSubscriber,
+    private createSubscriber: CreateAndUpdateSubscriberUseCase,
     private authService: AuthService,
     private selectIntegration: SelectIntegration,
     private analyticsService: AnalyticsService,
@@ -62,7 +62,7 @@ export class Session {
     }
 
     const subscriber = await this.createSubscriber.execute(
-      CreateSubscriberCommand.create({
+      CreateOrUpdateSubscriberCommand.create({
         environmentId: environment._id,
         organizationId: environment._organizationId,
         subscriberId: command.subscriberId,

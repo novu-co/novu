@@ -2,7 +2,12 @@ import sinon from 'sinon';
 import { expect } from 'chai';
 import { NotFoundException } from '@nestjs/common';
 import { EnvironmentRepository, IntegrationRepository } from '@novu/dal';
-import { AnalyticsService, CreateSubscriber, SelectIntegration, AuthService } from '@novu/application-generic';
+import {
+  AnalyticsService,
+  AuthService,
+  CreateAndUpdateSubscriberUseCase,
+  SelectIntegration,
+} from '@novu/application-generic';
 import { ChannelTypeEnum, InAppProviderIdEnum } from '@novu/shared';
 
 import { Session } from './session.usecase';
@@ -34,7 +39,7 @@ const mockIntegration = {
 describe('Session', () => {
   let session: Session;
   let environmentRepository: sinon.SinonStubbedInstance<EnvironmentRepository>;
-  let createSubscriber: sinon.SinonStubbedInstance<CreateSubscriber>;
+  let createSubscriber: sinon.SinonStubbedInstance<CreateAndUpdateSubscriberUseCase>;
   let authService: sinon.SinonStubbedInstance<AuthService>;
   let selectIntegration: sinon.SinonStubbedInstance<SelectIntegration>;
   let analyticsService: sinon.SinonStubbedInstance<AnalyticsService>;
@@ -42,7 +47,7 @@ describe('Session', () => {
   let integrationRepository: sinon.SinonStubbedInstance<IntegrationRepository>;
   beforeEach(() => {
     environmentRepository = sinon.createStubInstance(EnvironmentRepository);
-    createSubscriber = sinon.createStubInstance(CreateSubscriber);
+    createSubscriber = sinon.createStubInstance(CreateAndUpdateSubscriberUseCase);
     authService = sinon.createStubInstance(AuthService);
     selectIntegration = sinon.createStubInstance(SelectIntegration);
     analyticsService = sinon.createStubInstance(AnalyticsService);
